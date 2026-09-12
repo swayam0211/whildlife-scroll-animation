@@ -27,6 +27,23 @@
             scroll-behavior: auto;
         }
 
+        /* ── LENIS SMOOTH SCROLL NORMALIZER ── */
+        html.lenis, html.lenis body {
+            height: auto;
+        }
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+        .lenis.lenis-scrolling iframe {
+            pointer-events: none;
+        }
+
         body {
             background: #000;
             color: #fff;
@@ -1136,21 +1153,70 @@
             <div class="ring-wrapper cinematic">
                 <div class="ring-disc cinematic" id="cinematic-ring-disc">
                     <div class="ring-half top" id="air-half">
-                        <video class="air-video" src="sec3/air5sec.mp4" muted loop autoplay playsinline></video>
+                        <video class="air-video" src="sec3/air5sec.mp4" data-src="sec3/air5sec.mp4" muted loop autoplay playsinline preload="auto"></video>
                     </div>
                     <div class="ring-mist"></div>
                     <div class="ring-half bottom" id="water-half">
-                        <video class="water-video" src="sec3/water5sec.mp4" muted loop autoplay playsinline></video>
+                        <video class="water-video" src="sec3/water5sec.mp4" data-src="sec3/water5sec.mp4" muted loop autoplay playsinline preload="auto"></video>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- GSAP and Three.js -->
+    <!-- GSAP, Three.js, Lenis, JIT & Hardware Tier Engine -->
+    <script src="tier-engine.js"></script>
+    <script src="lenis.min.js"></script>
+    <script src="jit-engine.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- ══ STEP 1: LENIS MOMENTUM ENGINE & VELOCITY PREDICTOR ══ -->
+    <script>
+        // ── 1. SESSION GUARD: Require login authentication ──
+        if (sessionStorage.getItem('wildlife_auth') !== 'true') {
+            window.location.href = 'login_page/login.html';
+        }
+
+        // ── 2. SCROLL RESTORATION: Always start at top (0,0) on enter/refresh ──
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true,
+            touchMultiplier: 1.8,
+            infinite: false,
+        });
+        lenis.scrollTo(0, { immediate: true });
+
+        // Predictive velocity lookahead predictor
+        window.WildlifeScrollPredictor = {
+            velocity: 0,
+            lookaheadMultiplier: 1.0,
+            update(velocity) {
+                this.velocity = velocity || 0;
+                const absVel = Math.abs(this.velocity);
+                // On fast flick scrolls, dynamically expand lookahead up to 3.5x viewport height
+                this.lookaheadMultiplier = Math.min(3.5, 1.0 + absVel * 0.05);
+            }
+        };
+
+        lenis.on('scroll', (e) => {
+            if (window.ScrollTrigger) ScrollTrigger.update();
+            window.WildlifeScrollPredictor.update(e.velocity);
+        });
+
+        function lenisRaf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(lenisRaf);
+        }
+        requestAnimationFrame(lenisRaf);
+    </script>
 
     <script>
         (() => {
@@ -1331,19 +1397,31 @@
                 }
             }
 
-            /* â”€â”€ VIDEO READY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            function resetToTop() {
+                window.scrollTo(0, 0);
+                if (window.lenis) {
+                    try { window.lenis.scrollTo(0, { immediate: true }); } catch (e) {}
+                }
+                if (video) {
+                    try { video.currentTime = 0; } catch (e) {}
+                }
+                dispTime = 0;
+                targTime = 0;
+            }
+
+            /* ── VIDEO READY ── */
             function onReady() {
-                duration = video.duration;
-                video.currentTime = 0;
-                dispTime = targTime = 0;
+                duration = video.duration || 0;
+                resetToTop();
                 loader.classList.add('hidden');
                 isReady = true;
                 cacheLayout();
                 render();
             }
 
-            /* â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            /* ── INIT ── */
             function init() {
+                resetToTop();
                 video.pause();
                 video.addEventListener('play', () => video.pause());
                 cacheLayout();
@@ -1354,8 +1432,8 @@
                     video.addEventListener('canplaythrough', onReady, { once: true });
                     video.addEventListener('loadedmetadata', () => {
                         if (!isReady) {
-                            duration = video.duration;
-                            video.currentTime = 0;
+                            duration = video.duration || 0;
+                            resetToTop();
                             loader.classList.add('hidden');
                             isReady = true;
                             cacheLayout();
@@ -1366,6 +1444,8 @@
 
                 window.addEventListener('scroll', onScroll, { passive: true });
                 window.addEventListener('resize', () => { cacheLayout(); onScroll(); }, { passive: true });
+                window.addEventListener('pageshow', resetToTop);
+                window.addEventListener('beforeunload', resetToTop);
             }
 
             if (document.readyState === 'loading') {
@@ -1376,13 +1456,15 @@
         })();
     </script>
 
-    <!-- ══ PARTICLE BRIDGE JS ══ -->
+    <!-- ══ PARTICLE BRIDGE JS (JIT BOOTED) ══ -->
     <script>
-        (() => {
+        window.WildlifeJIT.register('particle-bridge-section', () => {
             gsap.registerPlugin(ScrollTrigger);
 
             const pbContainer = document.getElementById('pb-canvas-container');
-            if(!pbContainer) return;
+            if (!pbContainer || pbContainer.dataset.booted) return;
+            pbContainer.dataset.booted = 'true';
+            pbContainer.innerHTML = '';
 
             const pbScene = new THREE.Scene();
             const pbCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
@@ -1390,8 +1472,14 @@
 
             const pbRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             pbRenderer.setSize(window.innerWidth, window.innerHeight);
-            pbRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            const activeDpr = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.maxDpr) || Math.min(window.devicePixelRatio, 2);
+            pbRenderer.setPixelRatio(activeDpr);
             pbContainer.appendChild(pbRenderer.domElement);
+            if (window.WildlifeTierEngine) {
+                window.WildlifeTierEngine.registerWebGLContext(pbRenderer, () => {
+                    if (pbRenderer) pbRenderer.resetState();
+                });
+            }
 
             const PB_TEXT = "SCROLL MORE\nTO SHOW\nNEW ANIMALS";
             const PB_MOUSE_RADIUS = 100;
@@ -1437,7 +1525,7 @@
                 const homePositions = [];
                 const randomValues = [];
 
-                const step = 2.5; // High-density premium stardust
+                const step = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.particleStep) || 2.5; // Hardware-adaptive stardust density
                 for (let y = 0; y < offscreen.height; y += step) {
                     for (let x = 0; x < offscreen.width; x += step) {
                         const i = (Math.floor(y) * offscreen.width + Math.floor(x)) * 4;
@@ -1528,45 +1616,53 @@
                 return pbPoints;
             };
 
-            const pbPoints = setupPBParticles();
+            const buildAndAnimate = () => {
+                const pbPoints = setupPBParticles();
 
-            const pbAnimate = (time) => {
-                requestAnimationFrame(pbAnimate);
-                pbMouse.x = pbLerp(pbMouse.x, pbTargetMouse.x, 0.1);
-                pbMouse.y = pbLerp(pbMouse.y, pbTargetMouse.y, 0.1);
-                pbPoints.material.uniforms.uTime.value = time * 0.001;
-                pbPoints.material.uniforms.uScroll.value = pbScrollProgress;
-                pbRenderer.render(pbScene, pbCamera);
-            };
-            pbAnimate(0);
+                const pbAnimate = (time) => {
+                    requestAnimationFrame(pbAnimate);
+                    pbMouse.x = pbLerp(pbMouse.x, pbTargetMouse.x, 0.1);
+                    pbMouse.y = pbLerp(pbMouse.y, pbTargetMouse.y, 0.1);
+                    pbPoints.material.uniforms.uTime.value = time * 0.001;
+                    pbPoints.material.uniforms.uScroll.value = pbScrollProgress;
+                    pbRenderer.render(pbScene, pbCamera);
+                };
+                pbAnimate(0);
 
-            window.addEventListener('resize', () => {
-                if(pbRenderer) {
-                    pbRenderer.setSize(window.innerWidth, window.innerHeight);
-                    pbCamera.aspect = window.innerWidth / window.innerHeight;
-                    pbCamera.updateProjectionMatrix();
-                }
-            });
-
-            ScrollTrigger.create({
-                trigger: '#particle-bridge-section',
-                start: 'top top',
-                end: '+=400vh', 
-                pin: true,
-                scrub: 0.1,
-                onUpdate: (self) => {
-                    pbScrollProgress = self.progress;
-                    // Fade out near the very end so the handoff to animal ring is clean
-                    const fadeStart = 0.8;
-                    let fade = 1.0;
-                    if(self.progress > fadeStart) {
-                        fade = 1.0 - ((self.progress - fadeStart) / (1.0 - fadeStart));
+                window.addEventListener('resize', () => {
+                    if(pbRenderer) {
+                        pbRenderer.setSize(window.innerWidth, window.innerHeight);
+                        pbCamera.aspect = window.innerWidth / window.innerHeight;
+                        pbCamera.updateProjectionMatrix();
                     }
-                    pbPoints.material.uniforms.uGlobalFade.value = fade;
-                }
-            });
+                });
 
-        })();
+                ScrollTrigger.create({
+                    trigger: '#particle-bridge-section',
+                    start: 'top top',
+                    end: '+=400vh', 
+                    pin: true,
+                    scrub: 0.1,
+                    onUpdate: (self) => {
+                        pbScrollProgress = self.progress;
+                        // Fade out near the very end so the handoff to animal ring is clean
+                        const fadeStart = 0.8;
+                        let fade = 1.0;
+                        if(self.progress > fadeStart) {
+                            fade = 1.0 - ((self.progress - fadeStart) / (1.0 - fadeStart));
+                        }
+                        pbPoints.material.uniforms.uGlobalFade.value = fade;
+                    }
+                });
+                ScrollTrigger.refresh();
+            };
+
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(buildAndAnimate);
+            } else {
+                buildAndAnimate();
+            }
+        });
     </script>
 
     <!-- â•â•â•â• ANIMAL RING JS â•â•â•â• -->
@@ -1711,7 +1807,21 @@
                 onUpdate: function (self) { render(self.progress); }
             });
 
-            /* â”€â”€ CINEMATIC RING LOGIC â”€â”€ */
+            /* ── JIT BOOT FOR CINEMATIC RING ── */
+            if (window.WildlifeJIT) {
+                window.WildlifeJIT.register('ring-cinematic', (sec) => {
+                    const vids = sec.querySelectorAll('video[data-src]');
+                    vids.forEach(v => {
+                        if (!v.src && v.dataset.src) {
+                            v.src = v.dataset.src;
+                            v.load();
+                            v.play().catch(() => {});
+                        }
+                    });
+                });
+            }
+
+            /* ── CINEMATIC RING LOGIC ── */
             const cinematicRing = document.getElementById('cinematic-ring-disc');
             const airHalf = document.getElementById('air-half');
             const waterHalf = document.getElementById('water-half');
@@ -1848,55 +1958,85 @@
                 mouseY = e.clientY;
             });
 
+            /* ── WEB WORKER OFFLOADING FOR MAGNETIC TEXT MATH ── */
+            let physicsWorker = null;
+            if (window.Worker) {
+                try { physicsWorker = new Worker('physics.worker.js'); } catch (e) {}
+            }
+
+            if (physicsWorker) {
+                physicsWorker.onmessage = function (e) {
+                    if (e.data && e.data.type === 'MAGNETIC_TEXT_RESULT') {
+                        const output = e.data.output;
+                        let maxProx = 0;
+                        magneticChars.forEach((c, i) => {
+                            const offset = i * 4;
+                            const moveX = output[offset];
+                            const moveY = output[offset + 1];
+                            const scale = output[offset + 2];
+                            const prox = output[offset + 3];
+
+                            if (prox > maxProx) maxProx = prox;
+
+                            if (prox > 0) {
+                                c.inner.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
+                                c.inner.style.color = '#fff';
+                                c.inner.style.textShadow = '0 0 15px rgba(255,255,255,0.7)';
+                            } else {
+                                c.inner.style.transform = 'translate(0, 0) scale(1)';
+                                c.inner.style.color = 'rgba(255, 255, 255, 0.6)';
+                                c.inner.style.textShadow = 'none';
+                            }
+                        });
+                        glow.style.opacity = (0.3 + 0.6 * maxProx).toString();
+                    }
+                };
+            }
+
             function updateMagneticText() {
                 if (!isHoveringCinematic || cinematicRotationPaused) {
-                    if (cinematicRotationPaused) glow.style.opacity = '0'; // Hide glow when expanded
+                    if (cinematicRotationPaused) glow.style.opacity = '0';
                     requestAnimationFrame(updateMagneticText);
                     return;
                 }
 
-                // Smooth glow position tracking
                 glow.style.left = mouseX + 'px';
                 glow.style.top = mouseY + 'px';
 
-                let maxProx = 0;
+                if (physicsWorker) {
+                    const charData = magneticChars.map(c => {
+                        const innerRect = c.inner.getBoundingClientRect();
+                        return { cx: innerRect.left + innerRect.width / 2, cy: innerRect.top + innerRect.height / 2 };
+                    });
+                    physicsWorker.postMessage({ type: 'MAGNETIC_TEXT', mouseX, mouseY, chars: charData, threshold: 130 });
+                } else {
+                    let maxProx = 0;
+                    magneticChars.forEach(c => {
+                        const innerRect = c.inner.getBoundingClientRect();
+                        const cx = innerRect.left + innerRect.width / 2;
+                        const cy = innerRect.top + innerRect.height / 2;
+                        const dx = mouseX - cx;
+                        const dy = mouseY - cy;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const THRESHOLD = 130;
+                        if (dist < THRESHOLD) {
+                            const prox = 1 - (dist / THRESHOLD);
+                            if (prox > maxProx) maxProx = prox;
+                            const moveX = (dx / dist) * prox * 10;
+                            const moveY = (dy / dist) * prox * 10;
+                            const scale = 1 + (prox * 0.22);
+                            c.inner.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
+                            c.inner.style.color = '#fff';
+                            c.inner.style.textShadow = '0 0 15px rgba(255,255,255,0.7)';
+                        } else {
+                            c.inner.style.transform = 'translate(0, 0) scale(1)';
+                            c.inner.style.color = 'rgba(255, 255, 255, 0.6)';
+                            c.inner.style.textShadow = 'none';
+                        }
+                    });
+                    glow.style.opacity = (0.3 + 0.6 * maxProx).toString();
+                }
 
-                magneticChars.forEach(c => {
-                    const rect = c.wrap.getBoundingClientRect();
-                    // Because .char-wrapper is a tall thin box spanning the diameter, 
-                    // bounding client rect center is the CENTER of the ring, not the letter!
-                    // To get the letter's coordinates, we must get the bounding rect of `inner`!
-                    const innerRect = c.inner.getBoundingClientRect();
-                    const cx = innerRect.left + innerRect.width / 2;
-                    const cy = innerRect.top + innerRect.height / 2;
-
-                    const dx = mouseX - cx;
-                    const dy = mouseY - cy;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-
-                    const THRESHOLD = 130; // Hover trigger distance
-                    if (dist < THRESHOLD) {
-                        const prox = 1 - (dist / THRESHOLD);
-                        if (prox > maxProx) maxProx = prox;
-
-                        // Push slightly away or pull toward? "moves slightly toward cursor"
-                        const moveX = (dx / dist) * prox * 10;
-                        const moveY = (dy / dist) * prox * 10;
-
-                        const scale = 1 + (prox * 0.22);
-
-                        c.inner.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
-                        c.inner.style.color = '#fff';
-                        c.inner.style.textShadow = '0 0 15px rgba(255,255,255,0.7)';
-                    } else {
-                        c.inner.style.transform = 'translate(0, 0) scale(1)';
-                        c.inner.style.color = 'rgba(255, 255, 255, 0.6)';
-                        c.inner.style.textShadow = 'none';
-                    }
-                });
-
-                // Diffused glow intensity boosts
-                glow.style.opacity = (0.3 + 0.6 * maxProx).toString();
                 requestAnimationFrame(updateMagneticText);
             }
             updateMagneticText();

@@ -11,12 +11,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
 
-    <!-- Three.js Library -->
+    <!-- Hardware Tier, Lenis & Three.js Library -->
+    <script src="../tier-engine.js"></script>
+    <script src="../lenis.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
 
     <style>
+        /* ── LENIS SMOOTH SCROLL NORMALIZER ── */
+        html.lenis, html.lenis body {
+            height: auto;
+        }
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+
         /* ── VARIABLES ── */
         :root {
             --glass-bg: rgba(14, 21, 33, 0.45);
@@ -576,6 +586,9 @@
             form.addEventListener('submit', (e) => {
                 e.preventDefault(); // Prevent standard page reload
 
+                // Set authenticated flag in session storage
+                sessionStorage.setItem('wildlife_auth', 'true');
+
                 // Subtly press the button
                 btn.style.transform = 'scale(0.96)';
 
@@ -601,6 +614,11 @@
             const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            if (window.WildlifeTierEngine) {
+                window.WildlifeTierEngine.registerWebGLContext(renderer, () => {
+                    if (renderer) renderer.resetState();
+                });
+            }
 
             // Cinematic Lighting Setup
             const ambientLight = new THREE.AmbientLight(0xffedd1, 0.6); // Soft warm ambient
@@ -737,20 +755,28 @@
                 });
             };
 
-            // ── MODEL LOADING (Perfected Alignments) ──
-            loader.load('lion-3.glb', (gltf) => {
-                setupModel(gltf, 'lion', 2.5, 2.5, 2.5, 0, 0, 0, -4.5, 0.2, -5);
-            }, undefined, (e) => console.log('Lion loading skipped/failed:', e));
+            // ── JIT MODEL LOADING (Non-blocking background idle load) ──
+            const bootModelsJIT = () => {
+                loader.load('lion-3.glb', (gltf) => {
+                    setupModel(gltf, 'lion', 2.5, 2.5, 2.5, 0, 0, 0, -4.5, 0.2, -5);
+                }, undefined, (e) => console.log('Lion loading skipped/failed:', e));
 
-            loader.load('eagle-3.glb', (gltf) => {
-                // Tilted UP to face the camera directly
-                setupModel(gltf, 'eagle', 3.0, 3.0, 3.0, -0.35, 0, 0, -4, 3.5, -4);
-            }, undefined, (e) => console.log('Eagle loading skipped/failed:', e));
+                loader.load('eagle-3.glb', (gltf) => {
+                    // Tilted UP to face the camera directly
+                    setupModel(gltf, 'eagle', 3.0, 3.0, 3.0, -0.35, 0, 0, -4, 3.5, -4);
+                }, undefined, (e) => console.log('Eagle loading skipped/failed:', e));
 
-            loader.load('crock-3.glb', (gltf) => {
-                // Grounded Croc - lowered and tilted forward for a more natural pose
-                setupModel(gltf, 'croc', 4.5, 4.5, 4.5, 0.15, 0, 0, -1.2, -0.7, -6);
-            }, undefined, (e) => console.log('Croc loading skipped/failed:', e));
+                loader.load('crock-3.glb', (gltf) => {
+                    // Grounded Croc - lowered and tilted forward for a more natural pose
+                    setupModel(gltf, 'croc', 4.5, 4.5, 4.5, 0.15, 0, 0, -1.2, -0.7, -6);
+                }, undefined, (e) => console.log('Croc loading skipped/failed:', e));
+            };
+
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(bootModelsJIT, { timeout: 800 });
+            } else {
+                setTimeout(bootModelsJIT, 50);
+            }
 
             /* ── AMBIENT PARTICLES ENGINE ── */
             const pContainer = document.getElementById('particle-container');
