@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Water World — Submerged Realm & Oceanic 3D Corridor</title>
+    <meta name="description"
+        content="Dive into the aquatic sanctuary featuring real-time scroll video scrubbing, dolphin spotlight card at 5.5s, 3D continuous ocean room corridor, and WebGL liquid temple flow animation." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://db.onlinewebfonts.com/c/a3e23614fd0c8f24eb253631c8e2cd44?family=CF+One+Two+Trees+Regular"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;600&family=Outfit:wght@300;400;600;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: auto;
+        }
+
+        /* ── LENIS SMOOTH SCROLL NORMALIZER ── */
+        html.lenis,
+        html.lenis body {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+
+        .lenis.lenis-scrolling iframe {
+            pointer-events: none;
+        }
+
+        body {
+            background: #010a14;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ── HEADER / NAVIGATION ── */
+        .water-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .water-nav * {
+            pointer-events: auto;
+        }
+
+        .nav-logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #00e5ff;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+            text-decoration: none;
+        }
+
+        .nav-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 10px 22px;
+            border-radius: 30px;
+            background: rgba(1, 15, 30, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .nav-back-btn:hover {
+            color: #00e5ff;
+            border-color: rgba(0, 229, 255, 0.8);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.35);
+            transform: translateY(-2px);
+        }
+
+        /* ── LOADER ── */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #010a14;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity .8s, visibility .8s;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-ring {
+            width: 48px;
+            height: 48px;
+            border: 1.5px solid rgba(0, 229, 255, .15);
+            border-top-color: rgba(0, 229, 255, .9);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        .loader-text {
+            font-size: .65rem;
+            letter-spacing: .35em;
+            text-transform: uppercase;
+            color: rgba(0, 229, 255, .6);
+        }
+
+        /* ══ SECTION 1: HERO SCROLL STAGE ══ */
+        #scroll-stage {
+            position: relative;
+            height: 900vh;
+        }
+
+        #hero-sticky {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #010a14;
+        }
+
+        #hero-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        #clip-top,
+        #clip-bot {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            will-change: clip-path;
+            pointer-events: none;
+        }
+
+        #clip-top {
+            background: #010a14;
+            clip-path: inset(0 0 50% 0);
+        }
+
+        #clip-bot {
+            background: #010a14;
+            clip-path: inset(50% 0 0 0);
+        }
+
+        #gap-fill {
+            position: absolute;
+            inset: 0;
+            background: #000812;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #vignette {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            pointer-events: none;
+            background: radial-gradient(ellipse 85% 65% at 50% 50%, transparent 35%, rgba(1, 10, 20, .6) 100%),
+                linear-gradient(to bottom, rgba(1, 10, 20, .4) 0%, transparent 25%, transparent 70%, rgba(1, 10, 20, .7) 100%);
+        }
+
+        #seam {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 15;
+            pointer-events: none;
+            transform: translate3d(0, -50%, 0);
+            opacity: 0;
+            background: linear-gradient(90deg, transparent 5%, rgba(0, 229, 255, .7) 30%, rgba(120, 240, 255, .9) 50%, rgba(0, 229, 255, .7) 70%, transparent 95%);
+            box-shadow: 0 0 20px 8px rgba(0, 229, 255, .4);
+        }
+
+        #hero-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            text-align: center;
+            padding: 0 1.5rem;
+            pointer-events: none;
+            transform: translate3d(0, 0, 0);
+            will-change: opacity, transform;
+        }
+
+        .eyebrow {
+            font-size: clamp(.6rem, .9vw, .78rem);
+            font-weight: 300;
+            letter-spacing: .36em;
+            text-transform: uppercase;
+            color: #00e5ff;
+            margin-bottom: 1.6rem;
+            text-shadow: 0 0 15px rgba(0, 229, 255, .5);
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.8rem, 7vw, 7rem);
+            font-weight: 300;
+            line-height: 1.07;
+            letter-spacing: -.01em;
+            color: #fff;
+            text-shadow: 0 2px 40px rgba(0, 0, 0, .8);
+            max-width: 850px;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: #7ee6ff;
+        }
+
+        .hero-divider {
+            width: 45px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, .8), transparent);
+            margin: 1.7rem auto;
+        }
+
+        .hero-sub {
+            font-size: clamp(.82rem, 1.4vw, 1rem);
+            font-weight: 300;
+            letter-spacing: .06em;
+            color: rgba(255, 255, 255, .65);
+            max-width: 480px;
+            line-height: 1.72;
+        }
+
+        .scroll-cue {
+            position: absolute;
+            bottom: 2.4rem;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .45rem;
+            z-index: 10;
+            pointer-events: none;
+            will-change: opacity;
+        }
+
+        .scroll-cue span {
+            font-size: .6rem;
+            letter-spacing: .3em;
+            text-transform: uppercase;
+            color: rgba(0, 229, 255, .6);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 38px;
+            background: linear-gradient(to bottom, rgba(0, 229, 255, .6), transparent);
+            animation: pulse 2.2s ease-in-out infinite;
+        }
+
+        #progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            width: 100%;
+            z-index: 30;
+            pointer-events: none;
+            background: linear-gradient(90deg, rgba(0, 229, 255, .8), rgba(120, 240, 255, .95));
+            box-shadow: 0 0 10px rgba(0, 229, 255, .7);
+            transform-origin: left center;
+            transform: scaleX(0);
+            will-change: transform;
+        }
+
+        /* ══ DOLPHIN SPOTLIGHT CARD (Reveals at 5.5s video mark) ══ */
+        #dolphin-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: min(880px, 94vw);
+            height: min(68vh, 580px);
+            z-index: 20;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate3d(-50%, -50%, 0) scale(.82);
+            will-change: opacity, transform;
+        }
+
+        .card-panels {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            gap: 10px;
+            padding: 0 20px;
+            align-items: stretch;
+            opacity: 0;
+            transform: translate3d(0, 30px, 0);
+            will-change: opacity, transform;
+        }
+
+        .card-panel {
+            flex: 1;
+            border-radius: 16px 16px 0 0;
+            border: 1px solid rgba(0, 229, 255, .2);
+            border-bottom: none;
+            background: linear-gradient(180deg, rgba(0, 229, 255, .08) 0%, rgba(0, 180, 230, .04) 60%, rgba(1, 20, 40, .25) 100%);
+        }
+
+        .card-panel:nth-child(2) {
+            background: linear-gradient(180deg, rgba(0, 229, 255, .12) 0%, rgba(0, 180, 230, .06) 60%, rgba(1, 30, 55, .3) 100%);
+        }
+
+        .card-title-bg {
+            position: absolute;
+            top: 6%;
+            left: 50%;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3.4rem, 8vw, 7.2rem);
+            font-weight: 300;
+            letter-spacing: .28em;
+            white-space: nowrap;
+            color: rgba(220, 248, 255, .95);
+            text-shadow:
+                0 2px 30px rgba(0, 0, 0, .9),
+                0 0 80px rgba(0, 229, 255, .4),
+                0 4px 60px rgba(0, 0, 0, .6);
+            z-index: 9;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate3d(-50%, 0, 0) translate3d(-40px, 0, 0);
+            will-change: opacity, transform;
+        }
+
+        .card-animal {
+            position: absolute;
+            bottom: 8%;
+            left: 56%;
+            width: min(420px, 56%);
+            max-height: 70%;
+            z-index: 7;
+            opacity: 0;
+            transform: translate3d(-50%, 28px, 0) scale(.88);
+            will-change: opacity, transform;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-animal img {
+            width: 100%;
+            height: auto;
+            max-height: 380px;
+            object-fit: contain;
+            border-radius: 16px;
+            display: block;
+            border: 1px solid rgba(0, 229, 255, 0.35);
+        }
+
+        .card-animal.floating img {
+            animation: float 6s ease-in-out infinite, breathe 4s ease-in-out infinite alternate;
+        }
+
+        .card-label {
+            position: absolute;
+            top: 1.8rem;
+            left: 50%;
+            font-size: .65rem;
+            font-weight: 600;
+            letter-spacing: .4em;
+            text-transform: uppercase;
+            color: #00e5ff;
+            white-space: nowrap;
+            z-index: 12;
+            text-shadow: 0 1px 12px rgba(0, 0, 0, .9), 0 0 30px rgba(0, 229, 255, .6);
+            opacity: 0;
+            transform: translate3d(-50%, -18px, 0);
+            will-change: opacity, transform;
+        }
+
+        .card-desc {
+            position: absolute;
+            left: 5%;
+            top: 36%;
+            max-width: min(230px, 32%);
+            font-size: .85rem;
+            font-weight: 300;
+            line-height: 1.85;
+            color: rgba(220, 245, 255, .95);
+            text-align: left;
+            z-index: 12;
+            text-shadow: 0 1px 10px rgba(0, 0, 0, .9), 0 0 25px rgba(0, 0, 0, .5);
+            opacity: 0;
+            transform: translate3d(-30px, 0, 0);
+            will-change: opacity, transform;
+        }
+
+        .card-stats {
+            position: absolute;
+            bottom: 3%;
+            left: 5%;
+            display: flex;
+            gap: .7rem;
+            z-index: 12;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translate3d(0, 20px, 0);
+            will-change: opacity, transform;
+        }
+
+        .card-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .3rem;
+            padding: .65rem 1.1rem;
+            border-radius: 10px;
+            min-width: 105px;
+            background: rgba(1, 15, 30, .75);
+            border: 1px solid rgba(0, 229, 255, .35);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .5);
+        }
+
+        .stat-val {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #00e5ff;
+            text-shadow: 0 1px 8px rgba(0, 229, 255, .5);
+        }
+
+        .stat-key {
+            font-size: .55rem;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: rgba(200, 240, 255, .7);
+        }
+
+        /* ══ STICKY 3D TUNNEL PORTAL TRANSITION STAGE (SECTIONS 2 & 3) ══ */
+        #corridor-transition-stage {
+            position: relative;
+            height: 380vh;
+            background: #010a14;
+            z-index: 40;
+        }
+
+        #corridor-sticky-wrapper {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #010a14;
+        }
+
+        #ocean-corridor-section {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #010a14;
+            z-index: 1;
+        }
+
+        #room-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 1;
+        }
+
+        .corridor-hero-content {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            width: 90%;
+            max-width: 900px;
+            will-change: opacity, transform;
+            transition: opacity 0.2s ease-out;
+        }
+
+        /* ══ EXPANDING PORTAL WRAPPER (SECTION 3) ══ */
+        #water-portal-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            height: 180px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 229, 255, 0.7);
+            box-shadow: 0 0 45px rgba(0, 229, 255, 0.5), inset 0 0 25px rgba(0, 229, 255, 0.3);
+            overflow: hidden;
+            z-index: 20;
+            background: url('last%20section/image.png') center/cover no-repeat #010810;
+            will-change: width, height, border-radius, box-shadow, opacity;
+            pointer-events: auto;
+        }
+
+        #water-canvas-container {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .water-hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            width: 90%;
+            max-width: 900px;
+            opacity: 0;
+            will-change: opacity, transform;
+        }
+
+        .water-subtitle {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: #00e5ff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.8);
+        }
+
+        .water-title {
+            font-family: "CF One Two Trees Regular", "Outfit", sans-serif;
+            font-size: clamp(3rem, 7vw, 6.5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 30%, #7ee6ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 40px rgba(0, 229, 255, 0.35);
+            margin-bottom: 25px;
+        }
+
+        .water-description {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 620px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+
+        /* ── KEYFRAMES ── */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: .45;
+                transform: scaleY(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scaleY(1.18);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-7px);
+            }
+        }
+
+        @keyframes breathe {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.013);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ══ HEADER / NAV ══ -->
+    <header class="water-nav">
+        <a href="index.html" class="nav-logo">WILDLIFE</a>
+        <a href="index.html" class="nav-back-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Return Home
+        </a>
+    </header>
+
+    <!-- ══ LOADER ══ -->
+    <div id="loader">
+        <div class="loader-ring"></div>
+        <p class="loader-text">Submerging into Water Realm</p>
+    </div>
+
+    <!-- ══ SECTION 1: HERO SCROLL STAGE ══ -->
+    <section id="scroll-stage">
+        <div id="hero-sticky">
+            <div id="gap-fill"></div>
+
+            <!-- Scroll Scrub Video -->
+            <video id="hero-video" preload="auto" muted playsinline webkit-playsinline>
+                <source src="last section/Realistic_Horse_and_Dolphin_Video.mp4" type="video/mp4" />
+            </video>
+
+            <!-- Clip Overlays -->
+            <div id="clip-top"></div>
+            <div id="clip-bot"></div>
+            <div id="vignette"></div>
+            <div id="seam"></div>
+
+            <!-- Hero Intro Text -->
+            <div id="hero-text">
+                <p class="eyebrow">A Cinematic Marine Experience</p>
+                <h1 class="hero-title">Discover the <em>Depth</em> of the Abyss</h1>
+                <div class="hero-divider"></div>
+                <p class="hero-sub">Witness the mystery, intelligence, and endless flow of ocean life.</p>
+            </div>
+
+            <div class="scroll-cue" id="scroll-cue">
+                <span>Scroll Down</span>
+                <div class="scroll-line"></div>
+            </div>
+
+            <!-- Dolphin Spotlight Card (Triggers at 5.5s video scrubbing mark) -->
+            <div id="dolphin-card">
+                <div class="card-panels" id="card-panels">
+                    <div class="card-panel"></div>
+                    <div class="card-panel"></div>
+                    <div class="card-panel"></div>
+                </div>
+                <h2 class="card-title-bg" id="card-title-bg">DOLPHINS</h2>
+                <div class="card-animal" id="card-animal">
+                    <img src="last section/dolphin.png" alt="Bottlenose Dolphins Underwater" />
+                </div>
+                <p class="card-label" id="card-label">Ocean Archive — Bottlenose</p>
+                <p class="card-desc" id="card-desc">
+                    Master navigators of the oceanic abyss, dolphins utilize sophisticated echolocation and playful social bonding to thrive in Earth's deepest waters.
+                </p>
+                <div class="card-stats" id="card-stats">
+                    <div class="card-stat"><span class="stat-val">35 km/h</span><span class="stat-key">Speed</span></div>
+                    <div class="card-stat"><span class="stat-val">300m+</span><span class="stat-key">Depth</span></div>
+                    <div class="card-stat"><span class="stat-val">Top 0.1%</span><span class="stat-key">IQ Rank</span></div>
+                </div>
+            </div>
+
+            <div id="progress-bar"></div>
+        </div>
+    </section>
+
+    <!-- ══ STICKY 3D TUNNEL PORTAL TRANSITION STAGE (SECTIONS 2 & 3) ══ -->
+    <div id="corridor-transition-stage">
+        <div id="corridor-sticky-wrapper">
+            <!-- Section 2: 3D Continuous Ocean Room Corridor -->
+            <section id="ocean-corridor-section">
+                <canvas id="room-canvas"></canvas>
+                <div class="corridor-hero-content" id="corridor-hero-content">
+                    <div class="water-subtitle">Oceanic Depth Gallery</div>
+                    <h2 class="water-title">SUBMERGED SANCTUARY</h2>
+                    <p class="water-description">
+                        Traverse the infinite 3D underwater corridor featuring Earth's most remarkable river and ocean creatures.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 3: Expanding Water Flow Shader Portal -->
+            <div id="water-portal-wrapper">
+                <div id="water-canvas-container"></div>
+                <div class="water-hero-content" id="water-hero-content">
+                    <div class="water-subtitle">The Sunken Sanctuary</div>
+                    <h1 class="water-title">SUBMERGED REALM</h1>
+                    <p class="water-description">
+                        Experience the endless depth of the ancient underwater temple with continuous real-time liquid motion.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ DEPENDENCIES ══ -->
+    <script src="tier-engine.js"></script>
+    <script src="lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="roomEngine.js"></script>
+
+    <!-- ══ MAIN WATER REALM CONTROLLER ══ -->
+    <script>
+        // Session Check
+        if (sessionStorage.getItem('wildlife_auth') !== 'true') {
+            window.location.href = 'login_page/login.html';
+        }
+
+        // Initialize Lenis
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true,
+            touchMultiplier: 1.0
+        });
+
+        lenis.on('scroll', (e) => {
+            if (window.ScrollTrigger) ScrollTrigger.update();
+            if (window.WildlifeScrollPredictor) window.WildlifeScrollPredictor.update(e.velocity);
+        });
+
+        function lenisRaf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(lenisRaf);
+        }
+        requestAnimationFrame(lenisRaf);
+
+        /* ── SECTION 1: HERO VIDEO SCRUB & 5.5s DOLPHIN CARD SPLIT ── */
+        (() => {
+            const video = document.getElementById('hero-video');
+            const clipTop = document.getElementById('clip-top');
+            const clipBot = document.getElementById('clip-bot');
+            const heroText = document.getElementById('hero-text');
+            const scrollCue = document.getElementById('scroll-cue');
+            const card = document.getElementById('dolphin-card');
+            const panels = document.getElementById('card-panels');
+            const animalImg = document.getElementById('card-animal');
+            const titleBg = document.getElementById('card-title-bg');
+            const labelEl = document.getElementById('card-label');
+            const descEl = document.getElementById('card-desc');
+            const statsEl = document.getElementById('card-stats');
+            const seamEl = document.getElementById('seam');
+            const progBar = document.getElementById('progress-bar');
+            const loader = document.getElementById('loader');
+
+            let duration = 0, isReady = false;
+            let dispTime = 0, targTime = 0;
+            let floating = false;
+
+            let stageH = 1, winH = 1;
+            function cacheLayout() {
+                const stage = document.getElementById('scroll-stage');
+                winH = window.innerHeight;
+                stageH = stage ? stage.offsetHeight - winH : 1;
+            }
+
+            const LERP = 0.10, MAX_STEP = 0.20;
+
+            let TARGET_CARD_TIME = 5.5; 
+            let T = {
+                TEXT_HOLD: 0.35, TEXT_GONE: 0.45,
+                SPLIT_OPEN: 0.48, SPLIT_FULL: 0.58,
+                SPLIT_CLOSE: 0.72, SPLIT_DONE: 0.82
+            };
+
+            function updateTimelineMapping() {
+                if (duration <= 0) return;
+                const pTarget = Math.min(0.85, Math.max(0.2, TARGET_CARD_TIME / duration));
+                T.TEXT_HOLD = Math.max(0.1, pTarget - 0.14);
+                T.TEXT_GONE = Math.max(0.15, pTarget - 0.04);
+                T.SPLIT_OPEN = pTarget;
+                T.SPLIT_FULL = Math.min(0.9, pTarget + 0.10);
+                T.SPLIT_CLOSE = Math.min(0.95, pTarget + 0.24);
+                T.SPLIT_DONE = Math.min(0.98, pTarget + 0.30);
+            }
+
+            function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+            function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+            function ss(t) { return t * t * (3 - 2 * t); }
+            function beat(sp, s, e) { return ss(clamp01((sp - s) / (e - s))); }
+            function getP() { return stageH > 0 ? clamp01(window.scrollY / stageH) : 0; }
+
+            function splitProg(p) {
+                if (p < T.SPLIT_OPEN) return 0;
+                if (p < T.SPLIT_FULL) return ss((p - T.SPLIT_OPEN) / (T.SPLIT_FULL - T.SPLIT_OPEN));
+                if (p < T.SPLIT_CLOSE) return 1;
+                if (p < T.SPLIT_DONE) return ss(1 - (p - T.SPLIT_CLOSE) / (T.SPLIT_DONE - T.SPLIT_CLOSE));
+                return 0;
+            }
+
+            let lastSeekMs = 0;
+            const SEEK_INTERVAL = 50;
+            const HAS_FAST_SEEK = typeof HTMLVideoElement.prototype.fastSeek === 'function';
+
+            function doSeek(t) {
+                if (video.seeking) return;
+                const now = performance.now();
+                if (now - lastSeekMs < SEEK_INTERVAL) return;
+                lastSeekMs = now;
+                if (HAS_FAST_SEEK) { video.fastSeek(t); } else { video.currentTime = t; }
+            }
+
+            function videoLerp() {
+                if (!isReady || duration <= 0) return;
+                const d = targTime - dispTime;
+                if (d > -0.008 && d < 0.008) {
+                    dispTime = targTime;
+                    doSeek(dispTime);
+                    return;
+                }
+                let step = d * LERP;
+                if (step > MAX_STEP) step = MAX_STEP;
+                else if (step < -MAX_STEP) step = -MAX_STEP;
+                dispTime = clamp(dispTime + step, 0, duration - 0.001);
+                doSeek(dispTime);
+            }
+
+            gsap.ticker.add(videoLerp);
+
+            function render() {
+                if (!isReady || duration <= 0) return;
+                const p = getP();
+                const sp = splitProg(p);
+                const gapPct = sp * 22;
+
+                targTime = clamp(p * duration, 0, duration - 0.001);
+                progBar.style.transform = `scaleX(${dispTime / duration})`;
+
+                const topEnd = 50 - gapPct / 2;
+                const botStart = 50 + gapPct / 2;
+                if (gapPct < 0.1) {
+                    video.style.clipPath = 'none';
+                } else {
+                    video.style.clipPath = `polygon(0% 0%, 100% 0%, 100% ${topEnd}%, 0% ${topEnd}%, 0% ${botStart}%, 100% ${botStart}%, 100% 100%, 0% 100%)`;
+                }
+                clipTop.style.display = 'none';
+                clipBot.style.display = 'none';
+
+                seamEl.style.opacity = sp;
+
+                let ta;
+                if (p < T.TEXT_HOLD) ta = 1;
+                else if (p < T.TEXT_GONE) ta = 1 - (p - T.TEXT_HOLD) / (T.TEXT_GONE - T.TEXT_HOLD);
+                else ta = 0;
+
+                heroText.style.opacity = ta;
+                heroText.style.transform = `translate3d(0,${(1 - ta) * -12}px,0)`;
+                scrollCue.style.opacity = ta;
+
+                const cardScale = 0.82 + 0.18 * sp;
+                const cardY = (1 - sp) * 44;
+                card.style.opacity = sp;
+                card.style.transform = `translate3d(-50%,-50%,0) translate3d(0,${cardY}px,0) scale(${cardScale})`;
+
+                const bP = beat(sp, 0.00, 0.28);
+                panels.style.opacity = bP;
+                panels.style.transform = `translate3d(0,${(1 - bP) * 30}px,0)`;
+
+                const bE = beat(sp, 0.18, 0.46);
+                animalImg.style.opacity = bE;
+                animalImg.style.transform = `translate3d(-50%,${(1 - bE) * 28}px,0) scale(${0.88 + 0.12 * bE})`;
+                if (bE >= 0.98 && !floating) { animalImg.classList.add('floating'); floating = true; }
+                if (bE < 0.98 && floating) { animalImg.classList.remove('floating'); floating = false; }
+
+                const bT = beat(sp, 0.30, 0.56);
+                titleBg.style.opacity = bT;
+                titleBg.style.transform = `translate3d(-50%,0,0) translate3d(${(1 - bT) * -40}px,0,0)`;
+
+                const bL = beat(sp, 0.38, 0.60);
+                labelEl.style.opacity = bL;
+                labelEl.style.transform = `translate3d(-50%,${(1 - bL) * -18}px,0)`;
+
+                const bD = beat(sp, 0.50, 0.72);
+                descEl.style.opacity = bD;
+                descEl.style.transform = `translate3d(${(1 - bD) * -30}px,0,0)`;
+
+                const bS = beat(sp, 0.62, 0.84);
+                statsEl.style.opacity = bS;
+                statsEl.style.transform = `translate3d(0,${(1 - bS) * 20}px,0)`;
+            }
+
+            window.addEventListener('scroll', render, { passive: true });
+            window.addEventListener('resize', () => { cacheLayout(); render(); });
+
+            function initVideo() {
+                duration = video.duration;
+                if (!duration || isNaN(duration)) return;
+                isReady = true;
+                updateTimelineMapping();
+                cacheLayout();
+
+                if (loader) loader.classList.add('hidden');
+                video.currentTime = 0;
+                render();
+            }
+
+            if (video.readyState >= 1) {
+                initVideo();
+            } else {
+                video.addEventListener('loadedmetadata', initVideo);
+            }
+            setTimeout(() => { if (!isReady) initVideo(); }, 2500);
+        })();
+
+        /* ── SECTION 2: 3D CONTINUOUS OCEAN ROOM CORRIDOR (PERMANENT LIFECYCLE) ── */
+        (() => {
+            const marineImages = [
+                'last section/images of sec2,3/Blue Sea Dragon.png',
+                'last section/images of sec2,3/Blue Whale.png',
+                'last section/images of sec2,3/Mantis Shrimp.png',
+                'last section/images of sec2,3/Octopus.png',
+                'last section/images of sec2,3/gerat white shark.png',
+                'last section/images of sec2,3/jellyfish.png',
+                'last section/images of sec2,3/seahorse.png',
+                'last section/images of sec2,3/wagel ray.png',
+                'last section/images of sec2,3/white beluga whale.png'
+            ];
+
+            window.bootOceanCorridor = () => {
+                if (!window.oceanRoomInstance) {
+                    const canvas = document.getElementById('room-canvas');
+                    if (canvas && window.OceanRoomEngine) {
+                        window.oceanRoomInstance = new window.OceanRoomEngine('#room-canvas', marineImages);
+                    }
+                } else {
+                    window.oceanRoomInstance.resume();
+                }
+            };
+
+            window.pauseOceanCorridor = () => {
+                if (window.oceanRoomInstance) {
+                    window.oceanRoomInstance.pause();
+                }
+            };
+        })();
+
+        /* ── SECTION 3: SUNKEN TEMPLE WATER FLOW SHADER (PERMANENT LIFECYCLE) ── */
+        (() => {
+            let scene, camera, renderer, mesh, waterMaterial, rafId, isPaused = false;
+
+            window.bootWaterShader = () => {
+                const container = document.getElementById('water-canvas-container');
+                if (!container) return;
+
+                if (!renderer) {
+                    container.innerHTML = '';
+                    scene = new THREE.Scene();
+                    camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+                    camera.position.z = 1;
+
+                    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    const dpr = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.maxDpr) || Math.min(window.devicePixelRatio, 2);
+                    renderer.setPixelRatio(dpr);
+                    container.appendChild(renderer.domElement);
+
+                    if (window.WildlifeTierEngine) {
+                        window.WildlifeTierEngine.registerWebGLContext(renderer, () => {
+                            if (renderer) renderer.resetState();
+                        });
+                    }
+
+                    const canvasPlaceholder = document.createElement('canvas');
+                    canvasPlaceholder.width = 2;
+                    canvasPlaceholder.height = 2;
+                    const ctx = canvasPlaceholder.getContext('2d');
+                    ctx.fillStyle = '#011526';
+                    ctx.fillRect(0, 0, 2, 2);
+                    const defaultTexture = new THREE.CanvasTexture(canvasPlaceholder);
+
+                    const vertexShader = `
+                        varying vec2 vUv;
+                        void main() {
+                            vUv = uv;
+                            gl_Position = vec4(position, 1.0);
+                        }
+                    `;
+
+                    const fragmentShader = `
+                        uniform sampler2D uTexture;
+                        uniform float uTime;
+                        varying vec2 vUv;
+
+                        void main() {
+                            vec2 uv = vUv;
+                            float time = uTime * 0.5;
+                            float intensity = 1.95;
+
+                            float wave1 = sin(uv.y * 16.0 + uv.x * 10.0 + time * 2.0) * 0.0045 * intensity;
+                            float wave2 = cos(uv.y * 24.0 - uv.x * 14.0 + time * 1.6) * 0.0035 * intensity;
+                            float wave3 = sin(uv.x * 20.0 + time * 1.2) * 0.003 * intensity;
+
+                            vec2 offset = vec2(wave1 + wave2, wave2 + wave3);
+                            uv += offset;
+
+                            vec3 tint = vec3(0.0, 0.12, 0.18);
+                            vec4 color = texture2D(uTexture, uv);
+                            float shimmer = sin(uv.y * 30.0 + time * 2.2) * 0.04 * intensity;
+                            color.rgb += tint * (1.0 + shimmer);
+
+                            gl_FragColor = color;
+                        }
+                    `;
+
+                    waterMaterial = new THREE.ShaderMaterial({
+                        uniforms: {
+                            uTexture: { value: defaultTexture },
+                            uTime: { value: 0 }
+                        },
+                        vertexShader: vertexShader,
+                        fragmentShader: fragmentShader
+                    });
+
+                    const plane = new THREE.PlaneGeometry(2, 2);
+                    mesh = new THREE.Mesh(plane, waterMaterial);
+                    scene.add(mesh);
+
+                    const textureLoader = new THREE.TextureLoader();
+                    textureLoader.load('last section/image.png', (loadedTexture) => {
+                        loadedTexture.minFilter = THREE.LinearFilter;
+                        loadedTexture.magFilter = THREE.LinearFilter;
+                        if (waterMaterial && waterMaterial.uniforms) {
+                            waterMaterial.uniforms.uTexture.value = loadedTexture;
+                        }
+                    });
+
+                    const animate = (t) => {
+                        if (isPaused) return;
+                        rafId = requestAnimationFrame(animate);
+                        if (waterMaterial && waterMaterial.uniforms) {
+                            waterMaterial.uniforms.uTime.value = t * 0.001;
+                        }
+                        renderer.render(scene, camera);
+                    };
+                    isPaused = false;
+                    animate(0);
+
+                    window.addEventListener('resize', () => {
+                        if (renderer) {
+                            renderer.setSize(window.innerWidth, window.innerHeight);
+                        }
+                    });
+                } else if (isPaused) {
+                    isPaused = false;
+                    const animate = (t) => {
+                        if (isPaused) return;
+                        rafId = requestAnimationFrame(animate);
+                        if (waterMaterial && waterMaterial.uniforms) {
+                            waterMaterial.uniforms.uTime.value = t * 0.001;
+                        }
+                        renderer.render(scene, camera);
+                    };
+                    animate(performance.now());
+                }
+            };
+
+            window.pauseWaterShader = () => {
+                isPaused = true;
+                if (rafId) {
+                    cancelAnimationFrame(rafId);
+                    rafId = null;
+                }
+            };
+        })();
+
+        /* ── STICKY 3D TUNNEL PORTAL TRANSITION CONTROLLER ── */
+        (() => {
+            const stage = document.getElementById('corridor-transition-stage');
+            const portalWrapper = document.getElementById('water-portal-wrapper');
+            const corridorContent = document.getElementById('corridor-hero-content');
+            const waterContent = document.getElementById('water-hero-content');
+
+            function getStageProgress() {
+                if (!stage) return 0;
+                const rect = stage.getBoundingClientRect();
+                const totalScrollable = stage.offsetHeight - window.innerHeight;
+                if (totalScrollable <= 0) return 0;
+                const currentScroll = -rect.top;
+                return Math.min(1, Math.max(0, currentScroll / totalScrollable));
+            }
+
+            function updatePortalTransition() {
+                if (!stage) return;
+                const rect = stage.getBoundingClientRect();
+                const isNearStage = rect.top < window.innerHeight * 1.5 && rect.bottom > -window.innerHeight * 0.5;
+
+                if (isNearStage) {
+                    if (typeof window.bootOceanCorridor === 'function') window.bootOceanCorridor();
+                    if (typeof window.bootWaterShader === 'function') window.bootWaterShader();
+                } else {
+                    if (typeof window.pauseOceanCorridor === 'function') window.pauseOceanCorridor();
+                    if (typeof window.pauseWaterShader === 'function') window.pauseWaterShader();
+                    return;
+                }
+
+                const p = getStageProgress();
+
+                // 1. Sync 3D Corridor Tunnel depth with scroll progress
+                if (window.oceanRoomInstance && typeof window.oceanRoomInstance.setScrollProgress === 'function') {
+                    window.oceanRoomInstance.setScrollProgress(p);
+                }
+
+                // 2. Exponential scaling p^2.0 maps slow initial growth in center to explosive full-screen bloom
+                const pEased = Math.pow(p, 2.0);
+
+                const minW = 280;
+                const minH = 180;
+                const maxW = window.innerWidth;
+                const maxH = window.innerHeight;
+
+                const curW = minW + (maxW - minW) * pEased;
+                const curH = minH + (maxH - minH) * pEased;
+                const borderRadius = 18 * (1 - Math.min(1, pEased * 1.4));
+                const borderWidth = Math.max(0, 1 - pEased * 2);
+
+                if (portalWrapper) {
+                    portalWrapper.style.width = `${curW}px`;
+                    portalWrapper.style.height = `${curH}px`;
+                    portalWrapper.style.borderRadius = `${borderRadius}px`;
+                    portalWrapper.style.borderWidth = `${borderWidth}px`;
+
+                    if (pEased >= 0.96) {
+                        portalWrapper.style.boxShadow = 'none';
+                    } else {
+                        const glowIntensity = (1 - pEased) * 45;
+                        portalWrapper.style.boxShadow = `0 0 ${glowIntensity}px rgba(0, 229, 255, 0.5), inset 0 0 25px rgba(0, 229, 255, 0.3)`;
+                    }
+                }
+
+                // 3. Fade out Section 2 text title as user travels down corridor (p from 0.0 to 0.35)
+                const sec2Opacity = Math.max(0, 1 - p / 0.35);
+                if (corridorContent) {
+                    corridorContent.style.opacity = sec2Opacity;
+                    corridorContent.style.transform = `translate(-50%, ${-15 - (1 - sec2Opacity) * 30}px)`;
+                }
+
+                // 4. Fade in Section 3 text title as portal reaches full screen (p from 0.65 to 1.0)
+                let sec3Opacity = 0;
+                if (p > 0.65) {
+                    sec3Opacity = Math.min(1, (p - 0.65) / 0.30);
+                }
+                if (waterContent) {
+                    waterContent.style.opacity = sec3Opacity;
+                    waterContent.style.transform = `translate(-50%, -50%) translate3d(0, ${(1 - sec3Opacity) * 30}px, 0)`;
+                }
+            }
+
+            window.addEventListener('scroll', updatePortalTransition, { passive: true });
+            window.addEventListener('resize', updatePortalTransition);
+            setTimeout(updatePortalTransition, 100);
+        })();
+    </script>
+</body>
+
+</html>

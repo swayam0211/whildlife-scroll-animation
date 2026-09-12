@@ -1910,6 +1910,9 @@
                         if (halfEl === airHalf) {
                             sessionStorage.setItem('airAccess', 'true');
                             window.location.href = 'air.html';
+                        } else {
+                            sessionStorage.setItem('waterAccess', 'true');
+                            window.location.href = 'water.html';
                         }
                     }, 1800);
                 }, 400);
