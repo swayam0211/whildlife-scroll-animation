@@ -1787,36 +1787,15 @@
             gsap.registerPlugin(ScrollTrigger);
 
             // --- PARTICLE SCROLL BRIDGE SETUP (JIT BOOTED) ---
-            window.WildlifeJIT.register('particle-bridge-section', () => {
-                const pbContainer = document.getElementById('pb-canvas-container');
-                if (!pbContainer || pbContainer.dataset.booted) return;
-                pbContainer.dataset.booted = 'true';
-                pbContainer.innerHTML = '';
-
-                const pbScene = new THREE.Scene();
-                const pbCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
-                pbCamera.position.z = 500;
-
-                const pbRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-                pbRenderer.setSize(window.innerWidth, window.innerHeight);
-                const activeDpr = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.maxDpr) || Math.min(window.devicePixelRatio, 2);
-                pbRenderer.setPixelRatio(activeDpr);
-                pbContainer.appendChild(pbRenderer.domElement);
-                if (window.WildlifeTierEngine) {
-                    window.WildlifeTierEngine.registerWebGLContext(pbRenderer, () => {
-                        if (pbRenderer) pbRenderer.resetState();
-                    });
-                }
-
-                const PB_TEXT = "SCROLL MORE\nTO SHOW\nNEW ANIMALS";
-                const PB_MOUSE_RADIUS = 100;
-                const pbLerp = (a, b, n) => (1 - n) * a + n * b;
-
+            (() => {
+                let pbScene, pbCamera, pbRenderer, pbPoints, pbRafId, pbTrigger;
+                let pbScrollProgress = 0;
                 const pbMouse = new THREE.Vector2(-9999, -9999);
                 const pbTargetMouse = new THREE.Vector2(-9999, -9999);
-                let pbScrollProgress = 0;
+                const pbLerp = (a, b, n) => (1 - n) * a + n * b;
 
-                window.addEventListener('mousemove', (e) => {
+                const onMouseMove = (e) => {
+                    if (!pbCamera) return;
                     const x = (e.clientX / window.innerWidth) * 2 - 1;
                     const y = -(e.clientY / window.innerHeight) * 2 + 1;
                     const z = 500;
@@ -1825,171 +1804,209 @@
                     const w = h * pbCamera.aspect;
                     pbTargetMouse.x = x * w / 2;
                     pbTargetMouse.y = y * h / 2;
-                });
+                };
 
-                const setupPBParticles = () => {
-                    const offscreen = document.createElement('canvas');
-                    const offCtx = offscreen.getContext('2d');
-                    offscreen.width = 2048;
-                    offscreen.height = 1024;
+                const bootParticleBridge = () => {
+                    gsap.registerPlugin(ScrollTrigger);
+                    const pbContainer = document.getElementById('pb-canvas-container');
+                    if (!pbContainer || pbContainer.dataset.booted === 'true') return;
+                    pbContainer.dataset.booted = 'true';
+                    pbContainer.innerHTML = '';
 
-                    const fontSize = 160;
-                    offCtx.fillStyle = '#fff';
-                    // Premium Cinematic Typeface
-                    offCtx.font = `800 ${fontSize}px "Outfit", sans-serif`;
-                    offCtx.textAlign = 'center';
-                    offCtx.textBaseline = 'middle';
+                    pbScene = new THREE.Scene();
+                    pbCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+                    pbCamera.position.z = 500;
 
-                    const lines = PB_TEXT.split('\n');
-                    const lineSpacing = fontSize * 1.3;
-                    lines.forEach((line, i) => {
-                        // Dynamically center any number of lines vertically
-                        const yOffset = (i - (lines.length - 1) / 2) * lineSpacing;
-                        offCtx.fillText(line, offscreen.width / 2, offscreen.height / 2 + yOffset);
-                    });
+                    pbRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                    pbRenderer.setSize(window.innerWidth, window.innerHeight);
+                    const activeDpr = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.maxDpr) || Math.min(window.devicePixelRatio, 2);
+                    pbRenderer.setPixelRatio(activeDpr);
+                    pbContainer.appendChild(pbRenderer.domElement);
 
-                    const imgData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height).data;
-                    const homePositions = [];
-                    const randomValues = [];
-
-                    const step = 4.0; // Balanced density like wildlife section
-                    for (let y = 0; y < offscreen.height; y += step) {
-                        for (let x = 0; x < offscreen.width; x += step) {
-                            const i = (Math.floor(y) * offscreen.width + Math.floor(x)) * 4;
-                            if (imgData[i + 3] > 128) {
-                                const px = (x - offscreen.width / 2) * 0.4;
-                                const py = -(y - offscreen.height / 2) * 0.4;
-                                homePositions.push(px, py, 0);
-                                randomValues.push(Math.random(), Math.random(), Math.random());
-                            }
-                        }
+                    if (window.WildlifeTierEngine) {
+                        window.WildlifeTierEngine.registerWebGLContext(pbRenderer, () => {
+                            if (pbRenderer) pbRenderer.resetState();
+                        });
                     }
 
-                    const geometry = new THREE.BufferGeometry();
-                    geometry.setAttribute('position', new THREE.Float32BufferAttribute(homePositions, 3));
-                    geometry.setAttribute('homePosition', new THREE.Float32BufferAttribute(homePositions, 3));
-                    geometry.setAttribute('randomValue', new THREE.Float32BufferAttribute(randomValues, 3));
+                    window.addEventListener('mousemove', onMouseMove);
 
-                    const material = new THREE.ShaderMaterial({
-                        uniforms: {
-                            uTime: { value: 0 },
-                            uMouse: { value: pbMouse },
-                            uMouseRadius: { value: PB_MOUSE_RADIUS },
-                            uScroll: { value: 0 },
-                            uGlobalFade: { value: 1.0 }
-                        },
-                        vertexShader: `
-                            uniform float uTime;
-                            uniform vec2 uMouse;
-                            uniform float uMouseRadius;
-                            uniform float uScroll;
-                            uniform float uGlobalFade;
-                            attribute vec3 homePosition;
-                            attribute vec3 randomValue;
-                            varying float vAlpha;
-                            varying vec3 vColor; // Pass color to fragment
+                    const setupParticles = () => {
+                        const offscreen = document.createElement('canvas');
+                        const offCtx = offscreen.getContext('2d');
+                        offscreen.width = 2048;
+                        offscreen.height = 1024;
 
-                            void main() {
-                                vec3 pos = homePosition;
-                                
-                                // Subtle organic breathing
-                                pos.x += sin(uTime * 1.2 + randomValue.x * 20.0) * 2.0;
-                                pos.y += cos(uTime * 1.5 + randomValue.y * 20.0) * 2.0;
+                        const fontSize = 160;
+                        offCtx.fillStyle = '#ffffff';
+                        offCtx.font = `800 ${fontSize}px Outfit, sans-serif`;
+                        offCtx.textAlign = 'center';
+                        offCtx.textBaseline = 'middle';
 
-                                // Scroll expansion effect
-                                pos.x *= 1.0 + uScroll * 1.5;
-                                pos.y *= 1.0 + uScroll * 1.5;
-                                pos.z += uScroll * 200.0 * randomValue.z;
+                        const PB_TEXT = "SCROLL MORE\nTO SHOW\nNEW ANIMALS";
+                        const lines = PB_TEXT.split('\n');
+                        const lineSpacing = fontSize * 1.3;
+                        lines.forEach((line, i) => {
+                            const yOffset = (i - (lines.length - 1) / 2) * lineSpacing;
+                            offCtx.fillText(line, offscreen.width / 2, offscreen.height / 2 + yOffset);
+                        });
 
-                                // Mouse repulsion
-                                float dist = distance(pos.xy, uMouse);
-                                if (dist < uMouseRadius) {
-                                    float force = (uMouseRadius - dist) / uMouseRadius;
-                                    vec2 dir = normalize(pos.xy - uMouse);
-                                    pos.xy += dir * force * 50.0;
-                                    pos.z += force * 40.0;
+                        const imgData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height).data;
+                        const homePositions = [];
+                        const randomValues = [];
+
+                        const step = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.particleStep) || 2.5;
+                        for (let y = 0; y < offscreen.height; y += step) {
+                            for (let x = 0; x < offscreen.width; x += step) {
+                                const i = (Math.floor(y) * offscreen.width + Math.floor(x)) * 4;
+                                if (imgData[i + 3] > 128) {
+                                    const px = (x - offscreen.width / 2) * 0.4;
+                                    const py = -(y - offscreen.height / 2) * 0.4;
+                                    homePositions.push(px, py, 0);
+                                    randomValues.push(Math.random(), Math.random(), Math.random());
                                 }
-
-                                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                                // Finer, sharper premium dots
-                                gl_PointSize = (1.2 + randomValue.x * 2.0) * (500.0 / -mvPosition.z);
-                                gl_Position = projectionMatrix * mvPosition;
-                                // Smoother alpha fade
-                                vAlpha = (1.0 - uScroll * 0.5) * (0.4 + 0.6 * randomValue.z) * uGlobalFade;
-                                
-                                // Autumn foliage colors (Burnt orange/amber to Golden yellow) to match Red Fox backdrop
-                                vColor = mix(vec3(0.95, 0.45, 0.1), vec3(0.95, 0.75, 0.2), randomValue.x);
                             }
-                        `,
-                        fragmentShader: `
-                            varying float vAlpha;
-                            varying vec3 vColor;
-                            void main() {
-                                float dist = distance(gl_PointCoord, vec2(0.5));
-                                if (dist > 0.5) discard;
-                                
-                                // Soft glow volumetric illumination
-                                float pointAlpha = smoothstep(0.5, 0.0, dist);
-                                gl_FragColor = vec4(vColor, vAlpha * pointAlpha * 1.5);
-                            }
-                        `,
-                        transparent: true,
-                        blending: THREE.AdditiveBlending,
-                        depthWrite: false
-                    });
+                        }
 
-                    const pbPoints = new THREE.Points(geometry, material);
-                    pbScene.add(pbPoints);
-                    return pbPoints;
-                };
+                        const geometry = new THREE.BufferGeometry();
+                        geometry.setAttribute('position', new THREE.Float32BufferAttribute(homePositions, 3));
+                        geometry.setAttribute('homePosition', new THREE.Float32BufferAttribute(homePositions, 3));
+                        geometry.setAttribute('randomValue', new THREE.Float32BufferAttribute(randomValues, 3));
 
-                const buildAndAnimate = () => {
-                    const pbPoints = setupPBParticles();
+                        const material = new THREE.ShaderMaterial({
+                            uniforms: {
+                                uTime: { value: 0 },
+                                uMouse: { value: pbMouse },
+                                uMouseRadius: { value: 100 },
+                                uScroll: { value: 0 },
+                                uGlobalFade: { value: 1.0 }
+                            },
+                            vertexShader: `
+                                uniform float uTime;
+                                uniform vec2 uMouse;
+                                uniform float uMouseRadius;
+                                uniform float uScroll;
+                                uniform float uGlobalFade;
+                                attribute vec3 homePosition;
+                                attribute vec3 randomValue;
+                                varying float vAlpha;
+                                varying vec3 vColor;
 
-                    const pbAnimate = (time) => {
-                        requestAnimationFrame(pbAnimate);
-                        pbMouse.x = pbLerp(pbMouse.x, pbTargetMouse.x, 0.1);
-                        pbMouse.y = pbLerp(pbMouse.y, pbTargetMouse.y, 0.1);
-                        pbPoints.material.uniforms.uTime.value = time * 0.001;
-                        pbPoints.material.uniforms.uScroll.value = pbScrollProgress;
-                        pbRenderer.render(pbScene, pbCamera);
+                                void main() {
+                                    vec3 pos = homePosition;
+                                    pos.x += sin(uTime * 1.2 + randomValue.x * 20.0) * 2.0;
+                                    pos.y += cos(uTime * 1.5 + randomValue.y * 20.0) * 2.0;
+                                    pos.x *= 1.0 + uScroll * 1.5;
+                                    pos.y *= 1.0 + uScroll * 1.5;
+                                    pos.z += uScroll * 200.0 * randomValue.z;
+
+                                    float dist = distance(pos.xy, uMouse);
+                                    if (dist < uMouseRadius) {
+                                        float force = (uMouseRadius - dist) / uMouseRadius;
+                                        vec2 dir = normalize(pos.xy - uMouse);
+                                        pos.xy += dir * force * 50.0;
+                                        pos.z += force * 40.0;
+                                    }
+
+                                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                                    gl_PointSize = (1.2 + randomValue.x * 2.0) * (500.0 / -mvPosition.z);
+                                    gl_Position = projectionMatrix * mvPosition;
+                                    vAlpha = (1.0 - uScroll * 0.5) * (0.4 + 0.6 * randomValue.z) * uGlobalFade;
+                                    vColor = mix(vec3(0.95, 0.45, 0.1), vec3(0.95, 0.75, 0.2), randomValue.x);
+                                }
+                            `,
+                            fragmentShader: `
+                                varying float vAlpha;
+                                varying vec3 vColor;
+                                void main() {
+                                    float dist = distance(gl_PointCoord, vec2(0.5));
+                                    if (dist > 0.5) discard;
+                                    float pointAlpha = smoothstep(0.5, 0.0, dist);
+                                    gl_FragColor = vec4(vColor, vAlpha * pointAlpha * 1.5);
+                                }
+                            `,
+                            transparent: true,
+                            blending: THREE.AdditiveBlending,
+                            depthWrite: false
+                        });
+
+                        pbPoints = new THREE.Points(geometry, material);
+                        pbScene.add(pbPoints);
                     };
-                    pbAnimate(0);
 
-                    window.addEventListener('resize', () => {
-                        if (pbRenderer) {
-                            pbRenderer.setSize(window.innerWidth, window.innerHeight);
-                            pbCamera.aspect = window.innerWidth / window.innerHeight;
-                            pbCamera.updateProjectionMatrix();
-                        }
-                    });
+                    const startAnimation = () => {
+                        setupParticles();
 
-                    ScrollTrigger.create({
-                        trigger: '#particle-bridge-section',
-                        start: 'top top',
-                        end: '+=400vh',
-                        pin: true,
-                        scrub: 0.1,
-                        onUpdate: (self) => {
-                            pbScrollProgress = self.progress;
-                            // Fade out near the very end so the handoff is clean
-                            const fadeStart = 0.8;
-                            let fade = 1.0;
-                            if (self.progress > fadeStart) {
-                                fade = 1.0 - ((self.progress - fadeStart) / (1.0 - fadeStart));
+                        const animate = (time) => {
+                            pbRafId = requestAnimationFrame(animate);
+                            pbMouse.x = pbLerp(pbMouse.x, pbTargetMouse.x, 0.1);
+                            pbMouse.y = pbLerp(pbMouse.y, pbTargetMouse.y, 0.1);
+                            if (pbPoints && pbPoints.material) {
+                                pbPoints.material.uniforms.uTime.value = time * 0.001;
+                                pbPoints.material.uniforms.uScroll.value = pbScrollProgress;
                             }
-                            pbPoints.material.uniforms.uGlobalFade.value = fade;
-                        }
-                    });
-                    ScrollTrigger.refresh();
+                            if (pbRenderer && pbScene && pbCamera) {
+                                pbRenderer.render(pbScene, pbCamera);
+                            }
+                        };
+                        animate(0);
+
+                        pbTrigger = ScrollTrigger.create({
+                            id: 'pb-trigger',
+                            trigger: '#particle-bridge-section',
+                            start: 'top top',
+                            end: '+=400vh',
+                            pin: true,
+                            scrub: 0.1,
+                            onUpdate: (self) => {
+                                pbScrollProgress = self.progress;
+                                const fadeStart = 0.8;
+                                let fade = 1.0;
+                                if (self.progress > fadeStart) {
+                                    fade = 1.0 - ((self.progress - fadeStart) / (1.0 - fadeStart));
+                                }
+                                if (pbPoints && pbPoints.material) {
+                                    pbPoints.material.uniforms.uGlobalFade.value = fade;
+                                }
+                            }
+                        });
+                        ScrollTrigger.refresh();
+                    };
+
+                    if (document.fonts && document.fonts.ready) {
+                        document.fonts.ready.then(startAnimation);
+                    } else {
+                        startAnimation();
+                    }
                 };
 
-                if (document.fonts && document.fonts.ready) {
-                    document.fonts.ready.then(buildAndAnimate);
-                } else {
-                    buildAndAnimate();
-                }
-            });
+                const disposeParticleBridge = () => {
+                    if (pbRafId) cancelAnimationFrame(pbRafId);
+                    window.removeEventListener('mousemove', onMouseMove);
+                    if (pbTrigger) pbTrigger.kill();
+                    if (pbPoints) {
+                        if (pbPoints.geometry) pbPoints.geometry.dispose();
+                        if (pbPoints.material) pbPoints.material.dispose();
+                        pbPoints = null;
+                    }
+                    if (pbRenderer) {
+                        pbRenderer.dispose();
+                        pbRenderer = null;
+                    }
+                    const pbContainer = document.getElementById('pb-canvas-container');
+                    if (pbContainer) {
+                        pbContainer.innerHTML = '';
+                        delete pbContainer.dataset.booted;
+                    }
+                    pbScene = null;
+                    pbCamera = null;
+                };
+
+                window.WildlifeJIT.register('particle-bridge-section', {
+                    onEnter: bootParticleBridge,
+                    onExit: disposeParticleBridge
+                });
+            })();
 
             ScrollTrigger.create({
                 trigger: '#air-life-section',
