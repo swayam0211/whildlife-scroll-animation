@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Nature Documentary Experience</title>
+    <meta name="description" content="Observe strength, intelligence, and survival in the wild." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fonts -->
+    <link href="https://db.onlinewebfonts.com/c/a3e23614fd0c8f24eb253631c8e2cd44?family=CF+One+Two+Trees+Regular"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: auto;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* â”€â”€ LOADER â”€â”€ */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            transition: opacity .8s, visibility .8s;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-ring {
+            width: 46px;
+            height: 46px;
+            border: 1.5px solid rgba(255, 255, 255, .1);
+            border-top-color: rgba(255, 200, 80, .85);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        .loader-text {
+            font-size: .62rem;
+            letter-spacing: .3em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .3);
+        }
+
+        /* â”€â”€ SCROLL STAGE â”€â”€ */
+        #scroll-stage {
+            position: relative;
+            height: 800vh;
+        }
+
+        /* â”€â”€ STICKY HERO â”€â”€ */
+        #hero-sticky {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+        }
+
+        /* â”€â”€ SINGLE VIDEO â”€â”€ */
+        #hero-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            will-change: auto;
+        }
+
+        /* â”€â”€ CLIP HALVES (GPU-composited via clip-path) â”€â”€ */
+        #clip-top,
+        #clip-bot {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            will-change: clip-path;
+            pointer-events: none;
+        }
+
+        #clip-top {
+            background: #000;
+            clip-path: inset(0 0 50% 0);
+        }
+
+        #clip-bot {
+            background: #000;
+            clip-path: inset(50% 0 0 0);
+        }
+
+        /* â”€â”€ GAP FILL â”€â”€ */
+        #gap-fill {
+            position: absolute;
+            inset: 0;
+            background: #0a0800;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* â”€â”€ CINEMATIC OVERLAYS â”€â”€ */
+        #vignette {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            pointer-events: none;
+            background: radial-gradient(ellipse 80% 60% at 50% 50%, transparent 35%, rgba(0, 0, 0, .5) 100%),
+                linear-gradient(to bottom, rgba(0, 0, 0, .38) 0%, transparent 28%, transparent 68%, rgba(0, 0, 0, .6) 100%);
+        }
+
+        /* â”€â”€ SEAM GLOW â”€â”€ */
+        #seam {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 15;
+            pointer-events: none;
+            transform: translate3d(0, -50%, 0);
+            opacity: 0;
+            background: linear-gradient(90deg, transparent 5%, rgba(255, 200, 80, .7) 30%, rgba(255, 210, 100, .85) 50%, rgba(255, 200, 80, .7) 70%, transparent 95%);
+            box-shadow: 0 0 18px 8px rgba(255, 180, 50, .25);
+        }
+
+        /* â”€â”€ HERO TEXT â”€â”€ */
+        #hero-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            text-align: center;
+            padding: 0 1.5rem;
+            pointer-events: none;
+            transform: translate3d(0, 0, 0);
+            will-change: opacity, transform;
+        }
+
+        .eyebrow {
+            font-size: clamp(.6rem, .9vw, .78rem);
+            font-weight: 300;
+            letter-spacing: .36em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .52);
+            margin-bottom: 1.6rem;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.8rem, 7vw, 7rem);
+            font-weight: 300;
+            line-height: 1.07;
+            letter-spacing: -.01em;
+            color: #fff;
+            text-shadow: 0 2px 40px rgba(0, 0, 0, .6);
+            max-width: 820px;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: rgba(255, 220, 150, .92);
+        }
+
+        .hero-divider {
+            width: 38px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 210, 120, .7), transparent);
+            margin: 1.7rem auto;
+        }
+
+        .hero-sub {
+            font-size: clamp(.82rem, 1.4vw, 1rem);
+            font-weight: 300;
+            letter-spacing: .06em;
+            color: rgba(255, 255, 255, .58);
+            max-width: 430px;
+            line-height: 1.72;
+        }
+
+        /* â”€â”€ SCROLL CUE â”€â”€ */
+        .scroll-cue {
+            position: absolute;
+            bottom: 2.4rem;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .45rem;
+            z-index: 10;
+            pointer-events: none;
+            will-change: opacity;
+        }
+
+        .scroll-cue span {
+            font-size: .6rem;
+            letter-spacing: .3em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .38);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 38px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, .48), transparent);
+            animation: pulse 2.2s ease-in-out infinite;
+        }
+
+        /* â”€â”€ PROGRESS BAR â”€â”€ */
+        #progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            width: 100%;
+            z-index: 30;
+            pointer-events: none;
+            background: linear-gradient(90deg, rgba(255, 155, 45, .8), rgba(255, 220, 95, .9));
+            box-shadow: 0 0 8px rgba(255, 175, 55, .6);
+            transform-origin: left center;
+            transform: scaleX(0);
+            will-change: transform;
+        }
+
+        /* â•â•â•â• ELEPHANT CARD â•â•â•â• */
+        #elephant-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: min(860px, 94vw);
+            height: min(68vh, 560px);
+            z-index: 20;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate3d(-50%, -50%, 0) scale(.82);
+            will-change: opacity, transform;
+        }
+
+        /* 3 vertical glass panels â€” NO backdrop-filter */
+        .card-panels {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            gap: 10px;
+            padding: 0 20px;
+            align-items: stretch;
+            opacity: 0;
+            transform: translate3d(0, 30px, 0);
+            will-change: opacity, transform;
+        }
+
+        .card-panel {
+            flex: 1;
+            border-radius: 16px 16px 0 0;
+            border: 1px solid rgba(255, 200, 80, .14);
+            border-bottom: none;
+            background: linear-gradient(180deg, rgba(255, 200, 90, .06) 0%, rgba(255, 190, 70, .035) 60%, rgba(40, 25, 5, .12) 100%);
+        }
+
+        .card-panel:nth-child(2) {
+            background: linear-gradient(180deg, rgba(255, 210, 110, .085) 0%, rgba(255, 190, 80, .05) 60%, rgba(50, 30, 5, .14) 100%);
+        }
+
+        /* ELEPHANT big bg title â€” positioned at top area so elephant image doesn't hide it */
+        .card-title-bg {
+            position: absolute;
+            top: 8%;
+            left: 50%;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3.4rem, 8vw, 7rem);
+            font-weight: 300;
+            letter-spacing: .28em;
+            white-space: nowrap;
+            color: rgba(255, 240, 205, .95);
+            text-shadow:
+                0 2px 30px rgba(0, 0, 0, .9),
+                0 0 80px rgba(200, 140, 40, .3),
+                0 4px 60px rgba(0, 0, 0, .5);
+            z-index: 9;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate3d(-50%, 0, 0) translate3d(-40px, 0, 0);
+            will-change: opacity, transform;
+        }
+
+        /* Elephant image â€” centered, sits in right-center area */
+        .card-elephant {
+            position: absolute;
+            bottom: 12%;
+            left: 55%;
+            width: min(380px, 52%);
+            z-index: 7;
+            filter: drop-shadow(0 20px 50px rgba(0, 0, 0, .85)) drop-shadow(0 0 30px rgba(180, 130, 40, .22));
+            opacity: 0;
+            transform: translate3d(-50%, 28px, 0) scale(.88);
+            will-change: opacity, transform;
+        }
+
+        .card-elephant img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .card-elephant.floating img {
+            animation: float 6s ease-in-out infinite, breathe 4s ease-in-out infinite alternate;
+        }
+
+        /* WILDLIFE ARCHIVE top label */
+        .card-label {
+            position: absolute;
+            top: 1.8rem;
+            left: 50%;
+            font-size: .65rem;
+            font-weight: 400;
+            letter-spacing: .4em;
+            text-transform: uppercase;
+            color: rgba(255, 215, 130, .95);
+            white-space: nowrap;
+            z-index: 12;
+            text-shadow: 0 1px 12px rgba(0, 0, 0, .8), 0 0 30px rgba(0, 0, 0, .5);
+            opacity: 0;
+            transform: translate3d(-50%, -18px, 0);
+            will-change: opacity, transform;
+        }
+
+        /* Description â€” left side, below title, away from elephant */
+        .card-desc {
+            position: absolute;
+            left: 5%;
+            top: 38%;
+            max-width: min(210px, 30%);
+            font-size: .82rem;
+            font-weight: 300;
+            line-height: 1.85;
+            color: rgba(255, 240, 200, .92);
+            text-align: left;
+            z-index: 12;
+            text-shadow: 0 1px 10px rgba(0, 0, 0, .8), 0 0 25px rgba(0, 0, 0, .4);
+            opacity: 0;
+            transform: translate3d(-30px, 0, 0);
+            will-change: opacity, transform;
+        }
+
+        /* Stats row â€” inside card, bottom area */
+        .card-stats {
+            position: absolute;
+            bottom: 3%;
+            left: 5%;
+            display: flex;
+            gap: .7rem;
+            z-index: 12;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translate3d(0, 20px, 0);
+            will-change: opacity, transform;
+        }
+
+        .card-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .3rem;
+            padding: .65rem 1.1rem;
+            border-radius: 10px;
+            min-width: 105px;
+            background: rgba(0, 0, 0, .45);
+            border: 1px solid rgba(255, 200, 80, .22);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .4);
+        }
+
+        .stat-val {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: .98rem;
+            font-weight: 400;
+            color: rgba(255, 225, 140, 1);
+            text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
+        }
+
+        .stat-key {
+            font-size: .55rem;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: rgba(255, 210, 120, .65);
+        }
+
+        /* â•â•â•â• ANIMAL RING SECTION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        #ring-section {
+            position: relative;
+            z-index: 40;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .ring-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        /* â”€â”€ Radial SVG Ring â”€â”€ */
+        .ring-wrapper {
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 420px;
+            height: 420px;
+            z-index: 30;
+        }
+
+        .ring-disc {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .ring-slot {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            top: 50%;
+            left: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s, filter 0.5s;
+            opacity: 0.3;
+            cursor: pointer;
+        }
+
+        .ring-slot img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .ring-slot.active {
+            opacity: 1;
+            filter: drop-shadow(0 0 12px rgba(255, 200, 80, .8)) drop-shadow(0 0 30px rgba(255, 180, 50, .4));
+        }
+
+        .ring-arc {
+            position: absolute;
+            inset: 20px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 200, 80, .18);
+            pointer-events: none;
+        }
+
+        /* â”€â”€ FULL IMAGE (splits vertically) â”€â”€ */
+        .full-img {
+            position: absolute;
+            inset: -6%;
+            z-index: 2;
+            background-size: cover;
+            background-position: center center;
+            will-change: clip-path;
+        }
+
+        .full-img-left {
+            clip-path: inset(0 50% 0 0);
+        }
+
+        .full-img-right {
+            clip-path: inset(0 0 0 50%);
+        }
+
+        /* â”€â”€ 3 GLASS PANELS (BBC Planet Earth style) â”€â”€ */
+        .glass-card {
+            position: absolute;
+            top: 52%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(680px, 78vw);
+            height: min(420px, 52vh);
+            display: flex;
+            gap: 14px;
+            z-index: 5;
+            opacity: 0;
+            perspective: 1200px;
+            padding: 16px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.35);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 0 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-panel {
+            flex: 1;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            will-change: transform;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-front,
+        .glass-back {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .glass-back {
+            transform: rotateY(180deg);
+        }
+
+        .glass-img {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+        }
+
+        /* Seamless 3-panel split with 20% bottom crop to hide Gemini logo */
+        .glass-panel:nth-child(1) .glass-img {
+            background-size: 300% 120%;
+            background-position: 0% 0%;
+        }
+
+        .glass-panel:nth-child(2) .glass-img {
+            background-size: 300% 120%;
+            background-position: 50% 0%;
+        }
+
+        .glass-panel:nth-child(3) .glass-img {
+            background-size: 300% 120%;
+            background-position: 100% 0%;
+        }
+
+        .glass-frost {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1.5px solid rgba(255, 200, 80, .18);
+            border-radius: 12px;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* â”€â”€ INFO CARD â”€â”€ */
+        .info-card {
+            position: absolute;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 20;
+            width: min(600px, 85vw);
+            opacity: 0;
+        }
+
+        .info-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.4rem, 5vw, 4rem);
+            font-weight: 300;
+            letter-spacing: .1em;
+            color: rgba(255, 248, 230, .98);
+            text-shadow: 0 2px 40px rgba(0, 0, 0, .9), 0 0 10px rgba(0, 0, 0, .5);
+            margin-bottom: .5rem;
+        }
+
+        .info-desc {
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            font-weight: 300;
+            line-height: 1.8;
+            color: rgba(255, 245, 225, .85);
+            text-shadow: 0 1px 15px rgba(0, 0, 0, .8);
+            max-width: 460px;
+            margin: 0 auto .7rem;
+        }
+
+        .info-stat {
+            display: inline-block;
+            padding: .4rem 1.1rem;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, .4);
+            border: 1px solid rgba(255, 200, 80, .2);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: .88rem;
+            color: rgba(255, 215, 120, .92);
+            text-shadow: 0 1px 6px rgba(0, 0, 0, .5);
+            letter-spacing: .04em;
+        }
+
+        .info-stat-label {
+            font-family: 'Inter', sans-serif;
+            font-size: .48rem;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: rgba(255, 200, 100, .5);
+            margin-right: .4rem;
+        }
+
+        /* â”€â”€ Dot indicators â”€â”€ */
+        .ring-dots {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 25;
+        }
+
+        .ring-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .2);
+            transition: background .4s, transform .4s;
+        }
+
+        .ring-dot.active {
+            background: rgba(255, 200, 80, .9);
+            transform: scale(1.4);
+            box-shadow: 0 0 8px rgba(255, 200, 80, .5);
+        }
+
+        /* â”€â”€ KEYFRAMES â”€â”€ */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: .45;
+                transform: scaleY(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scaleY(1.18);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-7px);
+            }
+        }
+
+        @keyframes breathe {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.013);
+            }
+        }
+
+        /* â”€â”€ CINEMATIC RING SECTION â”€â”€ */
+        #ring-cinematic {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            z-index: 50;
+            /* Above previous section naturally in flow */
+        }
+
+        #ring-cinematic .bg-image {
+            position: absolute;
+            inset: -5%;
+            /* Prevent blur edges from bleeding */
+            background: url('sec3/sec3photo.png') center center / cover no-repeat;
+            z-index: 0;
+            will-change: transform, opacity;
+            filter: blur(4px) brightness(0.9);
+        }
+
+        #ring-cinematic .gradient-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.65) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .cinematic-floater {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none;
+            /* Let hover events pass to the ring */
+            animation: floatCinematic 6s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        @keyframes floatCinematic {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        #ring-cinematic .ring-wrapper.cinematic {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 45vw;
+            height: 45vw;
+            max-width: 600px;
+            max-height: 600px;
+            border-radius: 50%;
+            overflow: hidden;
+            pointer-events: auto;
+            /* Restore interactivity under the floater */
+            z-index: 20;
+            box-shadow: 0 0 40px rgba(0, 0, 0, .6), inset 0 0 20px rgba(255, 200, 80, .15);
+            border: 2px solid rgba(255, 255, 255, .1);
+            transition: opacity 1.2s ease, transform 1.2s ease, border-color 0.8s, box-shadow 0.8s;
+            will-change: transform, opacity;
+        }
+
+        #ring-cinematic .ring-disc.cinematic {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: rotateRing 60s linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes rotateRing {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #ring-cinematic .ring-half {
+            position: absolute;
+            width: 100%;
+            height: 62%;
+            /* Overlap for blending */
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform .45s cubic-bezier(0.25, 1, 0.5, 1), box-shadow .4s ease, opacity 0.8s ease;
+            cursor: pointer;
+            will-change: transform;
+        }
+
+        #ring-cinematic .ring-half.top {
+            top: 0;
+            transform-origin: bottom center;
+            -webkit-mask-image: linear-gradient(to bottom, black 82%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 82%, transparent 100%);
+            z-index: 2;
+        }
+
+        #ring-cinematic .ring-half.bottom {
+            bottom: 0;
+            transform-origin: top center;
+            -webkit-mask-image: linear-gradient(to top, black 82%, transparent 100%);
+            mask-image: linear-gradient(to top, black 82%, transparent 100%);
+            z-index: 1;
+        }
+
+        /* ENVIRONMENTAL LIGHTING & DEPTH */
+        #ring-cinematic .ring-wrapper.cinematic::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0.08) 0%,
+                    transparent 30%,
+                    transparent 70%,
+                    rgba(0, 0, 0, 0.3) 100%);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        #ring-cinematic .ring-mist {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            transform: translateY(-50%);
+            background: linear-gradient(to bottom,
+                    transparent,
+                    rgba(200, 230, 255, 0.15),
+                    rgba(255, 255, 255, 0.2),
+                    rgba(200, 230, 255, 0.15),
+                    transparent);
+            filter: blur(15px);
+            z-index: 5;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+            opacity: 0.8;
+        }
+
+        #ring-cinematic .ring-half.top video {
+            filter: brightness(1.05) contrast(1.05) blur(0.5px);
+        }
+
+        #ring-cinematic .ring-half.bottom video {
+            filter: brightness(0.75) contrast(1.1) blur(0.5px);
+        }
+
+        #ring-cinematic .ring-half video {
+            position: absolute;
+            width: 110%;
+            height: auto;
+            min-height: 110%;
+            object-fit: cover;
+            transition: opacity 1.2s ease;
+            pointer-events: none;
+        }
+
+        #ring-cinematic .ring-half:hover {
+            transform: scale(1.05);
+            z-index: 5;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+        }
+
+        #ring-cinematic .ring-half:hover::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+            pointer-events: none;
+        }
+
+        /* â”€â”€ MAGNETIC CIRCULAR TEXT & GLOW â”€â”€ */
+        .cursor-glow {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(19, 50, 125, 0.09) 0%, transparent 60%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            mix-blend-mode: screen;
+            will-change: left, top, opacity;
+        }
+
+        .circle-text-centerer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1px;
+            height: 1px;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .circular-text-container {
+            position: absolute;
+            width: 58vw;
+            height: 58vw;
+            max-width: 820px;
+            max-height: 820px;
+            pointer-events: none;
+            animation: rotateText 60s linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes rotateText {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .char-wrapper {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            height: 100%;
+            width: 60px;
+            margin-left: -30px;
+            /* Center X */
+            transform-origin: center center;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .char-wrapper.bottom-arc {
+            align-items: flex-end;
+        }
+
+        .char-inner {
+            display: inline-block;
+            font-family: "CF One Two Trees Regular", "Outfit", sans-serif;
+            font-size: clamp(1.4rem, 4vw, 4.2rem);
+            font-weight: normal;
+            letter-spacing: 0.1rem;
+            color: rgba(255, 255, 255, 0.45);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.4s ease, text-shadow 0.4s ease;
+            will-change: transform, color, text-shadow;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* ── PARTICLE BRIDGE ── */
+        #particle-bridge-section {
+            width: 100%;
+            height: 100vh;
+            /* Autumn Forest backdrop to match Red Fox scene */
+            background: radial-gradient(circle at center, #1b0a02, #050200);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #pb-canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loader">
+        <div class="loader-ring"></div>
+        <p class="loader-text">Loading Experience</p>
+    </div>
+
+    <section id="scroll-stage">
+        <div id="hero-sticky">
+
+            <div id="gap-fill"></div>
+
+            <!-- SINGLE video -->
+            <video id="hero-video" preload="auto" muted playsinline webkit-playsinline>
+                <source src="hero/swyam_edit_30mb.mp4" type="video/mp4" />
+            </video>
+
+            <!-- Transparent clip overlays that hide the gap area (the video shows through) -->
+            <div id="clip-top"></div>
+            <div id="clip-bot"></div>
+
+            <div id="vignette"></div>
+            <div id="seam"></div>
+
+            <div id="hero-text">
+                <p class="eyebrow">A Cinematic Wildlife Experience</p>
+                <h1 class="hero-title">Learn From the <em>Power</em> of Nature</h1>
+                <div class="hero-divider"></div>
+                <p class="hero-sub">Observe strength, intelligence, and survival in the wild.</p>
+            </div>
+
+            <div class="scroll-cue" id="scroll-cue">
+                <span>Scroll</span>
+                <div class="scroll-line"></div>
+            </div>
+
+            <div id="elephant-card">
+                <div class="card-panels" id="card-panels">
+                    <div class="card-panel"></div>
+                    <div class="card-panel"></div>
+                    <div class="card-panel"></div>
+                </div>
+                <h2 class="card-title-bg" id="card-title-bg">ELEPHANT</h2>
+                <div class="card-elephant" id="card-elephant">
+                    <img src="photo/elephant.png.png" alt="African Elephant" />
+                </div>
+                <p class="card-label" id="card-label">Wildlife Archive</p>
+                <p class="card-desc" id="card-desc">
+                    Guardians of the savannah.<br>
+                    Known for intelligence,<br>
+                    memory, and strong<br>family bonds.
+                </p>
+                <div class="card-stats" id="card-stats">
+                    <div class="card-stat"><span class="stat-val">6,000 kg</span><span class="stat-key">Weight</span>
+                    </div>
+                    <div class="card-stat"><span class="stat-val">Savannah</span><span class="stat-key">Habitat</span>
+                    </div>
+                    <div class="card-stat"><span class="stat-val">Strength</span><span class="stat-key">Symbol</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="progress-bar"></div>
+
+        </div>
+    </section>
+
+    <!-- ══ PARTICLE SCROLL BRIDGE ══ -->
+    <section id="particle-bridge-section">
+        <div id="pb-canvas-container"></div>
+    </section>
+
+    <!-- â•â•â•â• ANIMAL RING SECTION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <section id="ring-section">
+
+        <!-- Gradient bg -->
+        <div class="ring-bg" id="ring-bg"></div>
+
+        <!-- Full-page image (splits vertically) -->
+        <div class="full-img full-img-left" id="full-left"></div>
+        <div class="full-img full-img-right" id="full-right"></div>
+
+        <!-- Radial SVG Ring -->
+        <div class="ring-wrapper">
+            <div class="ring-disc" id="ring-disc">
+                <div class="ring-arc"></div>
+            </div>
+        </div>
+
+        <!-- 3 Glass Panels (Planet Earth style) -->
+        <div class="glass-card" id="glass-card">
+            <div class="glass-panel" id="gpanel-0">
+                <div class="glass-front">
+                    <div class="glass-img"></div>
+                    <div class="glass-frost"></div>
+                </div>
+                <div class="glass-back">
+                    <div class="glass-img"></div>
+                    <div class="glass-frost"></div>
+                </div>
+            </div>
+            <div class="glass-panel" id="gpanel-1">
+                <div class="glass-front">
+                    <div class="glass-img"></div>
+                    <div class="glass-frost"></div>
+                </div>
+                <div class="glass-back">
+                    <div class="glass-img"></div>
+                    <div class="glass-frost"></div>
+                </div>
+            </div>
+            <div class="glass-panel" id="gpanel-2">
+                <div class="glass-front">
+                    <div class="glass-img"></div>
+                    <div class="glass-frost"></div>
+                </div>
+                <div class="glass-back">
+                    <div class="glass-img"></div>
+                    <div class="glass-frost"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="info-card" id="info-card">
+            <h2 class="info-name" id="info-name"></h2>
+            <p class="info-desc" id="info-desc"></p>
+            <span class="info-stat" id="info-stat"></span>
+        </div>
+
+        <!-- Dot indicators -->
+        <div class="ring-dots" id="ring-dots"></div>
+
+    </section>
+
+    <!-- â”€â”€ CINEMATIC RING SECTION â”€â”€ -->
+    <section id="ring-cinematic">
+        <div class="bg-image"></div>
+        <div class="gradient-overlay"></div>
+        <div class="cursor-glow"></div>
+        <div class="cinematic-floater">
+            <div class="circle-text-centerer">
+                <div class="circular-text-container" id="circular-text"></div>
+            </div>
+            <div class="ring-wrapper cinematic">
+                <div class="ring-disc cinematic" id="cinematic-ring-disc">
+                    <div class="ring-half top" id="air-half">
+                        <video class="air-video" src="sec3/air5sec.mp4" muted loop autoplay playsinline></video>
+                    </div>
+                    <div class="ring-mist"></div>
+                    <div class="ring-half bottom" id="water-half">
+                        <video class="water-video" src="sec3/water5sec.mp4" muted loop autoplay playsinline></video>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GSAP and Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        (() => {
+            /* â”€â”€ ELEMENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            const video = document.getElementById('hero-video');
+            const clipTop = document.getElementById('clip-top');
+            const clipBot = document.getElementById('clip-bot');
+            const heroText = document.getElementById('hero-text');
+            const scrollCue = document.getElementById('scroll-cue');
+            const card = document.getElementById('elephant-card');
+            const panels = document.getElementById('card-panels');
+            const elImg = document.getElementById('card-elephant');
+            const titleBg = document.getElementById('card-title-bg');
+            const labelEl = document.getElementById('card-label');
+            const descEl = document.getElementById('card-desc');
+            const statsEl = document.getElementById('card-stats');
+            const seamEl = document.getElementById('seam');
+            const progBar = document.getElementById('progress-bar');
+            const loader = document.getElementById('loader');
+
+            /* â”€â”€ STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            let duration = 0, isReady = false;
+            let dispTime = 0, targTime = 0, vidRaf = null;
+            let floating = false, dirty = false, renderRaf = null;
+
+            /* â”€â”€ CACHED LAYOUT (avoids reflow in scroll) â”€â”€ */
+            let stageH = 1, winH = 1, maxGap = 1;
+            function cacheLayout() {
+                const stage = document.getElementById('scroll-stage');
+                winH = window.innerHeight;
+                stageH = stage.offsetHeight - winH;
+                maxGap = winH * 0.22;
+            }
+
+            /* â”€â”€ TUNING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            const LERP = 0.10, MAX_STEP = 0.20;
+
+            /* â”€â”€ TIMELINE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            const T = {
+                TEXT_HOLD: 0.55, TEXT_GONE: 0.70,
+                SPLIT_OPEN: 0.68, SPLIT_FULL: 0.76,
+                SPLIT_CLOSE: 0.86, SPLIT_DONE: 0.93,
+            };
+
+            /* â”€â”€ MATH (inlined for speed) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+            function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+            function ss(t) { return t * t * (3 - 2 * t); }
+            function beat(sp, s, e) { return ss(clamp01((sp - s) / (e - s))); }
+
+            function getP() { return stageH > 0 ? clamp01(window.scrollY / stageH) : 0; }
+
+            function splitProg(p) {
+                if (p < T.SPLIT_OPEN) return 0;
+                if (p < T.SPLIT_FULL) return ss((p - T.SPLIT_OPEN) / (T.SPLIT_FULL - T.SPLIT_OPEN));
+                if (p < T.SPLIT_CLOSE) return 1;
+                if (p < T.SPLIT_DONE) return ss(1 - (p - T.SPLIT_CLOSE) / (T.SPLIT_DONE - T.SPLIT_CLOSE));
+                return 0;
+            }
+
+            let lastSeekMs = 0;           // monotonic clock of last actual seek
+            const SEEK_INTERVAL = 50;     // minimum ms between seeks (~20fps decode)
+            const HAS_FAST_SEEK = typeof HTMLVideoElement.prototype.fastSeek === 'function';
+
+            function doSeek(t) {
+                // Never seek while browser is still decoding a previous seek
+                if (video.seeking) return;
+                const now = performance.now();
+                if (now - lastSeekMs < SEEK_INTERVAL) return;
+                lastSeekMs = now;
+                if (HAS_FAST_SEEK) { video.fastSeek(t); } else { video.currentTime = t; }
+            }
+
+            function videoLerp() {
+                const d = targTime - dispTime;
+                // Close enough — snap and stop the loop
+                if (d > -0.008 && d < 0.008) {
+                    dispTime = targTime;
+                    doSeek(dispTime);
+                    vidRaf = null;
+                    return;
+                }
+                let step = d * LERP;
+                if (step > MAX_STEP) step = MAX_STEP;
+                else if (step < -MAX_STEP) step = -MAX_STEP;
+                dispTime = clamp(dispTime + step, 0, duration - 0.001);
+                doSeek(dispTime);
+                vidRaf = requestAnimationFrame(videoLerp);
+            }
+
+            /* â•â•â•â•â•â••â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               RENDER â€” called once per RAF frame max
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+            function render() {
+                renderRaf = null;
+                dirty = false;
+                if (!isReady) return;
+
+                const p = getP();
+                const sp = splitProg(p);
+                const gapPct = sp * 22;
+
+                // â”€â”€ Video seek
+                targTime = clamp(p * duration, 0, duration - 0.001);
+                if (!vidRaf) vidRaf = requestAnimationFrame(videoLerp);
+
+                // â”€â”€ Progress bar (scaleX = GPU-composited)
+                progBar.style.transform = `scaleX(${dispTime / duration})`;
+
+                // â”€â”€ SPLIT: clip-path cuts center gap from video, gap-fill shows behind
+                const topEnd = 50 - gapPct / 2;
+                const botStart = 50 + gapPct / 2;
+                if (gapPct < 0.1) {
+                    video.style.clipPath = 'none';
+                } else {
+                    video.style.clipPath =
+                        `polygon(0% 0%,100% 0%,100% ${topEnd}%,0% ${topEnd}%,0% ${botStart}%,100% ${botStart}%,100% 100%,0% 100%)`;
+                }
+                clipTop.style.display = 'none';
+                clipBot.style.display = 'none';
+
+                // â”€â”€ Seam glow
+                seamEl.style.opacity = sp;
+
+                // â”€â”€ HERO TEXT
+                let ta;
+                if (p < T.TEXT_HOLD) ta = 1;
+                else if (p < T.TEXT_GONE) ta = 1 - (p - T.TEXT_HOLD) / (T.TEXT_GONE - T.TEXT_HOLD);
+                else ta = 0;
+                heroText.style.opacity = ta;
+                heroText.style.transform = `translate3d(0,${(1 - ta) * -12}px,0)`;
+                scrollCue.style.opacity = ta;
+
+                // â”€â”€ CARD (overall)
+                const cardScale = 0.82 + 0.18 * sp;
+                const cardY = (1 - sp) * 44;
+                card.style.opacity = sp;
+                card.style.transform = `translate3d(-50%,-50%,0) translate3d(0,${cardY}px,0) scale(${cardScale})`;
+
+                // â‘  Panels
+                const bP = beat(sp, 0.00, 0.28);
+                panels.style.opacity = bP;
+                panels.style.transform = `translate3d(0,${(1 - bP) * 30}px,0)`;
+
+                // â‘¡ Elephant
+                const bE = beat(sp, 0.18, 0.46);
+                elImg.style.opacity = bE;
+                elImg.style.transform = `translate3d(-50%,${(1 - bE) * 28}px,0) scale(${0.88 + 0.12 * bE})`;
+                if (bE >= 0.98 && !floating) { elImg.classList.add('floating'); floating = true; }
+                if (bE < 0.98 && floating) { elImg.classList.remove('floating'); floating = false; }
+
+                // â‘¢ Title (top area, centered via -50% x)
+                const bT = beat(sp, 0.30, 0.56);
+                titleBg.style.opacity = bT;
+                titleBg.style.transform = `translate3d(-50%,0,0) translate3d(${(1 - bT) * -40}px,0,0)`;
+
+                // â‘£ Label
+                const bL = beat(sp, 0.38, 0.60);
+                labelEl.style.opacity = bL;
+                labelEl.style.transform = `translate3d(-50%,${(1 - bL) * -18}px,0)`;
+
+                // â‘¤ Description (left side, slides from left)
+                const bD = beat(sp, 0.50, 0.72);
+                descEl.style.opacity = bD;
+                descEl.style.transform = `translate3d(${(1 - bD) * -30}px,0,0)`;
+
+                // â‘¥ Stats (left side, slides up)
+                const bS = beat(sp, 0.62, 0.84);
+                statsEl.style.opacity = bS;
+                statsEl.style.transform = `translate3d(0,${(1 - bS) * 20}px,0)`;
+            }
+
+            /* â”€â”€ SCROLL â†’ dirty flag + single RAF â”€â”€â”€â”€ */
+            function onScroll() {
+                if (!dirty) {
+                    dirty = true;
+                    renderRaf = requestAnimationFrame(render);
+                }
+            }
+
+            /* â”€â”€ VIDEO READY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            function onReady() {
+                duration = video.duration;
+                video.currentTime = 0;
+                dispTime = targTime = 0;
+                loader.classList.add('hidden');
+                isReady = true;
+                cacheLayout();
+                render();
+            }
+
+            /* â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            function init() {
+                video.pause();
+                video.addEventListener('play', () => video.pause());
+                cacheLayout();
+
+                if (video.readyState >= 4) {
+                    onReady();
+                } else {
+                    video.addEventListener('canplaythrough', onReady, { once: true });
+                    video.addEventListener('loadedmetadata', () => {
+                        if (!isReady) {
+                            duration = video.duration;
+                            video.currentTime = 0;
+                            loader.classList.add('hidden');
+                            isReady = true;
+                            cacheLayout();
+                            render();
+                        }
+                    }, { once: true });
+                }
+
+                window.addEventListener('scroll', onScroll, { passive: true });
+                window.addEventListener('resize', () => { cacheLayout(); onScroll(); }, { passive: true });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+
+    <!-- ══ PARTICLE BRIDGE JS ══ -->
+    <script>
+        (() => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            const pbContainer = document.getElementById('pb-canvas-container');
+            if(!pbContainer) return;
+
+            const pbScene = new THREE.Scene();
+            const pbCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+            pbCamera.position.z = 500;
+
+            const pbRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            pbRenderer.setSize(window.innerWidth, window.innerHeight);
+            pbRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            pbContainer.appendChild(pbRenderer.domElement);
+
+            const PB_TEXT = "SCROLL MORE\nTO SHOW\nNEW ANIMALS";
+            const PB_MOUSE_RADIUS = 100;
+            const pbLerp = (a, b, n) => (1 - n) * a + n * b;
+
+            const pbMouse = new THREE.Vector2(-9999, -9999);
+            const pbTargetMouse = new THREE.Vector2(-9999, -9999);
+            let pbScrollProgress = 0;
+
+            window.addEventListener('mousemove', (e) => {
+                const x = (e.clientX / window.innerWidth) * 2 - 1;
+                const y = -(e.clientY / window.innerHeight) * 2 + 1;
+                const z = 500;
+                const vFov = (pbCamera.fov * Math.PI) / 180;
+                const h = 2 * Math.tan(vFov / 2) * z;
+                const w = h * pbCamera.aspect;
+                pbTargetMouse.x = x * w / 2;
+                pbTargetMouse.y = y * h / 2;
+            });
+
+            const setupPBParticles = () => {
+                const offscreen = document.createElement('canvas');
+                const offCtx = offscreen.getContext('2d');
+                offscreen.width = 2048; 
+                offscreen.height = 1024;
+
+                const fontSize = 160;
+                offCtx.fillStyle = '#fff';
+                // Premium Cinematic Typeface
+                offCtx.font = `800 ${fontSize}px "Outfit", sans-serif`;
+                offCtx.textAlign = 'center';
+                offCtx.textBaseline = 'middle';
+
+                const lines = PB_TEXT.split('\n');
+                const lineSpacing = fontSize * 1.3;
+                lines.forEach((line, i) => {
+                    // Dynamically center any number of lines vertically
+                    const yOffset = (i - (lines.length - 1) / 2) * lineSpacing;
+                    offCtx.fillText(line, offscreen.width / 2, offscreen.height / 2 + yOffset);
+                });
+
+                const imgData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height).data;
+                const homePositions = [];
+                const randomValues = [];
+
+                const step = 2.5; // High-density premium stardust
+                for (let y = 0; y < offscreen.height; y += step) {
+                    for (let x = 0; x < offscreen.width; x += step) {
+                        const i = (Math.floor(y) * offscreen.width + Math.floor(x)) * 4;
+                        if (imgData[i + 3] > 128) {
+                            const px = (x - offscreen.width / 2) * 0.4;
+                            const py = -(y - offscreen.height / 2) * 0.4;
+                            homePositions.push(px, py, 0);
+                            randomValues.push(Math.random(), Math.random(), Math.random());
+                        }
+                    }
+                }
+
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(homePositions, 3));
+                geometry.setAttribute('homePosition', new THREE.Float32BufferAttribute(homePositions, 3));
+                geometry.setAttribute('randomValue', new THREE.Float32BufferAttribute(randomValues, 3));
+
+                const material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        uTime: { value: 0 },
+                        uMouse: { value: pbMouse },
+                        uMouseRadius: { value: PB_MOUSE_RADIUS },
+                        uScroll: { value: 0 },
+                        uGlobalFade: { value: 1.0 }
+                    },
+                    vertexShader: `
+                        uniform float uTime;
+                        uniform vec2 uMouse;
+                        uniform float uMouseRadius;
+                        uniform float uScroll;
+                        uniform float uGlobalFade;
+                        attribute vec3 homePosition;
+                        attribute vec3 randomValue;
+                        varying float vAlpha;
+                        varying vec3 vColor;
+
+                        void main() {
+                            vec3 pos = homePosition;
+                            
+                            // Subtle organic breathing
+                            pos.x += sin(uTime * 1.2 + randomValue.x * 20.0) * 2.0;
+                            pos.y += cos(uTime * 1.5 + randomValue.y * 20.0) * 2.0;
+
+                            // Scroll expansion effect
+                            pos.x *= 1.0 + uScroll * 1.5;
+                            pos.y *= 1.0 + uScroll * 1.5;
+                            pos.z += uScroll * 200.0 * randomValue.z;
+
+                            // Mouse repulsion
+                            float dist = distance(pos.xy, uMouse);
+                            if (dist < uMouseRadius) {
+                                float force = (uMouseRadius - dist) / uMouseRadius;
+                                vec2 dir = normalize(pos.xy - uMouse);
+                                pos.xy += dir * force * 50.0;
+                                pos.z += force * 40.0;
+                            }
+
+                            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                            // Finer, sharper premium dots
+                            gl_PointSize = (1.2 + randomValue.x * 2.0) * (500.0 / -mvPosition.z);
+                            gl_Position = projectionMatrix * mvPosition;
+                            // Smoother alpha fade
+                            vAlpha = (1.0 - uScroll * 0.5) * (0.4 + 0.6 * randomValue.z) * uGlobalFade;
+                            
+                            // Autumn foliage colors (Burnt orange/amber to Golden yellow) to match Red Fox backdrop
+                            vColor = mix(vec3(0.95, 0.45, 0.1), vec3(0.95, 0.75, 0.2), randomValue.x);
+                        }
+                    `,
+                    fragmentShader: `
+                        varying float vAlpha;
+                        varying vec3 vColor;
+                        void main() {
+                            float dist = distance(gl_PointCoord, vec2(0.5));
+                            if (dist > 0.5) discard;
+                            
+                            // Soft glow volumetric illumination
+                            float pointAlpha = smoothstep(0.5, 0.0, dist);
+                            gl_FragColor = vec4(vColor, vAlpha * pointAlpha * 1.5);
+                        }
+                    `,
+                    transparent: true,
+                    blending: THREE.AdditiveBlending,
+                    depthWrite: false
+                });
+
+                const pbPoints = new THREE.Points(geometry, material);
+                pbScene.add(pbPoints);
+                return pbPoints;
+            };
+
+            const pbPoints = setupPBParticles();
+
+            const pbAnimate = (time) => {
+                requestAnimationFrame(pbAnimate);
+                pbMouse.x = pbLerp(pbMouse.x, pbTargetMouse.x, 0.1);
+                pbMouse.y = pbLerp(pbMouse.y, pbTargetMouse.y, 0.1);
+                pbPoints.material.uniforms.uTime.value = time * 0.001;
+                pbPoints.material.uniforms.uScroll.value = pbScrollProgress;
+                pbRenderer.render(pbScene, pbCamera);
+            };
+            pbAnimate(0);
+
+            window.addEventListener('resize', () => {
+                if(pbRenderer) {
+                    pbRenderer.setSize(window.innerWidth, window.innerHeight);
+                    pbCamera.aspect = window.innerWidth / window.innerHeight;
+                    pbCamera.updateProjectionMatrix();
+                }
+            });
+
+            ScrollTrigger.create({
+                trigger: '#particle-bridge-section',
+                start: 'top top',
+                end: '+=400vh', 
+                pin: true,
+                scrub: 0.1,
+                onUpdate: (self) => {
+                    pbScrollProgress = self.progress;
+                    // Fade out near the very end so the handoff to animal ring is clean
+                    const fadeStart = 0.8;
+                    let fade = 1.0;
+                    if(self.progress > fadeStart) {
+                        fade = 1.0 - ((self.progress - fadeStart) / (1.0 - fadeStart));
+                    }
+                    pbPoints.material.uniforms.uGlobalFade.value = fade;
+                }
+            });
+
+        })();
+    </script>
+
+    <!-- â•â•â•â• ANIMAL RING JS â•â•â•â• -->
+    <script>
+        (() => {
+            gsap.registerPlugin(ScrollTrigger);
+            const A = [
+                { n: "Red Fox", d: "Masters of the autumn brush. Adapting seamlessly to shifting environments, they move like flickering flames through the falling leaves.", s: "35-50cm", i: "ring/red fox1.png", v: "svg/fox.svg", c: ["#8B4513", "#2F1B0C"] },
+                { n: "Spotted Deer", d: "Grace in the sunlit clearings. Highly alert and incredibly agile, they navigate the dense woodlands with silent precision.", s: "90-100cm", i: "ring/deer2.png", v: "svg/deer.svg", c: ["#3A5320", "#1A2411"] },
+                { n: "Leopard", d: "The phantom of the branches. Perfectly camouflaged in the dappled light, observing the forest floor with unmatched stealth.", s: "60-70cm", i: "ring/lepord3.png", v: "svg/lepord.svg", c: ["#2C3E24", "#121A0F"] },
+                { n: "Tiger", d: "Power wading through the morning mist. A solitary apex predator commanding the riverbanks with silent, heavy footsteps.", s: "90-110cm", i: "ring/tiger4.png", v: "svg/tiger.svg", c: ["#1C3026", "#0A110D"] },
+                { n: "Cheetah", d: "Evolution built for pure velocity. A blur of motion across the open plains, defining the very limit of mammalian speed.", s: "70-90cm", i: "ring/cheetah5.png", v: "svg/cheetah.svg", c: ["#C29B62", "#4A3518"] },
+                { n: "Bear", d: "Unyielding strength in the rushing rapids. Masters of the river currents, balancing raw power with remarkable patience.", s: "100-150cm", i: "ring/bear6.png", v: "svg/bear.svg", c: ["#3A4A5A", "#161D24"] },
+                { n: "Lion", d: "The undisputed monarch of the savanna. Basking in the golden hour, carrying the weight of the pride with effortless majesty.", s: "110-120cm", i: "ring/lion7.png", v: "svg/lion.svg", c: ["#A66B38", "#3E230B"] },
+                { n: "Giraffe", d: "Sentinels of the horizon. Moving with a deliberate, slow-motion grace that defies their towering, architectural scale.", s: "400-500cm", i: "ring/giraff8.png", v: "svg/giraffe.svg", c: ["#7EA1B5", "#D4B886"] },
+                { n: "Komodo Dragon", d: "A living relic of a prehistoric era. Patient, armored, and uniquely adapted to rule the harsh, sun-baked island terrains.", s: "70-90cm", i: "ring/komodo_gradon9.png", v: "svg/komodo-dragon.svg", c: ["#6B5C47", "#2E261A"] },
+            ];
+            const N = A.length;
+            const $bg = document.getElementById('ring-bg');
+            const $fl = document.getElementById('full-left');
+            const $fr = document.getElementById('full-right');
+            const $disc = document.getElementById('ring-disc');
+            const $gc = document.getElementById('glass-card');
+            const $gp = [0, 1, 2].map(j => document.getElementById('gpanel-' + j));
+            const $ic = document.getElementById('info-card');
+            const $in = document.getElementById('info-name');
+            const $id = document.getElementById('info-desc');
+            const $is = document.getElementById('info-stat');
+            const $dots = document.getElementById('ring-dots');
+
+            // Build ring
+            const RAD = 175;
+            A.forEach((a, j) => {
+                const sl = document.createElement('div');
+                sl.className = 'ring-slot';
+                const ang = j * (360 / N), rd = ang * Math.PI / 180;
+                sl.style.transform = `translate(calc(-50% + ${Math.sin(rd) * RAD}px), calc(-50% + ${Math.cos(rd) * RAD}px))`;
+                const im = document.createElement('img');
+                im.src = a.v; im.alt = a.n;
+                sl.appendChild(im);
+                $disc.appendChild(sl);
+            });
+            A.forEach(() => { const d = document.createElement('div'); d.className = 'ring-dot'; $dots.appendChild(d); });
+
+            // Math
+            function cl(v, a, b) { return v < a ? a : v > b ? b : v; }
+            function ss(t) { return t * t * (3 - 2 * t); }
+            function pr(v, a, b) { return cl((v - a) / (b - a), 0, 1); }
+            function lr(a, b, t) { return a + (b - a) * t; }
+            function hx(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+            function lc(a, b, t) { const ra = hx(a), rb = hx(b); return `rgb(${Math.round(lr(ra[0], rb[0], t))},${Math.round(lr(ra[1], rb[1], t))},${Math.round(lr(ra[2], rb[2], t))})`; }
+
+            // Setters
+            function sImg(j) { const u = "url('" + A[j].i + "')"; $fl.style.backgroundImage = u; $fr.style.backgroundImage = u; }
+            function sGl(j, f) { const u = "url('" + A[j].i + "')"; $gp.forEach(p => { p.querySelector('.glass-' + f + ' .glass-img').style.backgroundImage = u; }); }
+            function sInf(j) { $in.textContent = A[j].n; $id.textContent = A[j].d; $is.innerHTML = '<span class="info-stat-label">HEIGHT</span>' + A[j].s; }
+            function sUI(j) {
+                document.querySelectorAll('.ring-slot').forEach((s, k) => s.classList.toggle('active', k === j));
+                document.querySelectorAll('.ring-dot').forEach((d, k) => d.classList.toggle('active', k === j));
+                const r = (j * (360 / N));
+                $disc.style.transform = 'rotate(' + r + 'deg)';
+                document.querySelectorAll('.ring-slot img').forEach(im => { im.style.transform = 'rotate(' + (-r) + 'deg)'; });
+            }
+
+            // Init
+            sImg(0); sGl(0, 'front'); sGl(0, 'back'); sInf(0); sUI(0);
+            $bg.style.background = 'linear-gradient(160deg,' + A[0].c[0] + ' 0%,' + A[0].c[1] + ' 100%)';
+
+            let lastUiIdx = -1;
+            function render(gp) {
+                const seg = gp * N;
+                const idx = Math.min(Math.floor(seg), N - 1);
+                const lp = seg - idx;
+                const nxt = Math.min(idx + 1, N - 1);
+
+                sImg(idx); sGl(idx, 'front');
+                if (idx !== nxt) sGl(nxt, 'back');
+
+                // Gradient
+                const bt = ss(pr(lp, 0.58, 0.90));
+                if (idx !== nxt) {
+                    $bg.style.background = 'linear-gradient(160deg,' + lc(A[idx].c[0], A[nxt].c[0], bt) + ' 0%,' + lc(A[idx].c[1], A[nxt].c[1], bt) + ' 100%)';
+                } else {
+                    $bg.style.background = 'linear-gradient(160deg,' + A[idx].c[0] + ' 0%,' + A[idx].c[1] + ' 100%)';
+                }
+
+                // Split
+                let sp = 0;
+                if (lp < 0.15) sp = 0;
+                else if (lp < 0.42) sp = ss(pr(lp, 0.15, 0.42));
+                else if (lp < 0.58) sp = 1;
+                else if (lp < 0.85) sp = 1 - ss(pr(lp, 0.58, 0.85));
+                else sp = 0;
+                const gap = sp * 50;
+                $fl.style.clipPath = 'inset(0 calc(' + (50 + gap / 2) + '% - 1px) 0 0)';
+                $fr.style.clipPath = 'inset(0 0 0 calc(' + (50 + gap / 2) + '% - 1px))';
+
+                // Glass
+                const gIn = ss(pr(lp, 0.20, 0.40));
+                const gOu = 1 - ss(pr(lp, 0.62, 0.80));
+                const gO = sp > 0.01 ? Math.min(gIn, gOu < 0.01 ? 0 : gOu) : 0;
+                $gc.style.opacity = gO;
+                $gc.style.transform = 'translate(-50%,-50%) scale(' + (0.86 + 0.14 * gO) + ')';
+
+                // Info
+                const iIn = ss(pr(lp, 0.28, 0.45));
+                const iOu = 1 - ss(pr(lp, 0.64, 0.78));
+                const iO = sp > 0.01 ? Math.min(iIn, iOu < 0.01 ? 0 : iOu) : 0;
+                $ic.style.opacity = iO;
+                $ic.style.transform = 'translateX(-50%) translateY(' + ((1 - iO) * 22) + 'px)';
+                if (lp < 0.72) sInf(idx); else if (idx !== nxt) sInf(nxt);
+
+                // Panel flip
+                $gp.forEach((p, k) => {
+                    const st = k * 0.035;
+                    const fP = ss(pr(lp, 0.55 + st, 0.82 + st));
+                    p.style.transform = 'rotateY(' + (fP * 180) + 'deg)';
+                });
+
+                // Determine active animal for fully declarative UI
+                const activeAnimal = (lp > 0.88 && idx !== nxt) ? nxt : idx;
+
+                // After flip
+                if (lp > 0.88 && idx !== nxt) {
+                    sImg(nxt); sGl(nxt, 'front');
+                    $gp.forEach(p => { p.style.transform = 'rotateY(0deg)'; });
+                }
+
+                if (activeAnimal !== lastUiIdx) {
+                    lastUiIdx = activeAnimal;
+                    sUI(activeAnimal);
+                }
+            }
+
+            ScrollTrigger.create({
+                trigger: '#ring-section',
+                start: 'top top',
+                end: '+=9000',
+                pin: true,
+                pinSpacing: true,
+                scrub: 0.3,
+                onUpdate: function (self) { render(self.progress); }
+            });
+
+            /* â”€â”€ CINEMATIC RING LOGIC â”€â”€ */
+            const cinematicRing = document.getElementById('cinematic-ring-disc');
+            const airHalf = document.getElementById('air-half');
+            const waterHalf = document.getElementById('water-half');
+            const ringWrap = document.querySelector('#ring-cinematic .ring-wrapper.cinematic');
+            const bgImgCinematic = document.querySelector('#ring-cinematic .bg-image');
+            let cinematicRotationPaused = false;
+
+            function expandCinematic(halfEl) {
+                if (cinematicRotationPaused) return;
+                cinematicRotationPaused = true;
+
+                // Pause rotation by locking transform
+                const st = window.getComputedStyle(cinematicRing);
+                const mat = st.getPropertyValue('transform');
+                cinematicRing.style.animation = 'none';
+                cinematicRing.style.transform = mat;
+
+                // Brief hover-like pop
+                halfEl.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease';
+                halfEl.style.transform = 'scale(1.05)';
+                halfEl.style.zIndex = '10';
+
+                // Other half fades out
+                const other = halfEl === airHalf ? waterHalf : airHalf;
+                other.style.opacity = '0';
+
+                // Dissolve border and outer text organically
+                ringWrap.style.borderColor = 'rgba(255,255,255,0)';
+                ringWrap.style.boxShadow = 'none';
+
+                // Fade out text container
+                const ct = document.querySelector('.circle-text-centerer');
+                if (ct) {
+                    ct.style.transition = 'opacity 0.6s ease';
+                    ct.style.opacity = '0';
+                }
+
+                // Calculate displacement to keep the clicked half's center fixed in the middle of the viewport
+                let rad = 0;
+                if (mat !== 'none') {
+                    const vals = mat.split('(')[1].split(')')[0].split(',');
+                    const a = parseFloat(vals[0]);
+                    const b = parseFloat(vals[1]);
+                    rad = Math.atan2(b, a);
+                }
+
+                // Radius of the offset (25% of the circle height)
+                const rect = ringWrap.getBoundingClientRect();
+                const R = rect.height / 4;
+                // Local angle: air is -90deg, water is +90deg from center
+                const localAng = halfEl === airHalf ? -Math.PI / 2 : Math.PI / 2;
+                const totalAng = rad + localAng;
+
+                const dx = R * Math.cos(totalAng);
+                const dy = R * Math.sin(totalAng);
+
+                setTimeout(() => {
+                    bgImgCinematic.style.opacity = '0';
+
+                    ringWrap.style.transition = 'transform 1.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.6s ease';
+                    // Scale heavily and counter-translate so the selected half covers the screen
+                    ringWrap.style.transform = `translate(calc(-50% - ${dx}px), calc(-50% - ${dy}px)) scale(6)`;
+
+                    const vid = halfEl.querySelector('video');
+                    vid.style.transition = 'opacity 1.5s ease 0.4s';
+                    vid.style.opacity = '0';
+
+                    setTimeout(() => {
+                        ringWrap.style.display = 'none';
+                        // Navigate to Air Section
+                        if (halfEl === airHalf) {
+                            sessionStorage.setItem('airAccess', 'true');
+                            window.location.href = 'air.html';
+                        }
+                    }, 1800);
+                }, 400);
+            }
+
+            airHalf.addEventListener('click', () => expandCinematic(airHalf));
+            waterHalf.addEventListener('click', () => expandCinematic(waterHalf));
+
+            /* â”€â”€ MAGNETIC CIRCULAR TEXT & GLOW â”€â”€ */
+            const circularText = document.getElementById('circular-text');
+            const airText = "AIR WORLD";
+            const waterText = "WATER WORLD";
+            const magneticChars = [];
+
+            function createTextRing(text, isBottom) {
+                const totalAngle = 105; // Spread arc over 105 degrees for massive look
+                const step = totalAngle / Math.max(1, text.length - 1);
+
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    if (char === ' ') continue;
+
+                    const wrap = document.createElement('div');
+                    wrap.className = 'char-wrapper' + (isBottom ? ' bottom-arc' : '');
+
+                    // Angle calculation: increasing for top, decreasing for bottom
+                    const angle = isBottom
+                        ? (totalAngle / 2) - (i * step)
+                        : -(totalAngle / 2) + (i * step);
+
+                    wrap.style.transform = `rotate(${angle}deg)`;
+
+                    const inner = document.createElement('div');
+                    inner.className = 'char-inner';
+                    inner.innerText = char;
+
+                    wrap.appendChild(inner);
+                    circularText.appendChild(wrap);
+                    magneticChars.push({ wrap, inner });
+                }
+            }
+
+            createTextRing(airText, false);
+            createTextRing(waterText, true);
+
+            const glow = document.querySelector('#ring-cinematic .cursor-glow');
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let isHoveringCinematic = false;
+
+            document.getElementById('ring-cinematic').addEventListener('mouseenter', () => {
+                isHoveringCinematic = true;
+                glow.style.opacity = '1';
+            });
+            document.getElementById('ring-cinematic').addEventListener('mouseleave', () => {
+                isHoveringCinematic = false;
+                glow.style.opacity = '0';
+            });
+            document.getElementById('ring-cinematic').addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function updateMagneticText() {
+                if (!isHoveringCinematic || cinematicRotationPaused) {
+                    if (cinematicRotationPaused) glow.style.opacity = '0'; // Hide glow when expanded
+                    requestAnimationFrame(updateMagneticText);
+                    return;
+                }
+
+                // Smooth glow position tracking
+                glow.style.left = mouseX + 'px';
+                glow.style.top = mouseY + 'px';
+
+                let maxProx = 0;
+
+                magneticChars.forEach(c => {
+                    const rect = c.wrap.getBoundingClientRect();
+                    // Because .char-wrapper is a tall thin box spanning the diameter, 
+                    // bounding client rect center is the CENTER of the ring, not the letter!
+                    // To get the letter's coordinates, we must get the bounding rect of `inner`!
+                    const innerRect = c.inner.getBoundingClientRect();
+                    const cx = innerRect.left + innerRect.width / 2;
+                    const cy = innerRect.top + innerRect.height / 2;
+
+                    const dx = mouseX - cx;
+                    const dy = mouseY - cy;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    const THRESHOLD = 130; // Hover trigger distance
+                    if (dist < THRESHOLD) {
+                        const prox = 1 - (dist / THRESHOLD);
+                        if (prox > maxProx) maxProx = prox;
+
+                        // Push slightly away or pull toward? "moves slightly toward cursor"
+                        const moveX = (dx / dist) * prox * 10;
+                        const moveY = (dy / dist) * prox * 10;
+
+                        const scale = 1 + (prox * 0.22);
+
+                        c.inner.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
+                        c.inner.style.color = '#fff';
+                        c.inner.style.textShadow = '0 0 15px rgba(255,255,255,0.7)';
+                    } else {
+                        c.inner.style.transform = 'translate(0, 0) scale(1)';
+                        c.inner.style.color = 'rgba(255, 255, 255, 0.6)';
+                        c.inner.style.textShadow = 'none';
+                    }
+                });
+
+                // Diffused glow intensity boosts
+                glow.style.opacity = (0.3 + 0.6 * maxProx).toString();
+                requestAnimationFrame(updateMagneticText);
+            }
+            updateMagneticText();
+
+        })();
+    </script>
+</body>
+
+</html>

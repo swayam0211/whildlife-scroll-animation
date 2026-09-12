@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinematic Wildlife Interface</title>
+
+    <!-- UI Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+
+    <style>
+        /* ── VARIABLES ── */
+        :root {
+            --glass-bg: rgba(14, 21, 33, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-highlight: rgba(255, 255, 255, 0.4);
+            --accent-glow: #00d2ff;
+            --gold-glow: #ffc255;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #020508;
+            font-family: 'Outfit', sans-serif;
+            color: #fff;
+        }
+
+        /* ── 1. BACKGROUND VIDEO LAYER ── */
+        .bg-video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .bg-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Golden hour cinematic lighting overlay */
+            filter: brightness(0.85) contrast(1.15) saturate(1.2);
+            opacity: 0.8;
+            transition: opacity 1s ease;
+        }
+
+        .ambient-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 20%, rgba(2, 5, 8, 0.85) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ── 2. THREE.JS 3D CANVAS ── */
+        #webgl-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            /* In front of video, behind UI */
+            pointer-events: none;
+            /* Let UI events pass through */
+        }
+
+        /* ── 3. LOGIN UI CONTAINER ── */
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            justify-content: flex-end;
+            /* Card on the right */
+            align-items: center;
+            padding: 2rem 12vw;
+            box-sizing: border-box;
+            perspective: 1000px;
+        }
+
+        /* Glass Card Effect */
+        .login-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            max-width: 460px;
+            width: 100%;
+            min-height: 560px;
+            /* Hyper clear transparent crystal */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+            border-radius: 40px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow:
+                inset 1px 1px 1px rgba(255, 255, 255, 0.8),
+                inset -1px -1px 3px rgba(255, 255, 255, 0.2),
+                0 40px 100px rgba(0, 0, 0, 0.5),
+                0 0 4px rgba(255, 255, 255, 0.25);
+            border: 0.5px solid rgba(255, 255, 255, 0.4);
+            padding: 0;
+            transform-style: preserve-3d;
+            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* Subtle warm tint to pick up golden hour colors inside glass */
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top left, rgba(255, 215, 120, 0.08), transparent 60%);
+            border-radius: 40px;
+            pointer-events: none;
+        }
+
+        .login-card-inner {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border-radius: 22px;
+            box-shadow: none;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Right: Form Area */
+        .card-right {
+            flex: 1;
+            padding: 3rem 3.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .wildlife-logo {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 6px;
+            color: #ffc255;
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+            opacity: 0.9;
+            text-shadow: 0 0 15px rgba(255, 194, 85, 0.4);
+        }
+
+        .auth-header h1 {
+            font-weight: 800;
+            font-size: 3.4rem;
+            margin: 0 0 0.4rem 0;
+            color: #111;
+            letter-spacing: -2px;
+            text-shadow: 0 0 30px rgba(255, 194, 85, 0.35), 0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .auth-header p {
+            font-weight: 500;
+            font-size: 1.05rem;
+            color: rgba(0, 0, 0, 0.7);
+            margin: 0 0 2.5rem 0;
+            letter-spacing: -0.2px;
+            line-height: 1.4;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 1rem;
+            color: rgba(0, 0, 0, 0.9);
+            margin-bottom: 0.7rem;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 0.5px solid rgba(255, 255, 255, 0.6);
+            padding: 1.2rem 1.6rem;
+            border-radius: 40px;
+            color: #1a1a1a;
+            font-family: inherit;
+            font-size: 1.15rem;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow:
+                inset 1px 1px 2px rgba(255, 255, 255, 1),
+                inset -0.5px -0.5px 2px rgba(0, 0, 0, 0.05),
+                0 8px 24px rgba(0, 0, 0, 0.04);
+            box-sizing: border-box;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .input-field::placeholder {
+            color: rgba(0, 0, 0, 0.35);
+        }
+
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.35);
+            box-shadow:
+                inset 1px 1px 2px rgba(255, 255, 255, 1),
+                0 15px 35px rgba(0, 0, 0, 0.1),
+                0 0 15px rgba(0, 210, 255, 0.1);
+            transform: scale(1.03);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1.2rem;
+            margin-top: 1.2rem;
+            background: rgba(255, 255, 255, 0.5);
+            border: 0.5px solid rgba(255, 255, 255, 0.7);
+            border-radius: 40px;
+            color: #1a1a1a;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow:
+                inset 1.5px 1.5px 3px rgba(255, 255, 255, 1),
+                0 12px 28px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .login-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #ffc255;
+            filter: drop-shadow(0 0 5px rgba(255, 194, 85, 0.5));
+        }
+
+        .login-btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: rgba(255, 255, 255, 0.65);
+            box-shadow:
+                0 25px 45px rgba(0, 0, 0, 0.12),
+                0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .login-btn:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ── WATERMARK SAFE ZONE ── */
+        .safe-zone {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 15%;
+            height: 60px;
+            z-index: 10;
+            pointer-events: none;
+            /* Intentionally empty for clean watermark */
+        }
+
+        /* ── EYE OVERLAY SYSTEM ── */
+        .eye-overlay-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            /* Between 3D canvas (2) and UI (10) */
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .animal-eyes {
+            position: absolute;
+            display: flex;
+            gap: 0;
+            transition: transform 0.15s ease-out;
+        }
+
+        .eye {
+            position: relative;
+            border-radius: 45%;
+            overflow: hidden;
+        }
+
+        .eyeball {
+            width: 100%;
+            height: 100%;
+            border-radius: 45%;
+            background: radial-gradient(circle at 40% 35%, #f5f0e8, #e8e0d4 60%, #c8bfb0);
+            box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.25), inset -1px -1px 2px rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: blink 4s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            96%,
+            100% {
+                transform: scaleY(1);
+            }
+
+            98% {
+                transform: scaleY(0.05);
+            }
+        }
+
+        .pupil {
+            width: 45%;
+            height: 45%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 35%, #2a2a2a, #0a0a0a);
+            position: relative;
+            transition: transform 0.05s linear;
+        }
+
+        .pupil-highlight {
+            position: absolute;
+            width: 30%;
+            height: 30%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            top: 15%;
+            left: 20%;
+        }
+
+        /* ── AMBIENT PARTICLES ── */
+        .particle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 220, 150, 0.3);
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: drift linear infinite;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translateY(110vh) translateX(0);
+            }
+
+            to {
+                transform: translateY(-10vh) translateX(50px);
+            }
+        }
+
+        /* ── EYE CLIP ZONE ── */
+        .eye-clip-zone {
+            position: absolute;
+            overflow: hidden;
+            /* pupils can't escape model face */
+            pointer-events: none;
+            /* transparent - model shows through */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 1. BACKGROUND LAYER -->
+    <div class="bg-video-container">
+        <!-- Seamless Golden Hour Background Loop -->
+        <video id="bg-video" autoplay loop muted playsinline>
+            <source src="Video Project 8.mp4" type="video/mp4">
+        </video>
+        <div class="ambient-glow"></div>
+        <div class="particle-container" id="particle-container"></div>
+    </div>
+
+    <!-- 2. THREE.JS 3D CHARACTER LAYER -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- 2.5 EYE OVERLAY LAYER -->
+    <div class="eye-overlay-layer" id="eye-overlay-layer">
+        <!-- Lion: clip zone prevents eyes escaping face area -->
+        <div class="eye-clip-zone" id="lion-clip" style="display:none;">
+            <div class="animal-eyes" id="lion-eyes" style="position:absolute;">
+                <div class="eye" id="lion-eye-l">
+                    <div class="eyeball">
+                        <div class="pupil" id="lion-pupil-l">
+                            <div class="pupil-highlight"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="eye" id="lion-eye-r">
+                    <div class="eyeball">
+                        <div class="pupil" id="lion-pupil-r">
+                            <div class="pupil-highlight"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Eagle: clip zone -->
+        <div class="eye-clip-zone" id="eagle-clip" style="display:none;">
+            <div class="animal-eyes" id="eagle-eyes" style="position:absolute;">
+                <div class="eye" id="eagle-eye-l">
+                    <div class="eyeball">
+                        <div class="pupil" id="eagle-pupil-l">
+                            <div class="pupil-highlight"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="eye" id="eagle-eye-r">
+                    <div class="eyeball">
+                        <div class="pupil" id="eagle-pupil-r">
+                            <div class="pupil-highlight"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Croc: clip zone -->
+        <div class="eye-clip-zone" id="croc-clip" style="display:none;">
+            <div class="animal-eyes" id="croc-eyes" style="position:absolute;">
+                <div class="eye" id="croc-eye-l">
+                    <div class="eyeball">
+                        <div class="pupil" id="croc-pupil-l">
+                            <div class="pupil-highlight"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="eye" id="croc-eye-r">
+                    <div class="eyeball">
+                        <div class="pupil" id="croc-pupil-r">
+                            <div class="pupil-highlight"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. GLASS UI LAYER -->
+    <div class="ui-layer">
+
+        <!-- The crystal glass login card -->
+        <div class="login-card" id="login-card">
+
+            <!-- Interior cut-out -->
+            <div class="login-card-inner">
+
+                <!-- Right Form Section -->
+                <div class="card-right">
+                    <div class="wildlife-logo">WILDLIFE</div>
+                    <div class="auth-header">
+                        <h1>Login</h1>
+                        <p>Authenticate to access the cinematic experience.</p>
+                    </div>
+
+                    <form onsubmit="event.preventDefault();">
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="text" class="input-field" placeholder="Email" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="password" class="input-field" placeholder="Password" required>
+                        </div>
+
+                        <button type="submit" class="login-btn">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M11 22.1C10.7 22.1 10.4 22 10.2 21.8L3.2 14.8C2.8 14.4 2.8 13.7 3.2 13.3L10.2 6.3C10.6 5.9 11.3 5.9 11.7 6.3C12.1 6.7 12.1 7.4 11.7 7.8L6.4 13.1H20.1C20.6 13.1 21.1 13.6 21.1 14.1C21.1 14.6 20.6 15.1 20.1 15.1H6.4L11.7 20.4C12.1 20.8 12.1 21.5 11.7 21.9C11.5 22 11.3 22.1 11 22.1Z" />
+                                <path
+                                    d="M12 2C11.4 2 11 2.4 11 3V4C11 4.6 11.4 5 12 5C12.6 5 13 4.6 13 4V3C13 2.4 12.6 2 12 2Z" />
+                            </svg>
+                            Login
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Safe Empty Zone -->
+    <div class="safe-zone"></div>
+
+    <!-- 4. LOGIC ENGINE -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- UI MICRO-INTERACTIONS ---
+            const uiLayer = document.querySelector('.ui-layer');
+            const loginCard = document.getElementById('login-card');
+
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetMouseX = 0;
+            let targetMouseY = 0;
+
+            window.addEventListener('mousemove', (e) => {
+                // Normalized coordinates: -1 to +1
+                targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+
+                // Tilt effect for card (CSS 3D)
+                if (loginCard) {
+                    const tiltX = targetMouseY * 4; // degrees
+                    const tiltY = -targetMouseX * 6; // degrees
+                    loginCard.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+                }
+            });
+
+            // Input ripple / breathe interactions
+            const inputs = document.querySelectorAll('.input-field');
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    input.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        input.style.transform = 'scale(1.01)'; // Return to focus state
+                    }, 120);
+                });
+                input.addEventListener('blur', () => {
+                    input.style.transform = 'scale(1)';
+                });
+            });
+
+            // Form Submission -> Navigate to Cinematic Index
+            const form = document.querySelector('form');
+            const btn = document.querySelector('.login-btn');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault(); // Prevent standard page reload
+
+                // Subtly press the button
+                btn.style.transform = 'scale(0.96)';
+
+                // Fade out the entire document smoothly
+                document.body.style.transition = 'opacity 1s ease';
+                document.body.style.opacity = '0';
+
+                // Navigate to the wildlife index exactly when fade completes
+                setTimeout(() => {
+                    window.location.href = '../index.html';
+                }, 1000);
+            });
+
+
+            // --- THREE.JS ENGINE ---
+            const canvas = document.getElementById('webgl-canvas');
+            const scene = new THREE.Scene();
+
+            // Perspective camera matching physical depth
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 1.5, 12);
+
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Cinematic Lighting Setup
+            const ambientLight = new THREE.AmbientLight(0xffedd1, 0.6); // Soft warm ambient
+            scene.add(ambientLight);
+
+            // Primary Sun (Golden Hour)
+            const dirLight = new THREE.DirectionalLight(0xffc255, 1.2);
+            dirLight.position.set(8, 10, 8);
+            scene.add(dirLight);
+
+            // Cool Rim Light (Blue/Cyan energy acting as fill)
+            const rimLight = new THREE.DirectionalLight(0x00d2ff, 1.0);
+            rimLight.position.set(-8, 2, -8);
+            scene.add(rimLight);
+
+            // Back glow
+            const pointLight = new THREE.PointLight(0x00d2ff, 1, 20);
+            pointLight.position.set(0, 2, -5);
+            scene.add(pointLight);
+
+            // Loader for 3D Assets
+            // Handle Draco compression which blocks the previous GLB loads
+            const dracoLoader = new THREE.DRACOLoader();
+            dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
+
+            const loader = new THREE.GLTFLoader();
+            loader.setDRACOLoader(dracoLoader);
+
+            const models = [];
+
+            /* ── Eye tracking data (3D Anchor Based) ──
+               ─────────────────────────────────────────────────────────────── */
+            const eyeData = {
+                lion: {
+                    clipZone: document.getElementById('lion-clip'),
+                    container: document.getElementById('lion-eyes'),
+                    pupilL: document.getElementById('lion-pupil-l'),
+                    pupilR: document.getElementById('lion-pupil-r'),
+                    eyeL: document.getElementById('lion-eye-l'),
+                    eyeR: document.getElementById('lion-eye-r'),
+                    faceAnchor: new THREE.Vector3(0, 0.3, 0.4),
+                    // Manual Nudges (px)
+                    extraOffX: 40,
+                    extraOffY: 20,
+                    clipW: 100, clipH: 70,
+                    eyeSize: 16, eyeGap: 10,
+                    // Individual Eye Nudges
+                    eyeLOffX: -2, eyeLOffY: 0,
+                    eyeROffX: 0, eyeROffY: 0,
+                    maxMoveH: 6, maxMoveV: 4,
+                    currentLX: 0, currentLY: 0,
+                    currentRX: 0, currentRY: 0
+                },
+                eagle: {
+                    clipZone: document.getElementById('eagle-clip'),
+                    container: document.getElementById('eagle-eyes'),
+                    pupilL: document.getElementById('eagle-pupil-l'),
+                    pupilR: document.getElementById('eagle-pupil-r'),
+                    eyeL: document.getElementById('eagle-eye-l'),
+                    eyeR: document.getElementById('eagle-eye-r'),
+                    faceAnchor: new THREE.Vector3(0.02, 0.05, 0.4),
+                    extraOffX: 5,
+                    extraOffY: 4,
+                    clipW: 90, clipH: 60,
+                    eyeSize: 12, eyeGap: 6,
+                    maxMoveH: 5, maxMoveV: 3,
+                    currentLX: 0, currentLY: 0,
+                    currentRX: 0, currentRY: 0
+                },
+                croc: {
+                    clipZone: document.getElementById('croc-clip'),
+                    container: document.getElementById('croc-eyes'),
+                    pupilL: document.getElementById('croc-pupil-l'),
+                    pupilR: document.getElementById('croc-pupil-r'),
+                    eyeL: document.getElementById('croc-eye-l'),
+                    eyeR: document.getElementById('croc-eye-r'),
+                    faceAnchor: new THREE.Vector3(0, 0.12, 0.2),
+                    extraOffX: -2,
+                    extraOffY: -3,
+                    clipW: 110, clipH: 80,
+                    eyeSize: 17, eyeGap: 9,
+                    maxMoveH: 7, maxMoveV: 4,
+                    currentLX: 0, currentLY: 0,
+                    currentRX: 0, currentRY: 0
+                }
+            };
+
+            // Helper to configure loaded models safely
+            const setupModel = (gltf, type, sx, sy, sz, rx, ry, rz, px, py, pz) => {
+                const model = gltf.scene;
+
+                // Simple Box3 to detect model size for scaling logic if needed
+                const box = new THREE.Box3().setFromObject(model);
+                const size = box.getSize(new THREE.Vector3());
+
+                model.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        child.material.roughness = 0.5;
+                        child.material.metalness = 0.4;
+                        child.material.envMapIntensity = 0.8;
+                    }
+                });
+
+                model.scale.set(sx, sy, sz);
+                model.rotation.set(rx, ry, rz);
+                model.position.set(px, py, pz);
+                scene.add(model);
+
+                // Add contact shadow for land-based animals
+                let shadow = null;
+                if (type === 'lion' || type === 'croc') {
+                    const shadowGeo = new THREE.CircleGeometry(0.8, 32);
+                    const shadowMat = new THREE.MeshBasicMaterial({
+                        color: 0x000000,
+                        transparent: true,
+                        opacity: 0.35
+                    });
+                    shadow = new THREE.Mesh(shadowGeo, shadowMat);
+                    shadow.rotation.x = -Math.PI / 2;
+                    shadow.position.set(px, py - 0.2, pz); // Slightly below feet
+                    if (type === 'lion') shadow.scale.set(1.5, 1, 1);
+                    if (type === 'croc') shadow.scale.set(1.8, 1, 1.2);
+                    scene.add(shadow);
+                }
+
+                models.push({
+                    mesh: model,
+                    type,
+                    baseY: py,
+                    baseRotX: rx,
+                    baseRotY: ry,
+                    shadow: shadow,
+                    size: size
+                });
+            };
+
+            // ── MODEL LOADING (Perfected Alignments) ──
+            loader.load('lion-3.glb', (gltf) => {
+                setupModel(gltf, 'lion', 2.5, 2.5, 2.5, 0, 0, 0, -4.5, 0.2, -5);
+            }, undefined, (e) => console.log('Lion loading skipped/failed:', e));
+
+            loader.load('eagle-3.glb', (gltf) => {
+                // Tilted UP to face the camera directly
+                setupModel(gltf, 'eagle', 3.0, 3.0, 3.0, -0.35, 0, 0, -4, 3.5, -4);
+            }, undefined, (e) => console.log('Eagle loading skipped/failed:', e));
+
+            loader.load('crock-3.glb', (gltf) => {
+                // Grounded Croc - lowered and tilted forward for a more natural pose
+                setupModel(gltf, 'croc', 4.5, 4.5, 4.5, 0.15, 0, 0, -1.2, -0.7, -6);
+            }, undefined, (e) => console.log('Croc loading skipped/failed:', e));
+
+            /* ── AMBIENT PARTICLES ENGINE ── */
+            const pContainer = document.getElementById('particle-container');
+            if (pContainer) {
+                for (let i = 0; i < 40; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const size = Math.random() * 4 + 2;
+                    p.style.width = p.style.height = `${size}px`;
+                    p.style.left = `${Math.random() * 100}%`;
+                    const dur = 10 + Math.random() * 15;
+                    p.style.animationDuration = `${dur}s`;
+                    p.style.animationDelay = `${Math.random() * -20}s`;
+                    p.style.opacity = Math.random() * 0.4 + 0.1;
+                    pContainer.appendChild(p);
+                }
+            }
+
+
+            /* ═══════════════════════════════════════
+               EYE TRACKING: 3D → 2D PROJECTION
+               ═══════════════════════════════════════ */
+            const tempVec = new THREE.Vector3();
+            const screenW = () => window.innerWidth;
+            const screenH = () => window.innerHeight;
+
+            // Project a 3D world point to 2D screen px
+            function project3Dto2D(worldPos) {
+                tempVec.copy(worldPos);
+                tempVec.project(camera);
+                return {
+                    x: (tempVec.x * 0.5 + 0.5) * screenW(),
+                    y: (-tempVec.y * 0.5 + 0.5) * screenH()
+                };
+            }
+
+            // lerp helper
+            function lerp(a, b, t) { return a + (b - a) * t; }
+
+            // Raw cursor position in px
+            let rawCursorX = screenW() / 2;
+            let rawCursorY = screenH() / 2;
+            let cursorIdle = 0; // frames since last move
+
+            window.addEventListener('mousemove', (e) => {
+                rawCursorX = e.clientX;
+                rawCursorY = e.clientY;
+                cursorIdle = 0;
+            });
+
+            function updateEyes(modelData, ed) {
+                if (!modelData) return;
+                const mesh = modelData.mesh;
+
+                // ── THE ROBUST WAY: Project 3D Face Anchor to 2D Screen ──
+                // This uses the 3D local coordinate on the head, correctly transformed
+                const worldFacePos = ed.faceAnchor.clone().applyMatrix4(mesh.matrixWorld);
+                const face2D = project3Dto2D(worldFacePos);
+
+                const cx = face2D.x + (ed.extraOffX || 0);
+                const cy = face2D.y + (ed.extraOffY || 0);
+
+                // ── Position clip zone (transparent container) over the face ──
+                // clip zone creates a boundary that represents the animal's eye area
+                // Position clip zone (container) over the face
+                ed.clipZone.style.display = 'block';
+                ed.clipZone.style.width = `${ed.clipW}px`;
+                ed.clipZone.style.height = `${ed.clipH}px`;
+                ed.clipZone.style.left = `${cx - ed.clipW / 2}px`;
+                ed.clipZone.style.top = `${cy - ed.clipH / 2}px`;
+                ed.clipZone.style.opacity = '1';
+
+                // Center eyes inside clip zone
+                const totalW = ed.eyeSize * 2 + ed.eyeGap;
+                ed.container.style.display = 'flex';
+                ed.container.style.gap = `${ed.eyeGap}px`;
+                ed.container.style.left = `${(ed.clipW - totalW) / 2}px`;
+                ed.container.style.top = `${(ed.clipH - ed.eyeSize) / 2}px`;
+                ed.container.style.position = 'absolute';
+
+                const eyeElStyle = `width:${ed.eyeSize}px;height:${ed.eyeSize}px;`;
+                ed.eyeL.style.cssText = eyeElStyle + `transform:translate(${ed.eyeLOffX || 0}px, ${ed.eyeLOffY || 0}px);`;
+                ed.eyeR.style.cssText = eyeElStyle + `transform:translate(${ed.eyeROffX || 0}px, ${ed.eyeROffY || 0}px);`;
+
+                // ── Cursor tracking ──
+                const dx = rawCursorX - cx;
+                const dy = rawCursorY - cy;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const focusStrength = Math.max(0, 1 - dist / 500);
+                const idleFactor = cursorIdle > 60 ? Math.max(0, 1 - (cursorIdle - 60) / 120) : 1;
+                const strength = focusStrength * idleFactor;
+
+                const dirX = dist > 0 ? dx / dist : 0;
+                const dirY = dist > 0 ? dy / dist : 0;
+                const targetMoveX = dirX * ed.maxMoveH * strength;
+                const targetMoveY = dirY * ed.maxMoveV * strength;
+
+                const lerpSpeed = 0.08;
+                ed.currentLX = lerp(ed.currentLX, targetMoveX, lerpSpeed);
+                ed.currentLY = lerp(ed.currentLY, targetMoveY, lerpSpeed);
+                ed.currentRX = lerp(ed.currentRX, targetMoveX, lerpSpeed);
+                ed.currentRY = lerp(ed.currentRY, targetMoveY, lerpSpeed);
+
+                // Pupils move; clip zone overflow:hidden safely clips any excess
+                ed.pupilL.style.transform = `translate(${ed.currentLX}px, ${ed.currentLY}px)`;
+                ed.pupilR.style.transform = `translate(${ed.currentRX}px, ${ed.currentRY}px)`;
+            }
+
+
+            // ── ANIMATION LOOP ──
+            const clock = new THREE.Clock();
+
+            const renderLoop = () => {
+                requestAnimationFrame(renderLoop);
+
+                mouseX += (targetMouseX - mouseX) * 0.05;
+                mouseY += (targetMouseY - mouseY) * 0.05;
+                cursorIdle++;
+
+                const time = clock.getElapsedTime();
+
+                // Model breathing - disabled for ground animals so they look grounded
+                models.forEach((data) => {
+                    const m = data.mesh;
+                    if (data.type === 'eagle') {
+                        const breathPhase = time * 1.5 + m.position.x;
+                        m.position.y = data.baseY + Math.sin(breathPhase) * 0.18;
+                    }
+                    // Lion and Croc: NO vertical movement at all - stay firmly grounded
+
+                    // Update 2D eye overlay for this model
+                    if (eyeData[data.type]) {
+                        updateEyes(data, eyeData[data.type]);
+                    }
+                });
+
+                // Camera: near-zero parallax so models do NOT look like they float
+                camera.position.x += (mouseX * 0.06 - camera.position.x) * 0.03;
+                camera.position.y += (1.5 + mouseY * 0.03 - camera.position.y) * 0.03;
+                camera.lookAt(0, 1.5, 0);
+
+                renderer.render(scene, camera);
+            };
+
+            renderLoop();
+
+            // Window Resizing Response
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+        });
+    </script>
+</body>
+
+</html>

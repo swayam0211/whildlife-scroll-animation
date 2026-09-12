@@ -1,0 +1,13 @@
+{
+  "name": "wildlife-project",
+  "version": "1.0.0",
+  "description": "Cinematic Wildlife Interface",
+  "main": "index.html",
+  "scripts": {
+    "start": "browser-sync start --server --files \"**/*\" --startPath \"login_page/login.html\"",
+    "dev": "browser-sync start --server --files \"**/*\" --startPath \"login_page/login.html\""
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.0"
+  }
+}
