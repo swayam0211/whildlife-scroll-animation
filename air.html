@@ -766,23 +766,44 @@
             }
         }
 
-        /* ── PARTICLE BRIDGE ── */
-        #particle-bridge-section {
-            width: 100%;
-            height: 100vh;
-            /* Premium dark golden backdrop */
-            background: radial-gradient(circle at center, #1b1406, #070501);
+        /* ══ SECTION 2: 3D CONTINUOUS AIR ROOM CORRIDOR TUNNEL ══ */
+        #air-corridor-section {
             position: relative;
-            overflow: hidden;
+            height: 400vh;
+            background: #050a14;
+            z-index: 40;
         }
 
-        #pb-canvas-container {
-            position: absolute;
+        #air-corridor-sticky {
+            position: sticky;
             top: 0;
-            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #050a14;
+        }
+
+        #room-canvas {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
+            display: block;
+            z-index: 1;
+        }
+
+        .corridor-hero-content {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            width: 90%;
+            max-width: 900px;
+            will-change: opacity, transform;
+            transition: opacity 0.3s ease-out;
         }
 
         /* ── CINEMATIC RING SECTION ── */
@@ -1119,9 +1140,18 @@
         </div>
     </section>
 
-    <!-- ══ PARTICLE SCROLL BRIDGE ══ -->
-    <section id="particle-bridge-section">
-        <div id="pb-canvas-container"></div>
+    <!-- ══ SECTION 2: 3D CONTINUOUS AIR ROOM CORRIDOR TUNNEL ══ -->
+    <section id="air-corridor-section">
+        <div id="air-corridor-sticky">
+            <canvas id="room-canvas"></canvas>
+            <div class="corridor-hero-content" id="corridor-hero-content">
+                <div class="water-subtitle" style="color: #ffd700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">Aerial Depth Gallery</div>
+                <h2 class="water-title" style="background: linear-gradient(180deg, #ffffff 30%, #ffd700 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">SKY SANCTUARY</h2>
+                <p class="water-description">
+                    Traverse the infinite 3D atmospheric corridor featuring Earth's most remarkable avian creatures.
+                </p>
+            </div>
+        </div>
     </section>
 
     <!-- ══ AIR LIFE SCROLL SECTION ══ -->
@@ -1213,6 +1243,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="roomEngine.js"></script>
 
     <!-- ══ STEP 1: LENIS MOMENTUM ENGINE & VELOCITY PREDICTOR ══ -->
     <script>
@@ -1786,227 +1817,65 @@
             // Register GSAP Pin for Air Life Section
             gsap.registerPlugin(ScrollTrigger);
 
-            // --- PARTICLE SCROLL BRIDGE SETUP (JIT BOOTED) ---
-            (() => {
-                let pbScene, pbCamera, pbRenderer, pbPoints, pbRafId, pbTrigger;
-                let pbScrollProgress = 0;
-                const pbMouse = new THREE.Vector2(-9999, -9999);
-                const pbTargetMouse = new THREE.Vector2(-9999, -9999);
-                const pbLerp = (a, b, n) => (1 - n) * a + n * b;
+        /* ── SECTION 2: 3D CONTINUOUS AIR ROOM CORRIDOR TUNNEL ── */
+        (() => {
+            const birdImages = [
+                'air_section/photosb/albatross.png',
+                'air_section/photosb/black_raven.png',
+                'air_section/photosb/crane.png',
+                'air_section/photosb/eagle.png',
+                'air_section/photosb/falcon.png',
+                'air_section/photosb/hummingbird.png',
+                'air_section/photosb/owl.png',
+                'air_section/photosb/parrot.png',
+                'air_section/photosb/peacock.png'
+            ];
 
-                const onMouseMove = (e) => {
-                    if (!pbCamera) return;
-                    const x = (e.clientX / window.innerWidth) * 2 - 1;
-                    const y = -(e.clientY / window.innerHeight) * 2 + 1;
-                    const z = 500;
-                    const vFov = (pbCamera.fov * Math.PI) / 180;
-                    const h = 2 * Math.tan(vFov / 2) * z;
-                    const w = h * pbCamera.aspect;
-                    pbTargetMouse.x = x * w / 2;
-                    pbTargetMouse.y = y * h / 2;
-                };
+            const section = document.getElementById('air-corridor-section');
+            const content = document.getElementById('corridor-hero-content');
 
-                const bootParticleBridge = () => {
-                    gsap.registerPlugin(ScrollTrigger);
-                    const pbContainer = document.getElementById('pb-canvas-container');
-                    if (!pbContainer || pbContainer.dataset.booted === 'true') return;
-                    pbContainer.dataset.booted = 'true';
-                    pbContainer.innerHTML = '';
-
-                    pbScene = new THREE.Scene();
-                    pbCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
-                    pbCamera.position.z = 500;
-
-                    pbRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-                    pbRenderer.setSize(window.innerWidth, window.innerHeight);
-                    const activeDpr = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.maxDpr) || Math.min(window.devicePixelRatio, 2);
-                    pbRenderer.setPixelRatio(activeDpr);
-                    pbContainer.appendChild(pbRenderer.domElement);
-
-                    if (window.WildlifeTierEngine) {
-                        window.WildlifeTierEngine.registerWebGLContext(pbRenderer, () => {
-                            if (pbRenderer) pbRenderer.resetState();
-                        });
+            function bootCorridor() {
+                if (!window.oceanRoomInstance) {
+                    const canvas = document.getElementById('room-canvas');
+                    if (canvas && window.OceanRoomEngine) {
+                        window.oceanRoomInstance = new window.OceanRoomEngine('#room-canvas', birdImages);
                     }
+                } else {
+                    window.oceanRoomInstance.resume();
+                }
+            }
 
-                    window.addEventListener('mousemove', onMouseMove);
+            function updateCorridor() {
+                if (!section) return;
+                const rect = section.getBoundingClientRect();
+                const totalScrollable = section.offsetHeight - window.innerHeight;
+                const isNear = rect.top < window.innerHeight * 1.5 && rect.bottom > -window.innerHeight * 0.5;
 
-                    const setupParticles = () => {
-                        const offscreen = document.createElement('canvas');
-                        const offCtx = offscreen.getContext('2d');
-                        offscreen.width = 2048;
-                        offscreen.height = 1024;
-
-                        const fontSize = 160;
-                        offCtx.fillStyle = '#ffffff';
-                        offCtx.font = `800 ${fontSize}px Outfit, sans-serif`;
-                        offCtx.textAlign = 'center';
-                        offCtx.textBaseline = 'middle';
-
-                        const PB_TEXT = "SCROLL MORE\nTO SHOW\nNEW ANIMALS";
-                        const lines = PB_TEXT.split('\n');
-                        const lineSpacing = fontSize * 1.3;
-                        lines.forEach((line, i) => {
-                            const yOffset = (i - (lines.length - 1) / 2) * lineSpacing;
-                            offCtx.fillText(line, offscreen.width / 2, offscreen.height / 2 + yOffset);
-                        });
-
-                        const imgData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height).data;
-                        const homePositions = [];
-                        const randomValues = [];
-
-                        const step = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.particleStep) || 2.5;
-                        for (let y = 0; y < offscreen.height; y += step) {
-                            for (let x = 0; x < offscreen.width; x += step) {
-                                const i = (Math.floor(y) * offscreen.width + Math.floor(x)) * 4;
-                                if (imgData[i + 3] > 128) {
-                                    const px = (x - offscreen.width / 2) * 0.4;
-                                    const py = -(y - offscreen.height / 2) * 0.4;
-                                    homePositions.push(px, py, 0);
-                                    randomValues.push(Math.random(), Math.random(), Math.random());
-                                }
-                            }
+                if (isNear) {
+                    bootCorridor();
+                    if (totalScrollable > 0) {
+                        const currentScroll = -rect.top;
+                        const p = Math.min(1, Math.max(0, currentScroll / totalScrollable));
+                        if (window.oceanRoomInstance && typeof window.oceanRoomInstance.setScrollProgress === 'function') {
+                            window.oceanRoomInstance.setScrollProgress(p);
                         }
-
-                        const geometry = new THREE.BufferGeometry();
-                        geometry.setAttribute('position', new THREE.Float32BufferAttribute(homePositions, 3));
-                        geometry.setAttribute('homePosition', new THREE.Float32BufferAttribute(homePositions, 3));
-                        geometry.setAttribute('randomValue', new THREE.Float32BufferAttribute(randomValues, 3));
-
-                        const material = new THREE.ShaderMaterial({
-                            uniforms: {
-                                uTime: { value: 0 },
-                                uMouse: { value: pbMouse },
-                                uMouseRadius: { value: 100 },
-                                uScroll: { value: 0 },
-                                uGlobalFade: { value: 1.0 }
-                            },
-                            vertexShader: `
-                                uniform float uTime;
-                                uniform vec2 uMouse;
-                                uniform float uMouseRadius;
-                                uniform float uScroll;
-                                uniform float uGlobalFade;
-                                attribute vec3 homePosition;
-                                attribute vec3 randomValue;
-                                varying float vAlpha;
-                                varying vec3 vColor;
-
-                                void main() {
-                                    vec3 pos = homePosition;
-                                    pos.x += sin(uTime * 1.2 + randomValue.x * 20.0) * 2.0;
-                                    pos.y += cos(uTime * 1.5 + randomValue.y * 20.0) * 2.0;
-                                    pos.x *= 1.0 + uScroll * 1.5;
-                                    pos.y *= 1.0 + uScroll * 1.5;
-                                    pos.z += uScroll * 200.0 * randomValue.z;
-
-                                    float dist = distance(pos.xy, uMouse);
-                                    if (dist < uMouseRadius) {
-                                        float force = (uMouseRadius - dist) / uMouseRadius;
-                                        vec2 dir = normalize(pos.xy - uMouse);
-                                        pos.xy += dir * force * 50.0;
-                                        pos.z += force * 40.0;
-                                    }
-
-                                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                                    gl_PointSize = (1.2 + randomValue.x * 2.0) * (500.0 / -mvPosition.z);
-                                    gl_Position = projectionMatrix * mvPosition;
-                                    vAlpha = (1.0 - uScroll * 0.5) * (0.4 + 0.6 * randomValue.z) * uGlobalFade;
-                                    vColor = mix(vec3(0.95, 0.45, 0.1), vec3(0.95, 0.75, 0.2), randomValue.x);
-                                }
-                            `,
-                            fragmentShader: `
-                                varying float vAlpha;
-                                varying vec3 vColor;
-                                void main() {
-                                    float dist = distance(gl_PointCoord, vec2(0.5));
-                                    if (dist > 0.5) discard;
-                                    float pointAlpha = smoothstep(0.5, 0.0, dist);
-                                    gl_FragColor = vec4(vColor, vAlpha * pointAlpha * 1.5);
-                                }
-                            `,
-                            transparent: true,
-                            blending: THREE.AdditiveBlending,
-                            depthWrite: false
-                        });
-
-                        pbPoints = new THREE.Points(geometry, material);
-                        pbScene.add(pbPoints);
-                    };
-
-                    const startAnimation = () => {
-                        setupParticles();
-
-                        const animate = (time) => {
-                            pbRafId = requestAnimationFrame(animate);
-                            pbMouse.x = pbLerp(pbMouse.x, pbTargetMouse.x, 0.1);
-                            pbMouse.y = pbLerp(pbMouse.y, pbTargetMouse.y, 0.1);
-                            if (pbPoints && pbPoints.material) {
-                                pbPoints.material.uniforms.uTime.value = time * 0.001;
-                                pbPoints.material.uniforms.uScroll.value = pbScrollProgress;
-                            }
-                            if (pbRenderer && pbScene && pbCamera) {
-                                pbRenderer.render(pbScene, pbCamera);
-                            }
-                        };
-                        animate(0);
-
-                        pbTrigger = ScrollTrigger.create({
-                            id: 'pb-trigger',
-                            trigger: '#particle-bridge-section',
-                            start: 'top top',
-                            end: '+=400vh',
-                            pin: true,
-                            scrub: 0.1,
-                            onUpdate: (self) => {
-                                pbScrollProgress = self.progress;
-                                const fadeStart = 0.8;
-                                let fade = 1.0;
-                                if (self.progress > fadeStart) {
-                                    fade = 1.0 - ((self.progress - fadeStart) / (1.0 - fadeStart));
-                                }
-                                if (pbPoints && pbPoints.material) {
-                                    pbPoints.material.uniforms.uGlobalFade.value = fade;
-                                }
-                            }
-                        });
-                        ScrollTrigger.refresh();
-                    };
-
-                    if (document.fonts && document.fonts.ready) {
-                        document.fonts.ready.then(startAnimation);
-                    } else {
-                        startAnimation();
+                        if (content) {
+                            const opacity = Math.max(0, 1 - p / 0.20);
+                            content.style.opacity = opacity;
+                            content.style.transform = `translate(-50%, ${-15 - (1 - opacity) * 30}px)`;
+                        }
                     }
-                };
+                } else {
+                    if (window.oceanRoomInstance) {
+                        window.oceanRoomInstance.pause();
+                    }
+                }
+            }
 
-                const disposeParticleBridge = () => {
-                    if (pbRafId) cancelAnimationFrame(pbRafId);
-                    window.removeEventListener('mousemove', onMouseMove);
-                    if (pbTrigger) pbTrigger.kill();
-                    if (pbPoints) {
-                        if (pbPoints.geometry) pbPoints.geometry.dispose();
-                        if (pbPoints.material) pbPoints.material.dispose();
-                        pbPoints = null;
-                    }
-                    if (pbRenderer) {
-                        pbRenderer.dispose();
-                        pbRenderer = null;
-                    }
-                    const pbContainer = document.getElementById('pb-canvas-container');
-                    if (pbContainer) {
-                        pbContainer.innerHTML = '';
-                        delete pbContainer.dataset.booted;
-                    }
-                    pbScene = null;
-                    pbCamera = null;
-                };
-
-                window.WildlifeJIT.register('particle-bridge-section', {
-                    onEnter: bootParticleBridge,
-                    onExit: disposeParticleBridge
-                });
-            })();
+            window.addEventListener('scroll', updateCorridor, { passive: true });
+            window.addEventListener('resize', updateCorridor);
+            setTimeout(updateCorridor, 100);
+        })();
 
             ScrollTrigger.create({
                 trigger: '#air-life-section',
