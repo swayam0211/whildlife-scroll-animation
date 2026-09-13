@@ -12,39 +12,34 @@
             this.initBackgroundPrebuffer();
         }
 
-        // 1. Idle Background Pre-buffer into Browser HTTP Cache
+        // 1. Idle Background Pre-buffer (Lightweight asset caching)
         initBackgroundPrebuffer() {
-            const mediaToCache = [
-                'hero/swyam_edit_30mb.mp4',
-                'sec3/air5sec.mp4',
-                'sec3/water5sec.mp4',
-                'sec3/forest.mp4',
+            // High-priority 3D models only (cached on idle after initial hero video loads)
+            const modelsToCache = [
                 'login_page/lion-3.glb',
                 'login_page/eagle-3.glb',
                 'login_page/crock-3.glb'
             ];
 
-            const cacheMedia = () => {
-                mediaToCache.forEach(url => {
+            const cacheModels = () => {
+                modelsToCache.forEach(url => {
                     if (this.cachedUrls.has(url)) return;
                     this.cachedUrls.add(url);
-                    // Silent background pre-fetch into browser HTTP cache
-                    fetch(url, { mode: 'cors', cache: 'force-cache' })
-                        .catch(() => {});
+                    fetch(url, { mode: 'cors', cache: 'force-cache' }).catch(() => {});
                 });
             };
 
             if ('requestIdleCallback' in window) {
-                requestIdleCallback(cacheMedia, { timeout: 2000 });
+                requestIdleCallback(cacheModels, { timeout: 4000 });
             } else {
-                setTimeout(cacheMedia, 500);
+                setTimeout(cacheModels, 3000);
             }
         }
 
-        // 2. Predictive Sliding Window Observer (+/- 2 Viewport Sections)
+        // 2. Predictive Sliding Window Observer (+/- 3 Viewport Sections lookahead)
         initObserver() {
-            // +/- 2 Sections viewport margin (200vh lookahead/behind)
-            const rootMargin = '200vh 0px 200vh 0px';
+            // 300vh lookahead margin so videos pre-buffer 20+ frames before reaching viewport
+            const rootMargin = '300vh 0px 300vh 0px';
 
             this.observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -53,41 +48,35 @@
                     if (!config) return;
 
                     if (entry.isIntersecting) {
-                        // Enter Sliding Window (+/- 2 Sections): Load & Attach from Cache
+                        // Enter Sliding Window (+/- 3 Sections): Boot section & start videos
                         if (typeof config.onEnter === 'function') {
                             if (!config.booted || config.repeat) {
                                 config.booted = true;
                                 config.onEnter(entry.target);
                             }
                         }
-                        // Connect data-src videos instantly from local browser cache
-                        const vids = entry.target.querySelectorAll('video[data-src]');
+                        const vids = entry.target.querySelectorAll('video');
                         vids.forEach(v => {
                             if (!v.src && v.dataset.src) {
-                                v.muted = true;
-                                v.playsInline = true;
-                                v.setAttribute('playsinline', '');
-                                v.setAttribute('webkit-playsinline', '');
                                 v.src = v.dataset.src;
-                                v.load();
-                                const playPromise = v.play();
-                                if (playPromise !== undefined) {
-                                    playPromise.catch(() => {});
-                                }
+                            }
+                            v.muted = true;
+                            v.playsInline = true;
+                            v.setAttribute('playsinline', '');
+                            v.setAttribute('webkit-playsinline', '');
+                            const playPromise = v.play();
+                            if (playPromise !== undefined) {
+                                playPromise.catch(() => {});
                             }
                         });
                     } else {
-                        // Exit Sliding Window (> +/- 2 Sections): Evict & Reclaim RAM/VRAM
+                        // Exit Sliding Window (> 3 Sections): Pause to save GPU/CPU (keep src cached in memory)
                         if (typeof config.onExit === 'function') {
                             config.onExit(entry.target);
                         }
-                        const vids = entry.target.querySelectorAll('video[data-src]');
+                        const vids = entry.target.querySelectorAll('video');
                         vids.forEach(v => {
-                            if (v.src) {
-                                v.pause();
-                                v.removeAttribute('src');
-                                v.load(); // Flush hardware video decoder memory
-                            }
+                            v.pause();
                         });
                     }
                 });

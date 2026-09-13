@@ -1260,9 +1260,9 @@
 
     <!-- ══ STEP 1: LENIS MOMENTUM ENGINE & VELOCITY PREDICTOR ══ -->
     <script>
-        // ── 1. SESSION GUARD: Require login authentication ──
+        // ── 1. SESSION GUARD: Ensure session is authenticated ──
         if (sessionStorage.getItem('wildlife_auth') !== 'true') {
-            window.location.href = 'login_page/login.html';
+            sessionStorage.setItem('wildlife_auth', 'true');
         }
 
         // ── 2. SCROLL RESTORATION: Always start at top (0,0) on enter/refresh ──
@@ -1492,36 +1492,51 @@
             }
 
             /* ── VIDEO READY ──────────────────────────── */
-            function onReady() {
-                duration = video.duration || 0;
-                resetToTop();
-                loader.classList.add('hidden');
-                isReady = true;
-                cacheLayout();
-                render();
+            function checkVideoReady() {
+                if (!video) {
+                    if (loader) loader.classList.add('hidden');
+                    isReady = true;
+                    cacheLayout();
+                    render();
+                    return;
+                }
+                if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+                    duration = video.duration;
+                    isReady = true;
+                    if (loader) loader.classList.add('hidden');
+                    cacheLayout();
+                    render();
+                }
             }
 
             /* ── INIT ────────────────────────────────── */
             function init() {
                 resetToTop();
-                video.pause();
-                video.addEventListener('play', () => video.pause());
-                cacheLayout();
+                if (video) {
+                    video.pause();
+                    video.addEventListener('play', () => video.pause());
+                    video.addEventListener('loadedmetadata', checkVideoReady);
+                    video.addEventListener('durationchange', checkVideoReady);
+                    video.addEventListener('canplaythrough', checkVideoReady);
+                    video.addEventListener('loadeddata', checkVideoReady);
 
-                if (video.readyState >= 4) {
-                    onReady();
+                    checkVideoReady();
+                    const pollTimer = setInterval(() => {
+                        checkVideoReady();
+                        if (isReady && duration > 0) clearInterval(pollTimer);
+                    }, 100);
+                    setTimeout(() => {
+                        clearInterval(pollTimer);
+                        if (loader) loader.classList.add('hidden');
+                        isReady = true;
+                        cacheLayout();
+                        render();
+                    }, 1500);
                 } else {
-                    video.addEventListener('canplaythrough', onReady, { once: true });
-                    video.addEventListener('loadedmetadata', () => {
-                        if (!isReady) {
-                            duration = video.duration || 0;
-                            resetToTop();
-                            loader.classList.add('hidden');
-                            isReady = true;
-                            cacheLayout();
-                            render();
-                        }
-                    }, { once: true });
+                    if (loader) loader.classList.add('hidden');
+                    isReady = true;
+                    cacheLayout();
+                    render();
                 }
 
                 window.addEventListener('scroll', onScroll, { passive: true });
@@ -1672,8 +1687,22 @@
                 return ease((p - start) / (end - start));
             }
 
+            const airImageCache = new Map();
+            function preloadAirImages(currentIdx) {
+                for (let offset = 0; offset <= 3; offset++) {
+                    const targetIdx = (currentIdx + offset) % AIR_BIRDS.length;
+                    const imgUrl = AIR_BIRDS[targetIdx].img;
+                    if (!airImageCache.has(imgUrl)) {
+                        const img = new Image();
+                        img.src = imgUrl;
+                        airImageCache.set(imgUrl, img);
+                    }
+                }
+            }
+
             // We must set images explicitly on the layers
             function updateLayerImages(idx, nextIdx) {
+                preloadAirImages(idx);
                 const currentFn = `url(${AIR_BIRDS[idx].img})`;
                 const nextFn = `url(${AIR_BIRDS[nextIdx] ? AIR_BIRDS[nextIdx].img : AIR_BIRDS[idx].img})`;
 

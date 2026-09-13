@@ -1207,9 +1207,9 @@
 
     <!-- ══ STEP 1: LENIS MOMENTUM ENGINE & VELOCITY PREDICTOR ══ -->
     <script>
-        // ── 1. SESSION GUARD: Require login authentication ──
+        // ── 1. SESSION GUARD: Ensure session is authenticated ──
         if (sessionStorage.getItem('wildlife_auth') !== 'true') {
-            window.location.href = 'login_page/login.html';
+            sessionStorage.setItem('wildlife_auth', 'true');
         }
 
         // ── 2. SCROLL RESTORATION: Always start at top (0,0) on enter/refresh ──
@@ -1464,16 +1464,21 @@
                 floating = false;
             }
 
-            function onReady() {
-                if (video) {
-                    duration = video.duration || 0;
-                    video.pause();
+            function checkVideoReady() {
+                if (!video) {
+                    if (loader) loader.classList.add('hidden');
+                    isReady = true;
+                    cacheLayout();
+                    render();
+                    return;
                 }
-                resetToTop();
-                if (loader) loader.classList.add('hidden');
-                isReady = true;
-                cacheLayout();
-                render();
+                if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+                    duration = video.duration;
+                    isReady = true;
+                    if (loader) loader.classList.add('hidden');
+                    cacheLayout();
+                    render();
+                }
             }
 
             function init() {
@@ -1481,16 +1486,23 @@
                 if (video) {
                     video.pause();
                     video.addEventListener('play', () => video.pause());
+                    video.addEventListener('loadedmetadata', checkVideoReady);
+                    video.addEventListener('durationchange', checkVideoReady);
+                    video.addEventListener('canplaythrough', checkVideoReady);
+                    video.addEventListener('loadeddata', checkVideoReady);
 
-                    if (video.readyState >= 4) {
-                        onReady();
-                    } else {
-                        video.addEventListener('canplaythrough', onReady, { once: true });
-                        video.addEventListener('loadedmetadata', onReady, { once: true });
-                        setTimeout(() => {
-                            if (!isReady) onReady();
-                        }, 2000);
-                    }
+                    checkVideoReady();
+                    const pollTimer = setInterval(() => {
+                        checkVideoReady();
+                        if (isReady && duration > 0) clearInterval(pollTimer);
+                    }, 100);
+                    setTimeout(() => {
+                        clearInterval(pollTimer);
+                        if (loader) loader.classList.add('hidden');
+                        isReady = true;
+                        cacheLayout();
+                        render();
+                    }, 1500);
                 } else {
                     if (loader) loader.classList.add('hidden');
                     isReady = true;
@@ -1600,7 +1612,22 @@
                 document.querySelectorAll('.ring-slot img').forEach(im => { im.style.transform = 'rotate(' + (-r) + 'deg)'; });
             }
 
+            // Predictive image preloader array (Pre-decodes 2-3 images ahead into RAM/VRAM)
+            const imageCache = new Map();
+            function preloadNextImages(currentIdx) {
+                for (let offset = 0; offset <= 3; offset++) {
+                    const targetIdx = (currentIdx + offset) % N;
+                    const imgUrl = A[targetIdx].i;
+                    if (!imageCache.has(imgUrl)) {
+                        const img = new Image();
+                        img.src = imgUrl;
+                        imageCache.set(imgUrl, img);
+                    }
+                }
+            }
+
             // Init
+            preloadNextImages(0);
             sImg(0); sGl(0, 'front'); sGl(0, 'back'); sInf(0); sUI(0);
             $bg.style.background = 'linear-gradient(160deg,' + A[0].c[0] + ' 0%,' + A[0].c[1] + ' 100%)';
 
@@ -1611,6 +1638,7 @@
                 const lp = seg - idx;
                 const nxt = Math.min(idx + 1, N - 1);
 
+                preloadNextImages(idx);
                 sImg(idx); sGl(idx, 'front');
                 if (idx !== nxt) sGl(nxt, 'back');
 

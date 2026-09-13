@@ -1441,7 +1441,7 @@
     <script>
         // Session Check
         if (sessionStorage.getItem('wildlife_auth') !== 'true') {
-            window.location.href = 'login_page/login.html';
+            sessionStorage.setItem('wildlife_auth', 'true');
         }
 
         // Initialize Lenis
@@ -1620,24 +1620,38 @@
             window.addEventListener('scroll', render, { passive: true });
             window.addEventListener('resize', () => { cacheLayout(); render(); });
 
-            function initVideo() {
-                duration = video.duration;
-                if (!duration || isNaN(duration)) return;
-                isReady = true;
-                updateTimelineMapping();
-                cacheLayout();
-
-                if (loader) loader.classList.add('hidden');
-                video.currentTime = 0;
-                render();
+            function checkVideoReady() {
+                if (video && video.duration && !isNaN(video.duration) && video.duration > 0) {
+                    duration = video.duration;
+                    isReady = true;
+                    updateTimelineMapping();
+                    cacheLayout();
+                    if (loader) loader.classList.add('hidden');
+                    render();
+                }
             }
 
-            if (video.readyState >= 1) {
-                initVideo();
-            } else {
-                video.addEventListener('loadedmetadata', initVideo);
+            if (video) {
+                video.pause();
+                video.addEventListener('play', () => video.pause());
+                video.addEventListener('loadedmetadata', checkVideoReady);
+                video.addEventListener('durationchange', checkVideoReady);
+                video.addEventListener('canplaythrough', checkVideoReady);
+                video.addEventListener('loadeddata', checkVideoReady);
+
+                checkVideoReady();
+                const pollTimer = setInterval(() => {
+                    checkVideoReady();
+                    if (isReady && duration > 0) clearInterval(pollTimer);
+                }, 100);
+                setTimeout(() => {
+                    clearInterval(pollTimer);
+                    if (loader) loader.classList.add('hidden');
+                    isReady = true;
+                    cacheLayout();
+                    render();
+                }, 1500);
             }
-            setTimeout(() => { if (!isReady) initVideo(); }, 2500);
         })();
 
         /* ── SECTION 2: 3D CONTINUOUS OCEAN ROOM CORRIDOR (PERMANENT LIFECYCLE) ── */
@@ -1894,6 +1908,31 @@
                         stat3: { num: "Arctic Sea", lbl: "Habitat" }
                     }
                 ];
+
+                const marineImagesList = [
+                    'last section/images of sec2,3/Blue Sea Dragon.png',
+                    'last section/images of sec2,3/Blue Whale.png',
+                    'last section/images of sec2,3/Mantis Shrimp.png',
+                    'last section/images of sec2,3/Octopus.png',
+                    'last section/images of sec2,3/gerat white shark.png',
+                    'last section/images of sec2,3/jellyfish.png',
+                    'last section/images of sec2,3/seahorse.png',
+                    'last section/images of sec2,3/wagel ray.png',
+                    'last section/images of sec2,3/white beluga whale.png'
+                ];
+                const marineImageCache = new Map();
+                function preloadMarineImages(currentIdx) {
+                    for (let offset = 0; offset <= 3; offset++) {
+                        const targetIdx = (currentIdx + offset) % marineImagesList.length;
+                        const imgUrl = marineImagesList[targetIdx];
+                        if (!marineImageCache.has(imgUrl)) {
+                            const img = new Image();
+                            img.src = imgUrl;
+                            marineImageCache.set(imgUrl, img);
+                        }
+                    }
+                }
+                preloadMarineImages(0);
 
                 let currentSpotlightIndex = -1;
                 let ambientAngle = 0;
