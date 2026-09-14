@@ -27,18 +27,23 @@
         }
 
         /* ── LENIS SMOOTH SCROLL NORMALIZER ── */
-        html.lenis, html.lenis body {
+        html.lenis,
+        html.lenis body {
             height: auto;
         }
+
         .lenis.lenis-smooth {
             scroll-behavior: auto !important;
         }
+
         .lenis.lenis-smooth [data-lenis-prevent] {
             overscroll-behavior: contain;
         }
+
         .lenis.lenis-stopped {
             overflow: hidden;
         }
+
         .lenis.lenis-scrolling iframe {
             pointer-events: none;
         }
@@ -101,36 +106,27 @@
             background: #020a18;
         }
 
-        /* ── SINGLE VIDEO ── */
-        #hero-video {
+        #hero-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 0;
-            will-change: auto;
+            z-index: 2;
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
-        /* ── CLIP HALVES ── */
         #clip-top,
         #clip-bot {
+            display: none !important;
             position: absolute;
             inset: 0;
             z-index: 1;
             will-change: clip-path;
             pointer-events: none;
-        }
-
-        #clip-top {
-            background: #020a18;
-            clip-path: inset(0 0 50% 0);
-        }
-
-        #clip-bot {
-            background: #020a18;
-            clip-path: inset(50% 0 0 0);
         }
 
         /* ── GAP FILL ── */
@@ -488,24 +484,26 @@
             }
         }
 
-        /* ══ AIR LIFE SECTION (Pinned) ══ */
+        /* ══ AIR LIFE SECTION (Empty wrapper hidden) ══ */
         #air-life-section {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            /* Will be extended via JS ScrollTrigger pinSpacing */
-            background: #000;
-            overflow: hidden;
-            z-index: 50;
+            display: none;
         }
 
         .air-life-pin {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
+            top: 50%;
+            left: 50%;
+            width: 100vw;
             height: 100vh;
+            transform: translate(-50%, -50%) scale(0.22);
+            z-index: 20;
             overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            will-change: transform, opacity;
+            box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
+            border-radius: 16px;
+            transition: border-radius 0.2s ease, box-shadow 0.2s ease;
         }
 
         /* Dynamic Blended Background */
@@ -766,23 +764,44 @@
             }
         }
 
-        /* ── PARTICLE BRIDGE ── */
-        #particle-bridge-section {
-            width: 100%;
-            height: 100vh;
-            /* Premium dark golden backdrop */
-            background: radial-gradient(circle at center, #1b1406, #070501);
+        /* ══ SECTION 2: 3D CONTINUOUS AIR ROOM CORRIDOR TUNNEL ══ */
+        #air-corridor-section {
             position: relative;
-            overflow: hidden;
+            height: 100vh;
+            background: #050a14;
+            z-index: 40;
         }
 
-        #pb-canvas-container {
-            position: absolute;
+        #air-corridor-sticky {
+            position: sticky;
             top: 0;
-            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #050a14;
+        }
+
+        #room-canvas {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
+            display: block;
+            z-index: 1;
+        }
+
+        .corridor-hero-content {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            width: 90%;
+            max-width: 900px;
+            will-change: opacity, transform;
+            transition: opacity 0.3s ease-out;
         }
 
         /* ── CINEMATIC RING SECTION ── */
@@ -801,7 +820,7 @@
         #ring-cinematic .bg-image {
             position: absolute;
             inset: -5%;
-            background: url('airsec3/clouds.png') center center / cover no-repeat;
+            background: url('sec3/clouds.png') center center / cover no-repeat;
             z-index: 0;
             will-change: transform, opacity;
             filter: blur(4px) brightness(0.9);
@@ -1064,10 +1083,8 @@
 
             <div id="gap-fill"></div>
 
-            <!-- SINGLE video -->
-            <video id="hero-video" preload="auto" muted playsinline webkit-playsinline>
-                <source src="air_section/herosection/cheetahfinal.mp4" type="video/mp4" />
-            </video>
+            <!-- Canvas Frame Engine (24fps WebP Scrubbing) -->
+            <canvas id="hero-canvas"></canvas>
 
             <!-- Transparent clip overlays -->
             <div id="clip-top"></div>
@@ -1096,7 +1113,7 @@
                 </div>
                 <h2 class="card-title-bg" id="card-title-bg">CORMORANT</h2>
                 <div class="card-animal" id="card-animal">
-                    <img src="air_section/herosection/Double-crested_Cormorant.png" alt="Double-crested Cormorant" />
+                    <img src="air_section/herosection/Double-crested_Cormorant.webp" alt="Double-crested Cormorant" />
                 </div>
                 <p class="card-label" id="card-label">Sky Archive</p>
                 <p class="card-desc" id="card-desc">
@@ -1119,69 +1136,82 @@
         </div>
     </section>
 
-    <!-- ══ PARTICLE SCROLL BRIDGE ══ -->
-    <section id="particle-bridge-section">
-        <div id="pb-canvas-container"></div>
-    </section>
-
-    <!-- ══ AIR LIFE SCROLL SECTION ══ -->
-    <section id="air-life-section">
-        <div class="air-life-pin">
-            <!-- Dynamic Background -->
-            <div id="air-bg"></div>
-            <div class="air-particles"></div>
-
-            <!-- Global Image Sizer -->
-            <div class="air-layer-wrapper" id="air-layer-wrapper">
-
-                <!-- 1. The Behind Image (New Animal) -->
-                <div class="air-birds-behind" id="air-behind-img"></div>
-
-                <!-- 2. The Horizontal Strips (Old Animal splitting apart) -->
-                <div class="air-strips-layer" id="air-strips-layer">
-                    <div class="strip s1">
-                        <div class="strip-img current"></div>
-                        <div class="strip-img next"></div>
-                    </div>
-                    <div class="strip s2">
-                        <div class="strip-img current"></div>
-                        <div class="strip-img next"></div>
-                    </div>
-                    <div class="strip s3">
-                        <div class="strip-img current"></div>
-                        <div class="strip-img next"></div>
-                    </div>
-                    <div class="strip s4">
-                        <div class="strip-img current"></div>
-                        <div class="strip-img next"></div>
-                    </div>
-                </div>
-
-                <!-- 3. The X-Split Diagonals (Current Animal) -->
-                <div class="air-x-layer" id="air-x-layer">
-                    <div class="diag top"></div>
-                    <div class="diag right"></div>
-                    <div class="diag bottom"></div>
-                    <div class="diag left"></div>
-                </div>
-
-                <div class="air-blur-overlay" id="air-blur"></div>
+    <!-- ══ SECTION 2: 3D CONTINUOUS AIR ROOM CORRIDOR TUNNEL ══ -->
+    <section id="air-corridor-section">
+        <div id="air-corridor-sticky">
+            <canvas id="room-canvas"></canvas>
+            <div class="corridor-hero-content" id="corridor-hero-content">
+                <div class="water-subtitle" style="color: #ffd700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">Aerial
+                    Depth Gallery</div>
+                <h2 class="water-title"
+                    style="background: linear-gradient(180deg, #ffffff 30%, #ffd700 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    SKY SANCTUARY</h2>
+                <p class="water-description">
+                    Traverse the infinite 3D atmospheric corridor featuring Earth's most remarkable avian creatures.
+                </p>
             </div>
 
-            <!-- 4. Info Card -->
-            <div id="air-info-card">
-                <div class="air-card-circle">
-                    <img id="air-card-img" src="" alt="Bird Focus">
+            <!-- Section 3 Pin Container nested inside Section 2 Sticky Frame -->
+            <div class="air-life-pin" id="air-life-pin">
+                <!-- Dynamic Background -->
+                <div id="air-bg"></div>
+                <div class="air-particles"></div>
+
+                <!-- Global Image Sizer -->
+                <div class="air-layer-wrapper" id="air-layer-wrapper">
+
+                    <!-- 1. The Behind Image (New Animal) -->
+                    <div class="air-birds-behind" id="air-behind-img"></div>
+
+                    <!-- 2. The Horizontal Strips (Old Animal splitting apart) -->
+                    <div class="air-strips-layer" id="air-strips-layer">
+                        <div class="strip s1">
+                            <div class="strip-img current"></div>
+                            <div class="strip-img next"></div>
+                        </div>
+                        <div class="strip s2">
+                            <div class="strip-img current"></div>
+                            <div class="strip-img next"></div>
+                        </div>
+                        <div class="strip s3">
+                            <div class="strip-img current"></div>
+                            <div class="strip-img next"></div>
+                        </div>
+                        <div class="strip s4">
+                            <div class="strip-img current"></div>
+                            <div class="strip-img next"></div>
+                        </div>
+                    </div>
+
+                    <!-- 3. The X-Split Diagonals (Current Animal) -->
+                    <div class="air-x-layer" id="air-x-layer">
+                        <div class="diag top"></div>
+                        <div class="diag right"></div>
+                        <div class="diag bottom"></div>
+                        <div class="diag left"></div>
+                    </div>
+
+                    <div class="air-blur-overlay" id="air-blur"></div>
                 </div>
-                <div class="air-card-content">
-                    <h2 id="air-card-head">EAGLE</h2>
-                    <h3 id="air-card-tag">Highland Guardian</h3>
-                    <div id="air-card-data">3.2m Wingspan • Thermal Focus • Alpha</div>
-                    <p id="air-card-desc">Master of the highest peaks, ruling with an unwavering gaze.</p>
+
+                <!-- 4. Info Card -->
+                <div id="air-info-card">
+                    <div class="air-card-circle">
+                        <img id="air-card-img" src="" alt="Bird Focus">
+                    </div>
+                    <div class="air-card-content">
+                        <h2 id="air-card-head">EAGLE</h2>
+                        <h3 id="air-card-tag">Highland Guardian</h3>
+                        <div id="air-card-data">3.2m Wingspan • Thermal Focus • Alpha</div>
+                        <p id="air-card-desc">Master of the highest peaks, ruling with an unwavering gaze.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- ══ AIR LIFE SCROLL SECTION ══ -->
+    <section id="air-life-section"></section>
 
     <!-- ── CINEMATIC RING SECTION ── -->
     <section id="ring-cinematic">
@@ -1195,11 +1225,13 @@
             <div class="ring-wrapper cinematic">
                 <div class="ring-disc cinematic" id="cinematic-ring-disc">
                     <div class="ring-half top" id="wildlife-half">
-                        <video class="wildlife-video" src="airsec3/forest.mp4" data-src="airsec3/forest.mp4" muted loop autoplay playsinline preload="auto"></video>
+                        <video class="wildlife-video" src="sec3/forest.mp4" data-src="sec3/forest.mp4" muted loop
+                            autoplay playsinline preload="auto"></video>
                     </div>
                     <div class="ring-mist"></div>
                     <div class="ring-half bottom" id="water-half">
-                        <video class="water-video" src="airsec3/water5sec.mp4" data-src="airsec3/water5sec.mp4" muted loop autoplay playsinline preload="auto"></video>
+                        <video class="water-video" src="sec3/water5sec.mp4" data-src="sec3/water5sec.mp4" muted
+                            loop autoplay playsinline preload="auto"></video>
                     </div>
                 </div>
             </div>
@@ -1213,12 +1245,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="roomEngine.js"></script>
 
     <!-- ══ STEP 1: LENIS MOMENTUM ENGINE & VELOCITY PREDICTOR ══ -->
     <script>
-        // ── 1. SESSION GUARD: Require login authentication ──
+        // ── 1. SESSION GUARD: Ensure session is authenticated ──
         if (sessionStorage.getItem('wildlife_auth') !== 'true') {
-            window.location.href = 'login_page/login.html';
+            sessionStorage.setItem('wildlife_auth', 'true');
         }
 
         // ── 2. SCROLL RESTORATION: Always start at top (0,0) on enter/refresh ──
@@ -1273,41 +1306,63 @@
             const titleBg = document.getElementById('card-title-bg');
             const labelEl = document.getElementById('card-label');
             const descEl = document.getElementById('card-desc');
+        /* ── SECTION 1: 24FPS WEBP CANVAS FRAME ENGINE & CORMORANT CARD SPLIT ── */
+        (() => {
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas ? canvas.getContext('2d', { alpha: false, desynchronized: true }) : null;
+            const clipTop = document.getElementById('clip-top');
+            const clipBot = document.getElementById('clip-bot');
+            const heroText = document.getElementById('hero-text');
+            const scrollCue = document.getElementById('scroll-cue');
+            const card = document.getElementById('animal-card');
+            const panels = document.getElementById('card-panels');
+            const animalImg = document.getElementById('card-animal');
+            const titleBg = document.getElementById('card-title-bg');
+            const labelEl = document.getElementById('card-label');
+            const descEl = document.getElementById('card-desc');
             const statsEl = document.getElementById('card-stats');
             const seamEl = document.getElementById('seam');
             const progBar = document.getElementById('progress-bar');
             const loader = document.getElementById('loader');
 
-            /* ── STATE ──────────────────────────────────── */
-            let duration = 0, isReady = false;
-            let dispTime = 0, targTime = 0, vidRaf = null;
-            let floating = false, dirty = false, renderRaf = null;
+            const TOTAL_FRAMES = 241;
+            const frames = new Array(TOTAL_FRAMES);
+            const CRITICAL_BATCH = 30;
+            let loadedFramesCount = 0;
+            let isReady = false;
+            let currentDrawFrame = -1;
+            let dirty = false;
+            let renderRaf = null;
+            let floating = false;
 
-            /* ── CACHED LAYOUT ── */
-            let stageH = 1, winH = 1, maxGap = 1;
+            let stageH = 1, winH = 1;
             function cacheLayout() {
                 const stage = document.getElementById('scroll-stage');
                 winH = window.innerHeight;
-                stageH = stage.offsetHeight - winH;
-                maxGap = winH * 0.22;
+                stageH = stage ? stage.offsetHeight - winH : 1;
             }
 
-            /* ── TUNING ── */
-            const LERP = 0.10, MAX_STEP = 0.20;
+            function resizeCanvas() {
+                if (!canvas) return;
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = Math.floor(window.innerWidth * dpr);
+                canvas.height = Math.floor(window.innerHeight * dpr);
+                canvas.style.width = window.innerWidth + 'px';
+                canvas.style.height = window.innerHeight + 'px';
+            }
 
-            /* ── TIMELINE (card appears at 8s / 10s = 0.8 progress) ── */
+            // Eased Timeline mapping for Cormorant card split
+            const pTarget = 0.76;
             const T = {
-                TEXT_HOLD: 0.60, TEXT_GONE: 0.74,
-                SPLIT_OPEN: 0.76, SPLIT_FULL: 0.84,
+                TEXT_HOLD: 0.60, TEXT_GONE: 0.72,
+                SPLIT_OPEN: pTarget, SPLIT_FULL: 0.84,
                 SPLIT_CLOSE: 0.92, SPLIT_DONE: 0.98,
             };
 
-            /* ── MATH ── */
             function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
             function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
             function ss(t) { return t * t * (3 - 2 * t); }
             function beat(sp, s, e) { return ss(clamp01((sp - s) / (e - s))); }
-
             function getP() { return stageH > 0 ? clamp01(window.scrollY / stageH) : 0; }
 
             function splitProg(p) {
@@ -1318,172 +1373,229 @@
                 return 0;
             }
 
-            /* ── OPTIMIZED VIDEO SEEK ── */
-            let lastSeekMs = 0;
-            const SEEK_INTERVAL = 50; // approx 20fps decode — gives browser breathing room to avoid skipping frames
-            const HAS_FAST_SEEK = typeof HTMLVideoElement.prototype.fastSeek === 'function';
+            function drawHeroFrame(img, gapPct) {
+                if (!ctx || !img || !img.complete || img.naturalWidth === 0) return;
+                const cw = canvas.width;
+                const ch = canvas.height;
+                const iw = img.naturalWidth;
+                const ih = img.naturalHeight;
 
-            function doSeek(t) {
-                if (video.seeking) return;
-                const now = performance.now();
-                if (now - lastSeekMs < SEEK_INTERVAL) return;
-                lastSeekMs = now;
-                if (HAS_FAST_SEEK) { video.fastSeek(t); } else { video.currentTime = t; }
-            }
+                const scale = Math.max(cw / iw, ch / ih);
+                const nw = iw * scale;
+                const nh = ih * scale;
+                const cx = (cw - nw) / 2;
+                const cy = (ch - nh) / 2;
 
-            function videoLerp() {
-                const d = targTime - dispTime;
-                if (d > -0.008 && d < 0.008) {
-                    dispTime = targTime;
-                    doSeek(dispTime);
-                    vidRaf = null;
-                    return;
+                ctx.save();
+                if (gapPct > 0.1) {
+                    const topEnd = (50 - gapPct / 2) * (ch / 100);
+                    const botStart = (50 + gapPct / 2) * (ch / 100);
+
+                    // Top split half
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(0, 0, cw, topEnd);
+                    ctx.clip();
+                    ctx.drawImage(img, cx, cy, nw, nh);
+                    ctx.restore();
+
+                    // Bottom split half
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(0, botStart, cw, ch - botStart);
+                    ctx.clip();
+                    ctx.drawImage(img, cx, cy, nw, nh);
+                    ctx.restore();
+                } else {
+                    ctx.drawImage(img, cx, cy, nw, nh);
                 }
-                let step = d * LERP;
-                if (step > MAX_STEP) step = MAX_STEP;
-                else if (step < -MAX_STEP) step = -MAX_STEP;
-                dispTime = clamp(dispTime + step, 0, duration - 0.001);
-                doSeek(dispTime);
+                ctx.restore();
             }
 
-            // Sync with GSAP for butter-smooth timing
-            gsap.ticker.add(videoLerp);
-
-            /* ═══════════════════════════════════════════
-               RENDER — called once per RAF frame max
-            ═══════════════════════════════════════════ */
             function render() {
-                renderRaf = null;
                 dirty = false;
-                if (!isReady) return;
-
                 const p = getP();
                 const sp = splitProg(p);
                 const gapPct = sp * 22;
 
-                // ── Video seek
-                targTime = clamp(p * duration, 0, duration - 0.001);
+                if (progBar) progBar.style.transform = `scaleX(${p})`;
 
-                // ── Progress bar
-                progBar.style.transform = `scaleX(${dispTime / duration})`;
+                // Frame Scrubbing
+                const targetFrameIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.floor(p * TOTAL_FRAMES)));
+                const img = frames[targetFrameIdx];
 
-                // ── SPLIT: clip-path
-                const topEnd = 50 - gapPct / 2;
-                const botStart = 50 + gapPct / 2;
-                if (gapPct < 0.1) {
-                    video.style.clipPath = 'none';
+                if (img && img.complete && img.naturalWidth > 0) {
+                    currentDrawFrame = targetFrameIdx;
+                    drawHeroFrame(img, gapPct);
                 } else {
-                    video.style.clipPath =
-                        `polygon(0% 0%, 100% 0%, 100% ${topEnd}%, 0% ${topEnd}%, 0% ${botStart}%, 100% ${botStart}%, 100% 100%, 0% 100%)`;
+                    // Fallback to nearest available loaded frame
+                    for (let d = 1; d < TOTAL_FRAMES; d++) {
+                        const fwd = targetFrameIdx + d;
+                        const bwd = targetFrameIdx - d;
+                        if (fwd < TOTAL_FRAMES && frames[fwd] && frames[fwd].complete && frames[fwd].naturalWidth > 0) {
+                            drawHeroFrame(frames[fwd], gapPct);
+                            break;
+                        }
+                        if (bwd >= 0 && frames[bwd] && frames[bwd].complete && frames[bwd].naturalWidth > 0) {
+                            drawHeroFrame(frames[bwd], gapPct);
+                            break;
+                        }
+                    }
                 }
-                clipTop.style.display = 'none';
-                clipBot.style.display = 'none';
 
-                // ── Seam glow
-                seamEl.style.opacity = sp;
+                if (clipTop) clipTop.style.display = 'none';
+                if (clipBot) clipBot.style.display = 'none';
+                if (seamEl) seamEl.style.opacity = sp;
 
-                // ── HERO TEXT
                 let ta;
                 if (p < T.TEXT_HOLD) ta = 1;
                 else if (p < T.TEXT_GONE) ta = 1 - (p - T.TEXT_HOLD) / (T.TEXT_GONE - T.TEXT_HOLD);
                 else ta = 0;
-                heroText.style.opacity = ta;
-                heroText.style.transform = `translate3d(0,${(1 - ta) * -12}px,0)`;
-                scrollCue.style.opacity = ta;
 
-                // ── CARD (overall)
-                const cardScale = 0.82 + 0.18 * sp;
-                const cardY = (1 - sp) * 44;
-                card.style.opacity = sp;
-                card.style.transform = `translate3d(-50%,-50%,0) translate3d(0,${cardY}px,0) scale(${cardScale})`;
-
-                // ① Panels
-                const bP = beat(sp, 0.00, 0.28);
-                panels.style.opacity = bP;
-                panels.style.transform = `translate3d(0,${(1 - bP) * 30}px,0)`;
-
-                // ② Animal
-                const bE = beat(sp, 0.18, 0.46);
-                animalImg.style.opacity = bE;
-                animalImg.style.transform = `translate3d(-50%,${(1 - bE) * 28}px,0) scale(${0.88 + 0.12 * bE})`;
-                if (bE >= 0.98 && !floating) { animalImg.classList.add('floating'); floating = true; }
-                if (bE < 0.98 && floating) { animalImg.classList.remove('floating'); floating = false; }
-
-                // ③ Title
-                const bT = beat(sp, 0.30, 0.56);
-                titleBg.style.opacity = bT;
-                titleBg.style.transform = `translate3d(-50%,0,0) translate3d(${(1 - bT) * -40}px,0,0)`;
-
-                // ④ Label
-                const bL = beat(sp, 0.38, 0.60);
-                labelEl.style.opacity = bL;
-                labelEl.style.transform = `translate3d(-50%,${(1 - bL) * -18}px,0)`;
-
-                // ⑤ Description
-                const bD = beat(sp, 0.50, 0.72);
-                descEl.style.opacity = bD;
-                descEl.style.transform = `translate3d(${(1 - bD) * -30}px,0,0)`;
-
-                // ⑥ Stats
-                const bS = beat(sp, 0.62, 0.84);
-                statsEl.style.opacity = bS;
-                statsEl.style.transform = `translate3d(0,${(1 - bS) * 20}px,0)`;
-            }
-
-            /* ── SCROLL → dirty flag + single RAF ──── */
-            function onScroll() {
-                render(); // Just render directly inside the ticker-aware function
-            }
-
-            function resetToTop() {
-                window.scrollTo(0, 0);
-                if (window.lenis) {
-                    try { window.lenis.scrollTo(0, { immediate: true }); } catch (e) {}
+                if (heroText) {
+                    heroText.style.opacity = ta;
+                    heroText.style.transform = `translate3d(0,${(1 - ta) * -12}px,0)`;
                 }
-                if (video) {
-                    try { video.currentTime = 0; } catch (e) {}
+                if (scrollCue) scrollCue.style.opacity = ta;
+
+                if (card) {
+                    const cardScale = 0.82 + 0.18 * sp;
+                    const cardY = (1 - sp) * 44;
+                    card.style.opacity = sp;
+                    card.style.transform = `translate3d(-50%,-50%,0) translate3d(0,${cardY}px,0) scale(${cardScale})`;
                 }
-                dispTime = 0;
-                targTime = 0;
+
+                if (panels) {
+                    const bP = beat(sp, 0.00, 0.28);
+                    panels.style.opacity = bP;
+                    panels.style.transform = `translate3d(0,${(1 - bP) * 30}px,0)`;
+                }
+
+                if (animalImg) {
+                    const bE = beat(sp, 0.18, 0.46);
+                    animalImg.style.opacity = bE;
+                    animalImg.style.transform = `translate3d(-50%,${(1 - bE) * 28}px,0) scale(${0.88 + 0.12 * bE})`;
+                    if (bE >= 0.98 && !floating) { animalImg.classList.add('floating'); floating = true; }
+                    if (bE < 0.98 && floating) { animalImg.classList.remove('floating'); floating = false; }
+                }
+
+                if (titleBg) {
+                    const bT = beat(sp, 0.30, 0.56);
+                    titleBg.style.opacity = bT;
+                    titleBg.style.transform = `translate3d(-50%,0,0) translate3d(${(1 - bT) * -40}px,0,0)`;
+                }
+
+                if (labelEl) {
+                    const bL = beat(sp, 0.38, 0.60);
+                    labelEl.style.opacity = bL;
+                    labelEl.style.transform = `translate3d(-50%,${(1 - bL) * -18}px,0)`;
+                }
+
+                if (descEl) {
+                    const bD = beat(sp, 0.50, 0.72);
+                    descEl.style.opacity = bD;
+                    descEl.style.transform = `translate3d(${(1 - bD) * -30}px,0,0)`;
+                }
+
+                if (statsEl) {
+                    const bS = beat(sp, 0.62, 0.84);
+                    statsEl.style.opacity = bS;
+                    statsEl.style.transform = `translate3d(0,${(1 - bS) * 20}px,0)`;
+                }
             }
 
-            /* ── VIDEO READY ──────────────────────────── */
-            function onReady() {
-                duration = video.duration || 0;
-                resetToTop();
-                loader.classList.add('hidden');
-                isReady = true;
-                cacheLayout();
-                render();
+            function requestRender() {
+                if (!dirty) {
+                    dirty = true;
+                    renderRaf = requestAnimationFrame(render);
+                }
             }
 
-            /* ── INIT ────────────────────────────────── */
-            function init() {
-                resetToTop();
-                video.pause();
-                video.addEventListener('play', () => video.pause());
-                cacheLayout();
+            // Tiered Preloader Engine
+            function getFrameUrl(idx) {
+                return 'air_section/herosection/frames/frame_' + String(idx + 1).padStart(4, '0') + '.webp';
+            }
 
-                if (video.readyState >= 4) {
-                    onReady();
-                } else {
-                    video.addEventListener('canplaythrough', onReady, { once: true });
-                    video.addEventListener('loadedmetadata', () => {
-                        if (!isReady) {
-                            duration = video.duration || 0;
-                            resetToTop();
-                            loader.classList.add('hidden');
+            function preloadCriticalBatch() {
+                let criticalLoaded = 0;
+                for (let i = 0; i < CRITICAL_BATCH; i++) {
+                    const img = new Image();
+                    img.src = getFrameUrl(i);
+                    img.onload = () => {
+                        criticalLoaded++;
+                        loadedFramesCount++;
+                        if (i === 0 || criticalLoaded === 1) {
+                            if (loader) loader.classList.add('hidden');
                             isReady = true;
+                            resizeCanvas();
                             cacheLayout();
                             render();
                         }
-                    }, { once: true });
+                    };
+                    img.onerror = () => {
+                        criticalLoaded++;
+                        if (criticalLoaded === 1 && loader) loader.classList.add('hidden');
+                    };
+                    frames[i] = img;
                 }
 
-                window.addEventListener('scroll', onScroll, { passive: true });
-                window.addEventListener('resize', () => { cacheLayout(); onScroll(); }, { passive: true });
-                window.addEventListener('pageshow', resetToTop);
-                window.addEventListener('beforeunload', resetToTop);
+                // Fallback timeout so page never gets stuck
+                setTimeout(() => {
+                    if (loader && !loader.classList.contains('hidden')) {
+                        loader.classList.add('hidden');
+                        isReady = true;
+                        resizeCanvas();
+                        cacheLayout();
+                        render();
+                    }
+                }, 300);
+            }
+
+            function streamRemainingFrames(startIndex = CRITICAL_BATCH) {
+                const BATCH_SIZE = 30;
+                let current = startIndex;
+
+                function loadBatch() {
+                    const end = Math.min(TOTAL_FRAMES, current + BATCH_SIZE);
+                    for (let i = current; i < end; i++) {
+                        if (!frames[i]) {
+                            const img = new Image();
+                            img.src = getFrameUrl(i);
+                            img.onload = () => {
+                                loadedFramesCount++;
+                                if (Math.abs(Math.floor(getP() * TOTAL_FRAMES) - i) < 2) {
+                                    requestRender();
+                                }
+                            };
+                            frames[i] = img;
+                        }
+                    }
+                    current = end;
+                    if (current < TOTAL_FRAMES) {
+                        if ('requestIdleCallback' in window) {
+                            requestIdleCallback(loadBatch, { timeout: 100 });
+                        } else {
+                            setTimeout(loadBatch, 40);
+                        }
+                    }
+                }
+
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(loadBatch, { timeout: 200 });
+                } else {
+                    setTimeout(loadBatch, 80);
+                }
+            }
+
+            function init() {
+                cacheLayout();
+                resizeCanvas();
+                preloadCriticalBatch();
+                streamRemainingFrames();
+                render();
+
+                window.addEventListener('scroll', requestRender, { passive: true });
+                window.addEventListener('resize', () => { cacheLayout(); resizeCanvas(); requestRender(); }, { passive: true });
             }
 
             if (document.readyState === 'loading') {
@@ -1491,6 +1603,7 @@
             } else {
                 init();
             }
+        })();
 
             /* ══════════════════════════════════════════════════════════════
                AIR LIFE ANIMATION SYSTEM
@@ -1501,61 +1614,62 @@
                     title: "EAGLE", tagline: "Highland Guardian",
                     data: "3.2m Wingspan • Thermal Focus • Alpha",
                     desc: "Master of the highest peaks, ruling with an unwavering gaze.",
-                    img: "air_section/photosb/eagle.png", cA: "#FFD700", cB: "#FF8C00"
+                    img: "air_section/photosb/eagle.webp", cA: "#FFD700", cB: "#FF8C00"
                 },
                 {
                     title: "FALCON", tagline: "Shadow in the Sun",
                     data: "320 km/h • Pursuit • Calculation",
                     desc: "The fastest animal on earth, turning gravity into a weapon.",
-                    img: "air_section/photosb/falcon.png", cA: "#3E2723", cB: "#D7CCC8"
+                    img: "air_section/photosb/falcon.webp", cA: "#3E2723", cB: "#D7CCC8"
                 },
                 {
                     title: "OWL", tagline: "Ghost of the Pines",
                     data: "Night Vision • Stealth • Wisdom",
                     desc: "A silent predator whose presence is only known after the strike.",
-                    img: "air_section/photosb/owl.png", cA: "#0B1D3A", cB: "#EAEFF7"
+                    img: "air_section/photosb/owl.webp", cA: "#0B1D3A", cB: "#EAEFF7"
                 },
                 {
                     title: "PARROT", tagline: "Vibrant Adaption",
                     data: "Complexity • Social • Memory",
                     desc: "Intelligence beyond instinct, mastering the language of the jungle.",
-                    img: "air_section/photosb/parrot.png", cA: "#2ECC71", cB: "#F4D03F"
+                    img: "air_section/photosb/parrot.webp", cA: "#2ECC71", cB: "#F4D03F"
                 },
                 {
                     title: "PEACOCK", tagline: "Nature's Royal",
                     data: "Display • Elegance • Statuesque",
                     desc: "A breathtaking display of vanity, where every feather tells a story.",
-                    img: "air_section/photosb/peacock.png", cA: "#1ABC9C", cB: "#2E86C1"
+                    img: "air_section/photosb/peacock.webp", cA: "#1ABC9C", cB: "#2E86C1"
                 },
                 {
                     title: "ALBATROSS", tagline: "Ocean Wanderer",
                     data: "Storm Rider • Infinite • Strength",
                     desc: "Crossing entire oceans without a single wing-beat of effort.",
-                    img: "air_section/photosb/albatross.png", cA: "#3A7BD5", cB: "#BDC3C7"
+                    img: "air_section/photosb/albatross.webp", cA: "#3A7BD5", cB: "#BDC3C7"
                 },
                 {
                     title: "HUMMINGBIRD", tagline: "Hovering Gem",
                     data: "High Frequency • Stillness • Focus",
                     desc: "Defying physics with micro-precision and pure energy.",
-                    img: "air_section/photosb/hummingbird.png", cA: "#FF4DA6", cB: "#00FFB3"
+                    img: "air_section/photosb/hummingbird.webp", cA: "#FF4DA6", cB: "#00FFB3"
                 },
                 {
-                    title: "RAVEN", tagline: "Ancient Observer",
-                    data: "Shadow • Legend • Problem Solver",
-                    desc: "A mysterious sentinel of history, often seeing what others miss.",
-                    img: "air_section/photosb/black_raven.png", cA: "#0D0D0D", cB: "#6C5CE7"
+                    title: "FLAMINGO", tagline: "Rosy Solitude",
+                    data: "Balance • Filter • Colony",
+                    desc: "Thriving in extremes, turning harsh alkaline waters into a sanctuary of rose.",
+                    img: "air_section/photosb/flamingo.webp", cA: "#FF69B4", cB: "#FFB6C1"
                 },
                 {
                     title: "CRANE", tagline: "Wetland Grace",
                     data: "Poise • Zen • Flow",
                     desc: "Moving with the harmony of the water and the stillness of the air.",
-                    img: "air_section/photosb/crane.png", cA: "#E8DCC3", cB: "#A7C7E7"
+                    img: "air_section/photosb/crane.webp", cA: "#E8DCC3", cB: "#A7C7E7"
                 }
             ];
 
             const DOMElements = {
+                pin: document.getElementById('air-life-pin'),
                 wrapper: document.getElementById('air-layer-wrapper'),
-                bg: document.getElementById('air-life-section'),
+                bg: document.getElementById('air-bg'),
                 behindImg: document.getElementById('air-behind-img'),
                 stripsLayer: document.getElementById('air-strips-layer'),
                 xLayer: document.getElementById('air-x-layer'),
@@ -1627,8 +1741,22 @@
                 return ease((p - start) / (end - start));
             }
 
+            const airImageCache = new Map();
+            function preloadAirImages(currentIdx) {
+                for (let offset = 0; offset <= 3; offset++) {
+                    const targetIdx = (currentIdx + offset) % AIR_BIRDS.length;
+                    const imgUrl = AIR_BIRDS[targetIdx].img;
+                    if (!airImageCache.has(imgUrl)) {
+                        const img = new Image();
+                        img.src = imgUrl;
+                        airImageCache.set(imgUrl, img);
+                    }
+                }
+            }
+
             // We must set images explicitly on the layers
             function updateLayerImages(idx, nextIdx) {
+                preloadAirImages(idx);
                 const currentFn = `url(${AIR_BIRDS[idx].img})`;
                 const nextFn = `url(${AIR_BIRDS[nextIdx] ? AIR_BIRDS[nextIdx].img : AIR_BIRDS[idx].img})`;
 
@@ -1636,12 +1764,8 @@
                 Object.values(DOMElements.diags).forEach(d => {
                     d.style.backgroundImage = currentFn;
                 });
-                // Background shows next animal ONLY if it exists and we're not at the very end
-                if (idx < AIR_BIRDS.length - 1) {
-                    DOMElements.behindImg.style.backgroundImage = nextFn;
-                } else {
-                    DOMElements.behindImg.style.backgroundImage = 'none';
-                }
+                // Background shows next animal
+                DOMElements.behindImg.style.backgroundImage = nextFn;
             }
 
             // Render loop for the Air Life section
@@ -1652,14 +1776,12 @@
                 if (activeIdx >= totalAnimals) activeIdx = totalAnimals - 1;
                 if (activeIdx < 0) activeIdx = 0;
 
-                let localP = progress - activeIdx;
-
-                // Allow the absolute last bird to actually animate to the end (layer swap etc)
                 const isLast = activeIdx === totalAnimals - 1;
+                let localP = progress - activeIdx;
 
                 const nextIdx = Math.min(activeIdx + 1, totalAnimals - 1);
                 const bird = AIR_BIRDS[activeIdx];
-                const nextBird = isLast ? { img: "", cA: "#000000", cB: "#000000" } : AIR_BIRDS[nextIdx];
+                const nextBird = isLast ? bird : AIR_BIRDS[nextIdx];
 
                 // Did we change animals? Updates texts / images
                 if (activeIdx !== currentAnimalIndex) {
@@ -1786,236 +1908,131 @@
             // Register GSAP Pin for Air Life Section
             gsap.registerPlugin(ScrollTrigger);
 
-            // --- PARTICLE SCROLL BRIDGE SETUP (JIT BOOTED) ---
+            /* ── SECTION 2 & 3 UNIFIED ENGINE: 3D CORRIDOR & SKY LIFE GALLERY ── */
             (() => {
-                let pbScene, pbCamera, pbRenderer, pbPoints, pbRafId, pbTrigger;
-                let pbScrollProgress = 0;
-                const pbMouse = new THREE.Vector2(-9999, -9999);
-                const pbTargetMouse = new THREE.Vector2(-9999, -9999);
-                const pbLerp = (a, b, n) => (1 - n) * a + n * b;
+                const birdImages = [
+                    'air_section/photosb/albatross.webp',
+                    'air_section/photosb/black_raven.webp',
+                    'air_section/photosb/crane.webp',
+                    'air_section/photosb/eagle.webp',
+                    'air_section/photosb/falcon.webp',
+                    'air_section/photosb/hummingbird.webp',
+                    'air_section/photosb/owl.webp',
+                    'air_section/photosb/parrot.webp',
+                    'air_section/photosb/peacock.webp'
+                ];
 
-                const onMouseMove = (e) => {
-                    if (!pbCamera) return;
-                    const x = (e.clientX / window.innerWidth) * 2 - 1;
-                    const y = -(e.clientY / window.innerHeight) * 2 + 1;
-                    const z = 500;
-                    const vFov = (pbCamera.fov * Math.PI) / 180;
-                    const h = 2 * Math.tan(vFov / 2) * z;
-                    const w = h * pbCamera.aspect;
-                    pbTargetMouse.x = x * w / 2;
-                    pbTargetMouse.y = y * h / 2;
-                };
+                const section = document.getElementById('air-corridor-section');
+                const content = document.getElementById('corridor-hero-content');
+                const lifePin = document.getElementById('air-life-pin');
 
-                const bootParticleBridge = () => {
-                    gsap.registerPlugin(ScrollTrigger);
-                    const pbContainer = document.getElementById('pb-canvas-container');
-                    if (!pbContainer || pbContainer.dataset.booted === 'true') return;
-                    pbContainer.dataset.booted = 'true';
-                    pbContainer.innerHTML = '';
-
-                    pbScene = new THREE.Scene();
-                    pbCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
-                    pbCamera.position.z = 500;
-
-                    pbRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-                    pbRenderer.setSize(window.innerWidth, window.innerHeight);
-                    const activeDpr = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.maxDpr) || Math.min(window.devicePixelRatio, 2);
-                    pbRenderer.setPixelRatio(activeDpr);
-                    pbContainer.appendChild(pbRenderer.domElement);
-
-                    if (window.WildlifeTierEngine) {
-                        window.WildlifeTierEngine.registerWebGLContext(pbRenderer, () => {
-                            if (pbRenderer) pbRenderer.resetState();
-                        });
-                    }
-
-                    window.addEventListener('mousemove', onMouseMove);
-
-                    const setupParticles = () => {
-                        const offscreen = document.createElement('canvas');
-                        const offCtx = offscreen.getContext('2d');
-                        offscreen.width = 2048;
-                        offscreen.height = 1024;
-
-                        const fontSize = 160;
-                        offCtx.fillStyle = '#ffffff';
-                        offCtx.font = `800 ${fontSize}px Outfit, sans-serif`;
-                        offCtx.textAlign = 'center';
-                        offCtx.textBaseline = 'middle';
-
-                        const PB_TEXT = "SCROLL MORE\nTO SHOW\nNEW ANIMALS";
-                        const lines = PB_TEXT.split('\n');
-                        const lineSpacing = fontSize * 1.3;
-                        lines.forEach((line, i) => {
-                            const yOffset = (i - (lines.length - 1) / 2) * lineSpacing;
-                            offCtx.fillText(line, offscreen.width / 2, offscreen.height / 2 + yOffset);
-                        });
-
-                        const imgData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height).data;
-                        const homePositions = [];
-                        const randomValues = [];
-
-                        const step = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.particleStep) || 2.5;
-                        for (let y = 0; y < offscreen.height; y += step) {
-                            for (let x = 0; x < offscreen.width; x += step) {
-                                const i = (Math.floor(y) * offscreen.width + Math.floor(x)) * 4;
-                                if (imgData[i + 3] > 128) {
-                                    const px = (x - offscreen.width / 2) * 0.4;
-                                    const py = -(y - offscreen.height / 2) * 0.4;
-                                    homePositions.push(px, py, 0);
-                                    randomValues.push(Math.random(), Math.random(), Math.random());
-                                }
-                            }
+                function bootCorridor() {
+                    if (!window.oceanRoomInstance) {
+                        const canvas = document.getElementById('room-canvas');
+                        if (canvas && window.OceanRoomEngine) {
+                            window.oceanRoomInstance = new window.OceanRoomEngine('#room-canvas', birdImages);
                         }
-
-                        const geometry = new THREE.BufferGeometry();
-                        geometry.setAttribute('position', new THREE.Float32BufferAttribute(homePositions, 3));
-                        geometry.setAttribute('homePosition', new THREE.Float32BufferAttribute(homePositions, 3));
-                        geometry.setAttribute('randomValue', new THREE.Float32BufferAttribute(randomValues, 3));
-
-                        const material = new THREE.ShaderMaterial({
-                            uniforms: {
-                                uTime: { value: 0 },
-                                uMouse: { value: pbMouse },
-                                uMouseRadius: { value: 100 },
-                                uScroll: { value: 0 },
-                                uGlobalFade: { value: 1.0 }
-                            },
-                            vertexShader: `
-                                uniform float uTime;
-                                uniform vec2 uMouse;
-                                uniform float uMouseRadius;
-                                uniform float uScroll;
-                                uniform float uGlobalFade;
-                                attribute vec3 homePosition;
-                                attribute vec3 randomValue;
-                                varying float vAlpha;
-                                varying vec3 vColor;
-
-                                void main() {
-                                    vec3 pos = homePosition;
-                                    pos.x += sin(uTime * 1.2 + randomValue.x * 20.0) * 2.0;
-                                    pos.y += cos(uTime * 1.5 + randomValue.y * 20.0) * 2.0;
-                                    pos.x *= 1.0 + uScroll * 1.5;
-                                    pos.y *= 1.0 + uScroll * 1.5;
-                                    pos.z += uScroll * 200.0 * randomValue.z;
-
-                                    float dist = distance(pos.xy, uMouse);
-                                    if (dist < uMouseRadius) {
-                                        float force = (uMouseRadius - dist) / uMouseRadius;
-                                        vec2 dir = normalize(pos.xy - uMouse);
-                                        pos.xy += dir * force * 50.0;
-                                        pos.z += force * 40.0;
-                                    }
-
-                                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                                    gl_PointSize = (1.2 + randomValue.x * 2.0) * (500.0 / -mvPosition.z);
-                                    gl_Position = projectionMatrix * mvPosition;
-                                    vAlpha = (1.0 - uScroll * 0.5) * (0.4 + 0.6 * randomValue.z) * uGlobalFade;
-                                    vColor = mix(vec3(0.95, 0.45, 0.1), vec3(0.95, 0.75, 0.2), randomValue.x);
-                                }
-                            `,
-                            fragmentShader: `
-                                varying float vAlpha;
-                                varying vec3 vColor;
-                                void main() {
-                                    float dist = distance(gl_PointCoord, vec2(0.5));
-                                    if (dist > 0.5) discard;
-                                    float pointAlpha = smoothstep(0.5, 0.0, dist);
-                                    gl_FragColor = vec4(vColor, vAlpha * pointAlpha * 1.5);
-                                }
-                            `,
-                            transparent: true,
-                            blending: THREE.AdditiveBlending,
-                            depthWrite: false
-                        });
-
-                        pbPoints = new THREE.Points(geometry, material);
-                        pbScene.add(pbPoints);
-                    };
-
-                    const startAnimation = () => {
-                        setupParticles();
-
-                        const animate = (time) => {
-                            pbRafId = requestAnimationFrame(animate);
-                            pbMouse.x = pbLerp(pbMouse.x, pbTargetMouse.x, 0.1);
-                            pbMouse.y = pbLerp(pbMouse.y, pbTargetMouse.y, 0.1);
-                            if (pbPoints && pbPoints.material) {
-                                pbPoints.material.uniforms.uTime.value = time * 0.001;
-                                pbPoints.material.uniforms.uScroll.value = pbScrollProgress;
-                            }
-                            if (pbRenderer && pbScene && pbCamera) {
-                                pbRenderer.render(pbScene, pbCamera);
-                            }
-                        };
-                        animate(0);
-
-                        pbTrigger = ScrollTrigger.create({
-                            id: 'pb-trigger',
-                            trigger: '#particle-bridge-section',
-                            start: 'top top',
-                            end: '+=400vh',
-                            pin: true,
-                            scrub: 0.1,
-                            onUpdate: (self) => {
-                                pbScrollProgress = self.progress;
-                                const fadeStart = 0.8;
-                                let fade = 1.0;
-                                if (self.progress > fadeStart) {
-                                    fade = 1.0 - ((self.progress - fadeStart) / (1.0 - fadeStart));
-                                }
-                                if (pbPoints && pbPoints.material) {
-                                    pbPoints.material.uniforms.uGlobalFade.value = fade;
-                                }
-                            }
-                        });
-                        ScrollTrigger.refresh();
-                    };
-
-                    if (document.fonts && document.fonts.ready) {
-                        document.fonts.ready.then(startAnimation);
                     } else {
-                        startAnimation();
+                        window.oceanRoomInstance.resume();
                     }
-                };
+                }
 
-                const disposeParticleBridge = () => {
-                    if (pbRafId) cancelAnimationFrame(pbRafId);
-                    window.removeEventListener('mousemove', onMouseMove);
-                    if (pbTrigger) pbTrigger.kill();
-                    if (pbPoints) {
-                        if (pbPoints.geometry) pbPoints.geometry.dispose();
-                        if (pbPoints.material) pbPoints.material.dispose();
-                        pbPoints = null;
-                    }
-                    if (pbRenderer) {
-                        pbRenderer.dispose();
-                        pbRenderer = null;
-                    }
-                    const pbContainer = document.getElementById('pb-canvas-container');
-                    if (pbContainer) {
-                        pbContainer.innerHTML = '';
-                        delete pbContainer.dataset.booted;
-                    }
-                    pbScene = null;
-                    pbCamera = null;
-                };
+                const CORRIDOR_HEIGHT = 980; // vh (+70% extended scroll space for 3D room tunnel)
+                const GALLERY_DISTANCE = AIR_BIRDS.length * 1800; // vh (+50% slower scroll distance for 9-bird gallery: 1800vh per bird)
 
-                window.WildlifeJIT.register('particle-bridge-section', {
-                    onEnter: bootParticleBridge,
-                    onExit: disposeParticleBridge
+                ScrollTrigger.create({
+                    trigger: '#air-corridor-section',
+                    start: 'top top',
+                    end: `+=${CORRIDOR_HEIGHT + GALLERY_DISTANCE}vh`,
+                    pin: true,
+                    scrub: 2.16,
+                    onToggle: (self) => {
+                        if (self.isActive) bootCorridor();
+                        else if (window.oceanRoomInstance) window.oceanRoomInstance.pause();
+                    },
+                    onUpdate: (self) => {
+                        const winH = window.innerHeight;
+                        const totalPixelDist = (CORRIDOR_HEIGHT + GALLERY_DISTANCE) * (winH / 100);
+                        const currentPx = self.progress * totalPixelDist;
+                        const corridorPx = CORRIDOR_HEIGHT * (winH / 100);
+
+                        if (currentPx <= corridorPx) {
+                            // PHASE 1: Corridor 3D Tunnel & Center Pin Zoom (0 to 980vh)
+                            const pCorridor = Math.min(1, Math.max(0, currentPx / corridorPx));
+
+                            // 1. Unhide 3D Room canvas for Corridor Zoom and resume rendering engine
+                            const canvas = document.getElementById('room-canvas');
+                            if (canvas) {
+                                canvas.style.display = 'block';
+                                canvas.style.opacity = '1';
+                            }
+
+                            if (window.oceanRoomInstance) {
+                                window.oceanRoomInstance.resume();
+                                if (typeof window.oceanRoomInstance.setScrollProgress === 'function') {
+                                    window.oceanRoomInstance.setScrollProgress(pCorridor);
+                                }
+                            }
+
+                            // 2. Title fade out
+                            if (content) {
+                                const opacity = Math.max(0, 1 - pCorridor / 0.30);
+                                content.style.opacity = opacity;
+                                content.style.transform = `translate(-50%, ${-15 - (1 - opacity) * 30}px)`;
+                            }
+
+                            // 3. Drive .air-life-pin scaling from tunnel center opening (scale 0.22) to full screen (scale 1.0)
+                            if (lifePin) {
+                                renderAirLife(0); // Keep Eagle fully joined & background colors ready
+
+                                if (pCorridor < 0.50) {
+                                    lifePin.style.opacity = '0';
+                                    lifePin.style.pointerEvents = 'none';
+                                } else {
+                                    const pFade = Math.min(1, (pCorridor - 0.50) / 0.25);
+                                    lifePin.style.opacity = pFade;
+
+                                    const pZoom = Math.min(1, Math.max(0, (pCorridor - 0.75) / 0.25));
+                                    const easeZoom = pZoom * pZoom * (3 - 2 * pZoom);
+                                    const scaleVal = 0.22 + (1.0 - 0.22) * easeZoom;
+
+                                    lifePin.style.transform = `translate(-50%, -50%) scale(${scaleVal})`;
+                                    lifePin.style.borderRadius = (pZoom > 0.85) ? `${(1 - (pZoom - 0.85) / 0.15) * 16}px` : '16px';
+                                    lifePin.style.boxShadow = (pZoom > 0.85) ? 'none' : '0 0 80px rgba(0,0,0,0.9)';
+                                    lifePin.style.pointerEvents = (pZoom >= 0.98) ? 'auto' : 'none';
+                                }
+                            }
+                        } else {
+                            // PHASE 2: Full Screen Sky Life 9-Bird Gallery Animations
+                            const galleryPx = currentPx - corridorPx;
+                            const pGallery = Math.min(1, Math.max(0, galleryPx / (GALLERY_DISTANCE * (winH / 100))));
+
+                            if (content) content.style.opacity = '0';
+
+                            // 1. Set Section 3 pin to full screen
+                            if (lifePin) {
+                                lifePin.style.opacity = '1';
+                                lifePin.style.transform = 'translate(-50%, -50%) scale(1.0)';
+                                lifePin.style.borderRadius = '0px';
+                                lifePin.style.boxShadow = 'none';
+                                lifePin.style.pointerEvents = 'auto';
+                            }
+
+                            // 2. Hide Section 2 3D canvas so it doesn't show behind bird image slice cuts or waste GPU rendering!
+                            const canvas = document.getElementById('room-canvas');
+                            if (canvas) {
+                                canvas.style.display = 'none';
+                            }
+                            if (window.oceanRoomInstance) {
+                                window.oceanRoomInstance.pause();
+                            }
+
+                            // 3. Run Section 3 9-bird timeline animation across all birds
+                            renderAirLife(pGallery * AIR_BIRDS.length);
+                        }
+                    }
                 });
             })();
-
-            ScrollTrigger.create({
-                trigger: '#air-life-section',
-                start: 'top top',
-                end: `+=${AIR_BIRDS.length * 2500}vh`, // Sluggish/Heavy cinematic momentum (approx 1.3x current)
-                pin: true,
-                scrub: 1.2, // Increased scrub to match the long distance for fluid feel
-                onUpdate: (self) => renderAirLife(self.progress * AIR_BIRDS.length)
-            });
 
             /* ── JIT BOOT FOR CINEMATIC RING ── */
             if (window.WildlifeJIT) {
@@ -2160,7 +2177,7 @@
             /* ── WEB WORKER OFFLOADING FOR MAGNETIC TEXT MATH ── */
             let physicsWorker = null;
             if (window.Worker) {
-                try { physicsWorker = new Worker('physics.worker.js'); } catch (e) {}
+                try { physicsWorker = new Worker('physics.worker.js'); } catch (e) { }
             }
 
             if (physicsWorker) {

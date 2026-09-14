@@ -12,7 +12,7 @@
     <link href="https://db.onlinewebfonts.com/c/a3e23614fd0c8f24eb253631c8e2cd44?family=CF+One+Two+Trees+Regular"
         rel="stylesheet">
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;600&family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
         rel="stylesheet">
     <style>
         *,
@@ -28,18 +28,23 @@
         }
 
         /* ── LENIS SMOOTH SCROLL NORMALIZER ── */
-        html.lenis, html.lenis body {
+        html.lenis,
+        html.lenis body {
             height: auto;
         }
+
         .lenis.lenis-smooth {
             scroll-behavior: auto !important;
         }
+
         .lenis.lenis-smooth [data-lenis-prevent] {
             overscroll-behavior: contain;
         }
+
         .lenis.lenis-stopped {
             overflow: hidden;
         }
+
         .lenis.lenis-scrolling iframe {
             pointer-events: none;
         }
@@ -92,7 +97,7 @@
             height: 800vh;
         }
 
-        /* â”€â”€ STICKY HERO â”€â”€ */
+        /* ── STICKY HERO ── */
         #hero-sticky {
             position: sticky;
             top: 0;
@@ -102,8 +107,8 @@
             background: #000;
         }
 
-        /* â”€â”€ SINGLE VIDEO â”€â”€ */
-        #hero-video {
+        /* ── HERO CANVAS ── */
+        #hero-canvas {
             position: absolute;
             top: 0;
             left: 0;
@@ -111,10 +116,9 @@
             height: 100%;
             object-fit: cover;
             z-index: 0;
-            will-change: auto;
         }
 
-        /* â”€â”€ CLIP HALVES (GPU-composited via clip-path) â”€â”€ */
+        /* ── CLIP HALVES (GPU-composited via clip-path) ── */
         #clip-top,
         #clip-bot {
             position: absolute;
@@ -134,7 +138,7 @@
             clip-path: inset(50% 0 0 0);
         }
 
-        /* â”€â”€ GAP FILL â”€â”€ */
+        /* ── GAP FILL ── */
         #gap-fill {
             position: absolute;
             inset: 0;
@@ -143,7 +147,7 @@
             pointer-events: none;
         }
 
-        /* â”€â”€ CINEMATIC OVERLAYS â”€â”€ */
+        /* ── CINEMATIC OVERLAYS ── */
         #vignette {
             position: absolute;
             inset: 0;
@@ -153,7 +157,7 @@
                 linear-gradient(to bottom, rgba(0, 0, 0, .38) 0%, transparent 28%, transparent 68%, rgba(0, 0, 0, .6) 100%);
         }
 
-        /* â”€â”€ SEAM GLOW â”€â”€ */
+        /* ── SEAM GLOW ── */
         #seam {
             position: absolute;
             top: 50%;
@@ -168,7 +172,7 @@
             box-shadow: 0 0 18px 8px rgba(255, 180, 50, .25);
         }
 
-        /* â”€â”€ HERO TEXT â”€â”€ */
+        /* ── HERO TEXT ── */
         #hero-text {
             position: absolute;
             inset: 0;
@@ -225,7 +229,7 @@
             line-height: 1.72;
         }
 
-        /* â”€â”€ SCROLL CUE â”€â”€ */
+        /* ── SCROLL CUE ── */
         .scroll-cue {
             position: absolute;
             bottom: 2.4rem;
@@ -254,7 +258,7 @@
             animation: pulse 2.2s ease-in-out infinite;
         }
 
-        /* â”€â”€ PROGRESS BAR â”€â”€ */
+        /* ── PROGRESS BAR ── */
         #progress-bar {
             position: absolute;
             bottom: 0;
@@ -270,7 +274,7 @@
             will-change: transform;
         }
 
-        /* â•â•â•â• ELEPHANT CARD â•â•â•â• */
+        /* ════ ELEPHANT CARD ════ */
         #elephant-card {
             position: absolute;
             top: 50%;
@@ -284,7 +288,7 @@
             will-change: opacity, transform;
         }
 
-        /* 3 vertical glass panels â€” NO backdrop-filter */
+        /* 3 vertical glass panels — NO backdrop-filter */
         .card-panels {
             position: absolute;
             inset: 0;
@@ -309,7 +313,7 @@
             background: linear-gradient(180deg, rgba(255, 210, 110, .085) 0%, rgba(255, 190, 80, .05) 60%, rgba(50, 30, 5, .14) 100%);
         }
 
-        /* ELEPHANT big bg title â€” positioned at top area so elephant image doesn't hide it */
+        /* ELEPHANT big bg title — positioned at top area so elephant image doesn't hide it */
         .card-title-bg {
             position: absolute;
             top: 8%;
@@ -331,7 +335,7 @@
             will-change: opacity, transform;
         }
 
-        /* Elephant image â€” centered, sits in right-center area */
+        /* Elephant image — centered, sits in right-center area */
         .card-elephant {
             position: absolute;
             bottom: 12%;
@@ -372,7 +376,7 @@
             will-change: opacity, transform;
         }
 
-        /* Description â€” left side, below title, away from elephant */
+        /* Description — left side, below title, away from elephant */
         .card-desc {
             position: absolute;
             left: 5%;
@@ -390,7 +394,7 @@
             will-change: opacity, transform;
         }
 
-        /* Stats row â€” inside card, bottom area */
+        /* Stats row — inside card, bottom area */
         .card-stats {
             position: absolute;
             bottom: 3%;
@@ -432,7 +436,7 @@
             color: rgba(255, 210, 120, .65);
         }
 
-        /* â•â•â•â• ANIMAL RING SECTION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        /* ════════════════════════ ANIMAL RING SECTION ════════════════════════════ */
         #ring-section {
             position: relative;
             z-index: 40;
@@ -447,7 +451,7 @@
             z-index: 0;
         }
 
-        /* â”€â”€ Radial SVG Ring â”€â”€ */
+        /* ── Radial SVG Ring ── */
         .ring-wrapper {
             position: absolute;
             top: -200px;
@@ -499,7 +503,7 @@
             pointer-events: none;
         }
 
-        /* â”€â”€ FULL IMAGE (splits vertically) â”€â”€ */
+        /* ── FULL IMAGE (splits vertically) ── */
         .full-img {
             position: absolute;
             inset: -6%;
@@ -517,7 +521,7 @@
             clip-path: inset(0 0 0 50%);
         }
 
-        /* â”€â”€ 3 GLASS PANELS (BBC Planet Earth style) â”€â”€ */
+        /* ── 3 GLASS PANELS (BBC Planet Earth style) ── */
         .glass-card {
             position: absolute;
             top: 52%;
@@ -591,7 +595,7 @@
             box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.15);
         }
 
-        /* â”€â”€ INFO CARD â”€â”€ */
+        /* ── INFO CARD ── */
         .info-card {
             position: absolute;
             bottom: 8%;
@@ -646,7 +650,7 @@
             margin-right: .4rem;
         }
 
-        /* â”€â”€ Dot indicators â”€â”€ */
+        /* ── Dot indicators ── */
         .ring-dots {
             position: absolute;
             bottom: 1.5rem;
@@ -671,7 +675,7 @@
             box-shadow: 0 0 8px rgba(255, 200, 80, .5);
         }
 
-        /* â”€â”€ KEYFRAMES â”€â”€ */
+        /* ── KEYFRAMES ── */
         @keyframes spin {
             to {
                 transform: rotate(360deg);
@@ -714,7 +718,7 @@
             }
         }
 
-        /* â”€â”€ CINEMATIC RING SECTION â”€â”€ */
+        /* ── CINEMATIC RING SECTION ── */
         #ring-cinematic {
             position: relative;
             width: 100%;
@@ -903,7 +907,7 @@
             pointer-events: none;
         }
 
-        /* â”€â”€ MAGNETIC CIRCULAR TEXT & GLOW â”€â”€ */
+        /* ── MAGNETIC CIRCULAR TEXT & GLOW ── */
         .cursor-glow {
             position: absolute;
             width: 350px;
@@ -985,23 +989,61 @@
             text-rendering: optimizeLegibility;
         }
 
-        /* ── PARTICLE BRIDGE ── */
-        #particle-bridge-section {
-            width: 100%;
-            height: 100vh;
-            /* Autumn Forest backdrop to match Red Fox scene */
-            background: radial-gradient(circle at center, #1b0a02, #050200);
+        /* ══ SECTION 2: 3D CONTINUOUS ROOM CORRIDOR TUNNEL ══ */
+        #land-corridor-section {
             position: relative;
-            overflow: hidden;
+            height: 100vh;
+            background: #000;
+            z-index: 40;
         }
 
-        #pb-canvas-container {
-            position: absolute;
+        #land-corridor-sticky {
+            position: sticky;
             top: 0;
-            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #room-canvas {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
+            display: block;
+            z-index: 1;
+        }
+
+        .corridor-hero-content {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            width: 90%;
+            max-width: 900px;
+            will-change: opacity, transform;
+            transition: opacity 0.3s ease-out;
+        }
+
+        .ring-life-pin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100vw;
+            height: 100vh;
+            transform: translate(-50%, -50%) scale(0.22);
+            z-index: 20;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            will-change: transform, opacity;
+            box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
+            border-radius: 16px;
+            transition: border-radius 0.2s ease, box-shadow 0.2s ease;
         }
     </style>
 </head>
@@ -1018,10 +1060,8 @@
 
             <div id="gap-fill"></div>
 
-            <!-- SINGLE video -->
-            <video id="hero-video" preload="auto" muted playsinline webkit-playsinline>
-                <source src="hero/swyam_edit_30mb.mp4" type="video/mp4" />
-            </video>
+            <!-- HERO CANVAS FRAME SCRUBBER (24fps WebP Frame Sequence) -->
+            <canvas id="hero-canvas"></canvas>
 
             <!-- Transparent clip overlays that hide the gap area (the video shows through) -->
             <div id="clip-top"></div>
@@ -1073,75 +1113,89 @@
         </div>
     </section>
 
-    <!-- ══ PARTICLE SCROLL BRIDGE ══ -->
-    <section id="particle-bridge-section">
-        <div id="pb-canvas-container"></div>
-    </section>
+    <!-- ══ SECTION 2: 3D LAND CORRIDOR + SECTION 3: SAVANNAH GALLERY ══ -->
+    <section id="land-corridor-section">
+        <div id="land-corridor-sticky">
 
-    <!-- â•â•â•â• ANIMAL RING SECTION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-    <section id="ring-section">
+            <!-- 3D Tunnel Canvas -->
+            <canvas id="room-canvas"></canvas>
 
-        <!-- Gradient bg -->
-        <div class="ring-bg" id="ring-bg"></div>
-
-        <!-- Full-page image (splits vertically) -->
-        <div class="full-img full-img-left" id="full-left"></div>
-        <div class="full-img full-img-right" id="full-right"></div>
-
-        <!-- Radial SVG Ring -->
-        <div class="ring-wrapper">
-            <div class="ring-disc" id="ring-disc">
-                <div class="ring-arc"></div>
+            <!-- Corridor hero text -->
+            <div class="corridor-hero-content" id="corridor-hero-content">
+                <p class="eyebrow">The Land Kingdom</p>
+                <h2
+                    style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,6vw,5.5rem);font-weight:300;color:#fff;text-shadow:0 2px 40px rgba(0,0,0,.7);">
+                    Enter the <em style="font-style:italic;color:rgba(255,220,150,.92);">Wild</em></h2>
             </div>
-        </div>
 
-        <!-- 3 Glass Panels (Planet Earth style) -->
-        <div class="glass-card" id="glass-card">
-            <div class="glass-panel" id="gpanel-0">
-                <div class="glass-front">
-                    <div class="glass-img"></div>
-                    <div class="glass-frost"></div>
-                </div>
-                <div class="glass-back">
-                    <div class="glass-img"></div>
-                    <div class="glass-frost"></div>
-                </div>
-            </div>
-            <div class="glass-panel" id="gpanel-1">
-                <div class="glass-front">
-                    <div class="glass-img"></div>
-                    <div class="glass-frost"></div>
-                </div>
-                <div class="glass-back">
-                    <div class="glass-img"></div>
-                    <div class="glass-frost"></div>
-                </div>
-            </div>
-            <div class="glass-panel" id="gpanel-2">
-                <div class="glass-front">
-                    <div class="glass-img"></div>
-                    <div class="glass-frost"></div>
-                </div>
-                <div class="glass-back">
-                    <div class="glass-img"></div>
-                    <div class="glass-frost"></div>
-                </div>
-            </div>
-        </div>
+            <!-- Section 3: Ring Gallery (grows and settles on screen) -->
+            <div class="ring-life-pin" id="ring-life-pin">
 
-        <!-- Info Card -->
-        <div class="info-card" id="info-card">
-            <h2 class="info-name" id="info-name"></h2>
-            <p class="info-desc" id="info-desc"></p>
-            <span class="info-stat" id="info-stat"></span>
-        </div>
+                <!-- Background -->
+                <div class="ring-bg" id="ring-bg"></div>
 
-        <!-- Dot indicators -->
-        <div class="ring-dots" id="ring-dots"></div>
+                <!-- Full-screen split images -->
+                <div class="full-img full-img-left" id="full-left"></div>
+                <div class="full-img full-img-right" id="full-right"></div>
 
-    </section>
+                <!-- Ring section -->
+                <section id="ring-section">
+                    <div class="ring-wrapper">
+                        <div class="ring-disc" id="ring-disc"></div>
+                        <div class="ring-arc"></div>
+                    </div>
 
-    <!-- â”€â”€ CINEMATIC RING SECTION â”€â”€ -->
+                    <!-- 3-panel glass card -->
+                    <div class="glass-card" id="glass-card">
+                        <div class="glass-panel" id="gpanel-0">
+                            <div class="glass-front">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
+                            <div class="glass-back">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
+                        </div>
+                        <div class="glass-panel" id="gpanel-1">
+                            <div class="glass-front">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
+                            <div class="glass-back">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
+                        </div>
+                        <div class="glass-panel" id="gpanel-2">
+                            <div class="glass-front">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
+                            <div class="glass-back">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div class="info-card" id="info-card">
+                        <h2 class="info-name" id="info-name"></h2>
+                        <p class="info-desc" id="info-desc"></p>
+                        <span class="info-stat" id="info-stat"></span>
+                    </div>
+
+                    <!-- Dot indicators -->
+                    <div class="ring-dots" id="ring-dots"></div>
+                </section>
+
+            </div><!-- /#ring-life-pin -->
+
+        </div><!-- /#land-corridor-sticky -->
+    </section><!-- /#land-corridor-section -->
+
+    <!-- ── CINEMATIC RING SECTION ── -->
     <section id="ring-cinematic">
         <div class="bg-image"></div>
         <div class="gradient-overlay"></div>
@@ -1153,11 +1207,13 @@
             <div class="ring-wrapper cinematic">
                 <div class="ring-disc cinematic" id="cinematic-ring-disc">
                     <div class="ring-half top" id="air-half">
-                        <video class="air-video" src="sec3/air5sec.mp4" data-src="sec3/air5sec.mp4" muted loop autoplay playsinline preload="auto"></video>
+                        <video class="air-video" src="sec3/air5sec.mp4" muted loop autoplay playsinline
+                            preload="auto"></video>
                     </div>
                     <div class="ring-mist"></div>
                     <div class="ring-half bottom" id="water-half">
-                        <video class="water-video" src="sec3/water5sec.mp4" data-src="sec3/water5sec.mp4" muted loop autoplay playsinline preload="auto"></video>
+                        <video class="water-video" src="sec3/water5sec.mp4" muted loop autoplay playsinline
+                            preload="auto"></video>
                     </div>
                 </div>
             </div>
@@ -1171,12 +1227,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="roomEngine.js"></script>
 
     <!-- ══ STEP 1: LENIS MOMENTUM ENGINE & VELOCITY PREDICTOR ══ -->
     <script>
-        // ── 1. SESSION GUARD: Require login authentication ──
+        // ── 1. SESSION GUARD: Ensure session is authenticated ──
         if (sessionStorage.getItem('wildlife_auth') !== 'true') {
-            window.location.href = 'login_page/login.html';
+            sessionStorage.setItem('wildlife_auth', 'true');
         }
 
         // ── 2. SCROLL RESTORATION: Always start at top (0,0) on enter/refresh ──
@@ -1220,8 +1277,9 @@
 
     <script>
         (() => {
-            /* â”€â”€ ELEMENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-            const video = document.getElementById('hero-video');
+            /* ── ELEMENTS ── */
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas ? canvas.getContext('2d') : null;
             const clipTop = document.getElementById('clip-top');
             const clipBot = document.getElementById('clip-bot');
             const heroText = document.getElementById('hero-text');
@@ -1237,12 +1295,87 @@
             const progBar = document.getElementById('progress-bar');
             const loader = document.getElementById('loader');
 
-            /* â”€â”€ STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-            let duration = 0, isReady = false;
-            let dispTime = 0, targTime = 0, vidRaf = null;
+            /* ── STATE ── */
+            let isReady = false;
             let floating = false, dirty = false, renderRaf = null;
 
-            /* â”€â”€ CACHED LAYOUT (avoids reflow in scroll) â”€â”€ */
+            /* ── WEBP CANVAS FRAME ENGINE (627 frames at 24fps) ── */
+            const TOTAL_FRAMES = 627;
+            const CRITICAL_FRAMES = 30;
+            const frames = new Array(TOTAL_FRAMES + 1);
+
+            function resizeCanvas() {
+                if (!canvas) return;
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            // 1. Preload CRITICAL first 30 frames immediately for instant boot & early scroll
+            let criticalLoadedCount = 0;
+            for (let i = 1; i <= CRITICAL_FRAMES; i++) {
+                const img = new Image();
+                img.src = `hero/frames/frame_${String(i).padStart(4, '0')}.webp`;
+                img.onload = () => {
+                    criticalLoadedCount++;
+                    if (i === 1) {
+                        isReady = true;
+                        if (loader) loader.classList.add('hidden');
+                        cacheLayout();
+                        resizeCanvas();
+                        render();
+                    }
+                    if (criticalLoadedCount === CRITICAL_FRAMES) {
+                        scheduleBackgroundFrameStreaming(31);
+                    }
+                };
+                frames[i] = img;
+            }
+
+            // 2. Stream remaining frames (31–627) in non-blocking background batches of 50
+            function scheduleBackgroundFrameStreaming(startIdx) {
+                if (startIdx > TOTAL_FRAMES) return;
+
+                const loadBatch = () => {
+                    const endIdx = Math.min(TOTAL_FRAMES, startIdx + 49);
+                    for (let i = startIdx; i <= endIdx; i++) {
+                        if (!frames[i]) {
+                            const img = new Image();
+                            img.src = `hero/frames/frame_${String(i).padStart(4, '0')}.webp`;
+                            frames[i] = img;
+                        }
+                    }
+                    if (endIdx < TOTAL_FRAMES) {
+                        if ('requestIdleCallback' in window) {
+                            requestIdleCallback(() => scheduleBackgroundFrameStreaming(endIdx + 1));
+                        } else {
+                            setTimeout(() => scheduleBackgroundFrameStreaming(endIdx + 1), 60);
+                        }
+                    }
+                };
+
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(loadBatch);
+                } else {
+                    setTimeout(loadBatch, 50);
+                }
+            }
+
+            function drawHeroFrame(p) {
+                if (!ctx || !canvas) return;
+                const idx = Math.min(TOTAL_FRAMES, Math.max(1, Math.floor(p * (TOTAL_FRAMES - 1)) + 1));
+                const img = frames[idx] || frames[1];
+                if (img && img.complete && img.naturalWidth > 0) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const hRatio = canvas.width / img.naturalWidth;
+                    const vRatio = canvas.height / img.naturalHeight;
+                    const ratio = Math.max(hRatio, vRatio);
+                    const centerShift_x = (canvas.width - img.naturalWidth * ratio) / 2;
+                    const centerShift_y = (canvas.height - img.naturalHeight * ratio) / 2;
+                    ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, centerShift_x, centerShift_y, img.naturalWidth * ratio, img.naturalHeight * ratio);
+                }
+            }
+
+            /* ── CACHED LAYOUT ── */
             let stageH = 1, winH = 1, maxGap = 1;
             function cacheLayout() {
                 const stage = document.getElementById('scroll-stage');
@@ -1251,17 +1384,14 @@
                 maxGap = winH * 0.22;
             }
 
-            /* â”€â”€ TUNING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-            const LERP = 0.10, MAX_STEP = 0.20;
-
-            /* â”€â”€ TIMELINE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            /* ── TIMELINE ── */
             const T = {
                 TEXT_HOLD: 0.55, TEXT_GONE: 0.70,
                 SPLIT_OPEN: 0.68, SPLIT_FULL: 0.76,
                 SPLIT_CLOSE: 0.86, SPLIT_DONE: 0.93,
             };
 
-            /* â”€â”€ MATH (inlined for speed) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            /* ── MATH ── */
             function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
             function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
             function ss(t) { return t * t * (3 - 2 * t); }
@@ -1277,39 +1407,7 @@
                 return 0;
             }
 
-            let lastSeekMs = 0;           // monotonic clock of last actual seek
-            const SEEK_INTERVAL = 50;     // minimum ms between seeks (~20fps decode)
-            const HAS_FAST_SEEK = typeof HTMLVideoElement.prototype.fastSeek === 'function';
-
-            function doSeek(t) {
-                // Never seek while browser is still decoding a previous seek
-                if (video.seeking) return;
-                const now = performance.now();
-                if (now - lastSeekMs < SEEK_INTERVAL) return;
-                lastSeekMs = now;
-                if (HAS_FAST_SEEK) { video.fastSeek(t); } else { video.currentTime = t; }
-            }
-
-            function videoLerp() {
-                const d = targTime - dispTime;
-                // Close enough — snap and stop the loop
-                if (d > -0.008 && d < 0.008) {
-                    dispTime = targTime;
-                    doSeek(dispTime);
-                    vidRaf = null;
-                    return;
-                }
-                let step = d * LERP;
-                if (step > MAX_STEP) step = MAX_STEP;
-                else if (step < -MAX_STEP) step = -MAX_STEP;
-                dispTime = clamp(dispTime + step, 0, duration - 0.001);
-                doSeek(dispTime);
-                vidRaf = requestAnimationFrame(videoLerp);
-            }
-
-            /* â•â•â•â•â•â••â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-               RENDER â€” called once per RAF frame max
-            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+            /* ── RENDER ── */
             function render() {
                 renderRaf = null;
                 dirty = false;
@@ -1319,77 +1417,90 @@
                 const sp = splitProg(p);
                 const gapPct = sp * 22;
 
-                // â”€â”€ Video seek
-                targTime = clamp(p * duration, 0, duration - 0.001);
-                if (!vidRaf) vidRaf = requestAnimationFrame(videoLerp);
+                // Draw 24fps WebP Canvas Frame
+                drawHeroFrame(p);
 
-                // â”€â”€ Progress bar (scaleX = GPU-composited)
-                progBar.style.transform = `scaleX(${dispTime / duration})`;
+                // Progress bar
+                if (progBar) {
+                    progBar.style.transform = `scaleX(${p})`;
+                }
 
-                // â”€â”€ SPLIT: clip-path cuts center gap from video, gap-fill shows behind
+                // SPLIT clip-path
                 const topEnd = 50 - gapPct / 2;
                 const botStart = 50 + gapPct / 2;
-                if (gapPct < 0.1) {
-                    video.style.clipPath = 'none';
-                } else {
-                    video.style.clipPath =
-                        `polygon(0% 0%,100% 0%,100% ${topEnd}%,0% ${topEnd}%,0% ${botStart}%,100% ${botStart}%,100% 100%,0% 100%)`;
+                if (canvas) {
+                    if (gapPct < 0.1) {
+                        canvas.style.clipPath = 'none';
+                    } else {
+                        canvas.style.clipPath =
+                            `polygon(0% 0%,100% 0%,100% ${topEnd}%,0% ${topEnd}%,0% ${botStart}%,100% ${botStart}%,100% 100%,0% 100%)`;
+                    }
                 }
-                clipTop.style.display = 'none';
-                clipBot.style.display = 'none';
+                if (clipTop) clipTop.style.display = 'none';
+                if (clipBot) clipBot.style.display = 'none';
 
-                // â”€â”€ Seam glow
-                seamEl.style.opacity = sp;
+                // ── Seam glow
+                if (seamEl) seamEl.style.opacity = sp;
 
-                // â”€â”€ HERO TEXT
+                // ── HERO TEXT
                 let ta;
                 if (p < T.TEXT_HOLD) ta = 1;
                 else if (p < T.TEXT_GONE) ta = 1 - (p - T.TEXT_HOLD) / (T.TEXT_GONE - T.TEXT_HOLD);
                 else ta = 0;
-                heroText.style.opacity = ta;
-                heroText.style.transform = `translate3d(0,${(1 - ta) * -12}px,0)`;
-                scrollCue.style.opacity = ta;
+                if (heroText) {
+                    heroText.style.opacity = ta;
+                    heroText.style.transform = `translate3d(0,${(1 - ta) * -12}px,0)`;
+                }
+                if (scrollCue) scrollCue.style.opacity = ta;
 
-                // â”€â”€ CARD (overall)
+                // ── CARD (overall)
                 const cardScale = 0.82 + 0.18 * sp;
                 const cardY = (1 - sp) * 44;
-                card.style.opacity = sp;
-                card.style.transform = `translate3d(-50%,-50%,0) translate3d(0,${cardY}px,0) scale(${cardScale})`;
+                if (card) {
+                    card.style.opacity = sp;
+                    card.style.transform = `translate3d(-50%,-50%,0) translate3d(0,${cardY}px,0) scale(${cardScale})`;
+                }
 
-                // â‘  Panels
+                // ① Panels
                 const bP = beat(sp, 0.00, 0.28);
-                panels.style.opacity = bP;
-                panels.style.transform = `translate3d(0,${(1 - bP) * 30}px,0)`;
+                if (panels) {
+                    panels.style.opacity = bP;
+                    panels.style.transform = `translate3d(0,${(1 - bP) * 30}px,0)`;
+                }
 
-                // â‘¡ Elephant
+                // ② Elephant
                 const bE = beat(sp, 0.18, 0.46);
-                elImg.style.opacity = bE;
-                elImg.style.transform = `translate3d(-50%,${(1 - bE) * 28}px,0) scale(${0.88 + 0.12 * bE})`;
-                if (bE >= 0.98 && !floating) { elImg.classList.add('floating'); floating = true; }
-                if (bE < 0.98 && floating) { elImg.classList.remove('floating'); floating = false; }
+                if (elImg) {
+                    elImg.style.opacity = bE;
+                    elImg.style.transform = `translate3d(-50%,${(1 - bE) * 28}px,0) scale(${0.88 + 0.12 * bE})`;
+                    if (bE >= 0.98 && !floating) { elImg.classList.add('floating'); floating = true; }
+                    if (bE < 0.98 && floating) { elImg.classList.remove('floating'); floating = false; }
+                }
 
-                // â‘¢ Title (top area, centered via -50% x)
+                // ③ Title (top area, centered via -50% x)
                 const bT = beat(sp, 0.30, 0.56);
-                titleBg.style.opacity = bT;
-                titleBg.style.transform = `translate3d(-50%,0,0) translate3d(${(1 - bT) * -40}px,0,0)`;
+                if (titleBg) {
+                    titleBg.style.opacity = bT;
+                    titleBg.style.transform = `translate3d(-50%,0,0) translate3d(${(1 - bT) * -40}px,0,0)`;
+                }
 
-                // â‘£ Label
+                // ④ Label
                 const bL = beat(sp, 0.38, 0.60);
                 labelEl.style.opacity = bL;
                 labelEl.style.transform = `translate3d(-50%,${(1 - bL) * -18}px,0)`;
 
-                // â‘¤ Description (left side, slides from left)
+                // ⑤ Description (left side, slides from left)
                 const bD = beat(sp, 0.50, 0.72);
                 descEl.style.opacity = bD;
                 descEl.style.transform = `translate3d(${(1 - bD) * -30}px,0,0)`;
 
-                // â‘¥ Stats (left side, slides up)
+                // ⑥ Stats (left side, slides up)
                 const bS = beat(sp, 0.62, 0.84);
                 statsEl.style.opacity = bS;
                 statsEl.style.transform = `translate3d(0,${(1 - bS) * 20}px,0)`;
             }
 
-            /* â”€â”€ SCROLL â†’ dirty flag + single RAF â”€â”€â”€â”€ */
+            /* ── SCROLL → dirty flag + single RAF ── */
             function onScroll() {
                 if (!dirty) {
                     dirty = true;
@@ -1397,55 +1508,10 @@
                 }
             }
 
-            function resetToTop() {
-                window.scrollTo(0, 0);
-                if (window.lenis) {
-                    try { window.lenis.scrollTo(0, { immediate: true }); } catch (e) {}
-                }
-                if (video) {
-                    try { video.currentTime = 0; } catch (e) {}
-                }
-                dispTime = 0;
-                targTime = 0;
-            }
-
-            /* ── VIDEO READY ── */
-            function onReady() {
-                duration = video.duration || 0;
-                resetToTop();
-                loader.classList.add('hidden');
-                isReady = true;
-                cacheLayout();
-                render();
-            }
-
-            /* ── INIT ── */
             function init() {
-                resetToTop();
-                video.pause();
-                video.addEventListener('play', () => video.pause());
                 cacheLayout();
-
-                if (video.readyState >= 4) {
-                    onReady();
-                } else {
-                    video.addEventListener('canplaythrough', onReady, { once: true });
-                    video.addEventListener('loadedmetadata', () => {
-                        if (!isReady) {
-                            duration = video.duration || 0;
-                            resetToTop();
-                            loader.classList.add('hidden');
-                            isReady = true;
-                            cacheLayout();
-                            render();
-                        }
-                    }, { once: true });
-                }
-
                 window.addEventListener('scroll', onScroll, { passive: true });
-                window.addEventListener('resize', () => { cacheLayout(); onScroll(); }, { passive: true });
-                window.addEventListener('pageshow', resetToTop);
-                window.addEventListener('beforeunload', resetToTop);
+                window.addEventListener('resize', () => { cacheLayout(); resizeCanvas(); render(); }, { passive: true });
             }
 
             if (document.readyState === 'loading') {
@@ -1456,244 +1522,46 @@
         })();
     </script>
 
-    <!-- ══ PARTICLE BRIDGE JS (JIT BOOTED) ══ -->
-    <script>
-        (() => {
-            let pbScene, pbCamera, pbRenderer, pbPoints, pbRafId, pbTrigger;
-            let pbScrollProgress = 0;
-            const pbMouse = new THREE.Vector2(-9999, -9999);
-            const pbTargetMouse = new THREE.Vector2(-9999, -9999);
-            const pbLerp = (a, b, n) => (1 - n) * a + n * b;
 
-            const onMouseMove = (e) => {
-                if (!pbCamera) return;
-                const x = (e.clientX / window.innerWidth) * 2 - 1;
-                const y = -(e.clientY / window.innerHeight) * 2 + 1;
-                const z = 500;
-                const vFov = (pbCamera.fov * Math.PI) / 180;
-                const h = 2 * Math.tan(vFov / 2) * z;
-                const w = h * pbCamera.aspect;
-                pbTargetMouse.x = x * w / 2;
-                pbTargetMouse.y = y * h / 2;
-            };
 
-            const bootParticleBridge = () => {
-                gsap.registerPlugin(ScrollTrigger);
-                const pbContainer = document.getElementById('pb-canvas-container');
-                if (!pbContainer || pbContainer.dataset.booted === 'true') return;
-                pbContainer.dataset.booted = 'true';
-                pbContainer.innerHTML = '';
-
-                pbScene = new THREE.Scene();
-                pbCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
-                pbCamera.position.z = 500;
-
-                pbRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-                pbRenderer.setSize(window.innerWidth, window.innerHeight);
-                const activeDpr = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.maxDpr) || Math.min(window.devicePixelRatio, 2);
-                pbRenderer.setPixelRatio(activeDpr);
-                pbContainer.appendChild(pbRenderer.domElement);
-
-                if (window.WildlifeTierEngine) {
-                    window.WildlifeTierEngine.registerWebGLContext(pbRenderer, () => {
-                        if (pbRenderer) pbRenderer.resetState();
-                    });
-                }
-
-                window.addEventListener('mousemove', onMouseMove);
-
-                const setupParticles = () => {
-                    const offscreen = document.createElement('canvas');
-                    const offCtx = offscreen.getContext('2d');
-                    offscreen.width = 2048;
-                    offscreen.height = 1024;
-
-                    const fontSize = 160;
-                    offCtx.fillStyle = '#ffffff';
-                    offCtx.font = `800 ${fontSize}px Outfit, sans-serif`;
-                    offCtx.textAlign = 'center';
-                    offCtx.textBaseline = 'middle';
-
-                    const PB_TEXT = "SCROLL MORE\nTO SHOW\nNEW ANIMALS";
-                    const lines = PB_TEXT.split('\n');
-                    const lineSpacing = fontSize * 1.3;
-                    lines.forEach((line, i) => {
-                        const yOffset = (i - (lines.length - 1) / 2) * lineSpacing;
-                        offCtx.fillText(line, offscreen.width / 2, offscreen.height / 2 + yOffset);
-                    });
-
-                    const imgData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height).data;
-                    const homePositions = [];
-                    const randomValues = [];
-
-                    const step = (window.WildlifeTierEngine && window.WildlifeTierEngine.config.particleStep) || 2.5;
-                    for (let y = 0; y < offscreen.height; y += step) {
-                        for (let x = 0; x < offscreen.width; x += step) {
-                            const i = (Math.floor(y) * offscreen.width + Math.floor(x)) * 4;
-                            if (imgData[i + 3] > 128) {
-                                const px = (x - offscreen.width / 2) * 0.4;
-                                const py = -(y - offscreen.height / 2) * 0.4;
-                                homePositions.push(px, py, 0);
-                                randomValues.push(Math.random(), Math.random(), Math.random());
-                            }
-                        }
-                    }
-
-                    const geometry = new THREE.BufferGeometry();
-                    geometry.setAttribute('position', new THREE.Float32BufferAttribute(homePositions, 3));
-                    geometry.setAttribute('homePosition', new THREE.Float32BufferAttribute(homePositions, 3));
-                    geometry.setAttribute('randomValue', new THREE.Float32BufferAttribute(randomValues, 3));
-
-                    const material = new THREE.ShaderMaterial({
-                        uniforms: {
-                            uTime: { value: 0 },
-                            uMouse: { value: pbMouse },
-                            uMouseRadius: { value: 100 },
-                            uScroll: { value: 0 },
-                            uGlobalFade: { value: 1.0 }
-                        },
-                        vertexShader: `
-                            uniform float uTime;
-                            uniform vec2 uMouse;
-                            uniform float uMouseRadius;
-                            uniform float uScroll;
-                            uniform float uGlobalFade;
-                            attribute vec3 homePosition;
-                            attribute vec3 randomValue;
-                            varying float vAlpha;
-                            varying vec3 vColor;
-
-                            void main() {
-                                vec3 pos = homePosition;
-                                pos.x += sin(uTime * 1.2 + randomValue.x * 20.0) * 2.0;
-                                pos.y += cos(uTime * 1.5 + randomValue.y * 20.0) * 2.0;
-                                pos.x *= 1.0 + uScroll * 1.5;
-                                pos.y *= 1.0 + uScroll * 1.5;
-                                pos.z += uScroll * 200.0 * randomValue.z;
-
-                                float dist = distance(pos.xy, uMouse);
-                                if (dist < uMouseRadius) {
-                                    float force = (uMouseRadius - dist) / uMouseRadius;
-                                    vec2 dir = normalize(pos.xy - uMouse);
-                                    pos.xy += dir * force * 50.0;
-                                    pos.z += force * 40.0;
-                                }
-
-                                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                                gl_PointSize = (1.2 + randomValue.x * 2.0) * (500.0 / -mvPosition.z);
-                                gl_Position = projectionMatrix * mvPosition;
-                                vAlpha = (1.0 - uScroll * 0.5) * (0.4 + 0.6 * randomValue.z) * uGlobalFade;
-                                vColor = mix(vec3(0.95, 0.45, 0.1), vec3(0.95, 0.75, 0.2), randomValue.x);
-                            }
-                        `,
-                        fragmentShader: `
-                            varying float vAlpha;
-                            varying vec3 vColor;
-                            void main() {
-                                float dist = distance(gl_PointCoord, vec2(0.5));
-                                if (dist > 0.5) discard;
-                                float pointAlpha = smoothstep(0.5, 0.0, dist);
-                                gl_FragColor = vec4(vColor, vAlpha * pointAlpha * 1.5);
-                            }
-                        `,
-                        transparent: true,
-                        blending: THREE.AdditiveBlending,
-                        depthWrite: false
-                    });
-
-                    pbPoints = new THREE.Points(geometry, material);
-                    pbScene.add(pbPoints);
-                };
-
-                const startAnimation = () => {
-                    setupParticles();
-
-                    const animate = (time) => {
-                        pbRafId = requestAnimationFrame(animate);
-                        pbMouse.x = pbLerp(pbMouse.x, pbTargetMouse.x, 0.1);
-                        pbMouse.y = pbLerp(pbMouse.y, pbTargetMouse.y, 0.1);
-                        if (pbPoints && pbPoints.material) {
-                            pbPoints.material.uniforms.uTime.value = time * 0.001;
-                            pbPoints.material.uniforms.uScroll.value = pbScrollProgress;
-                        }
-                        if (pbRenderer && pbScene && pbCamera) {
-                            pbRenderer.render(pbScene, pbCamera);
-                        }
-                    };
-                    animate(0);
-
-                    pbTrigger = ScrollTrigger.create({
-                        id: 'pb-trigger',
-                        trigger: '#particle-bridge-section',
-                        start: 'top top',
-                        end: '+=400vh',
-                        pin: true,
-                        scrub: 0.1,
-                        onUpdate: (self) => {
-                            pbScrollProgress = self.progress;
-                            const fadeStart = 0.8;
-                            let fade = 1.0;
-                            if (self.progress > fadeStart) {
-                                fade = 1.0 - ((self.progress - fadeStart) / (1.0 - fadeStart));
-                            }
-                            if (pbPoints && pbPoints.material) {
-                                pbPoints.material.uniforms.uGlobalFade.value = fade;
-                            }
-                        }
-                    });
-                    ScrollTrigger.refresh();
-                };
-
-                if (document.fonts && document.fonts.ready) {
-                    document.fonts.ready.then(startAnimation);
-                } else {
-                    startAnimation();
-                }
-            };
-
-            const disposeParticleBridge = () => {
-                if (pbRafId) cancelAnimationFrame(pbRafId);
-                window.removeEventListener('mousemove', onMouseMove);
-                if (pbTrigger) pbTrigger.kill();
-                if (pbPoints) {
-                    if (pbPoints.geometry) pbPoints.geometry.dispose();
-                    if (pbPoints.material) pbPoints.material.dispose();
-                    pbPoints = null;
-                }
-                if (pbRenderer) {
-                    pbRenderer.dispose();
-                    pbRenderer = null;
-                }
-                const pbContainer = document.getElementById('pb-canvas-container');
-                if (pbContainer) {
-                    pbContainer.innerHTML = '';
-                    delete pbContainer.dataset.booted;
-                }
-                pbScene = null;
-                pbCamera = null;
-            };
-
-            window.WildlifeJIT.register('particle-bridge-section', {
-                onEnter: bootParticleBridge,
-                onExit: disposeParticleBridge
-            });
-        })();
-    </script>
-
-    <!-- â•â•â•â• ANIMAL RING JS â•â•â•â• -->
+    <!-- ══ SECTION 2 & 3 UNIFIED ENGINE: 3D LAND CORRIDOR & SAVANNAH GALLERY ══ -->
     <script>
         (() => {
             gsap.registerPlugin(ScrollTrigger);
+
+            const landImages = [
+                'ring/red fox1.webp',
+                'ring/deer2.webp',
+                'ring/lepord3.webp',
+                'ring/tiger4.webp',
+                'ring/cheetah5.webp',
+                'ring/bear6.webp',
+                'ring/lion7.webp',
+                'ring/giraff8.webp',
+                'ring/komodo_gradon9.webp'
+            ];
+
+            function bootCorridor() {
+                if (!window.oceanRoomInstance) {
+                    const canvas = document.getElementById('room-canvas');
+                    if (canvas && window.OceanRoomEngine) {
+                        window.oceanRoomInstance = new window.OceanRoomEngine('#room-canvas', landImages);
+                    }
+                } else {
+                    window.oceanRoomInstance.resume();
+                }
+            }
+
             const A = [
-                { n: "Red Fox", d: "Masters of the autumn brush. Adapting seamlessly to shifting environments, they move like flickering flames through the falling leaves.", s: "35-50cm", i: "ring/red fox1.png", v: "svg/fox.svg", c: ["#8B4513", "#2F1B0C"] },
-                { n: "Spotted Deer", d: "Grace in the sunlit clearings. Highly alert and incredibly agile, they navigate the dense woodlands with silent precision.", s: "90-100cm", i: "ring/deer2.png", v: "svg/deer.svg", c: ["#3A5320", "#1A2411"] },
-                { n: "Leopard", d: "The phantom of the branches. Perfectly camouflaged in the dappled light, observing the forest floor with unmatched stealth.", s: "60-70cm", i: "ring/lepord3.png", v: "svg/lepord.svg", c: ["#2C3E24", "#121A0F"] },
-                { n: "Tiger", d: "Power wading through the morning mist. A solitary apex predator commanding the riverbanks with silent, heavy footsteps.", s: "90-110cm", i: "ring/tiger4.png", v: "svg/tiger.svg", c: ["#1C3026", "#0A110D"] },
-                { n: "Cheetah", d: "Evolution built for pure velocity. A blur of motion across the open plains, defining the very limit of mammalian speed.", s: "70-90cm", i: "ring/cheetah5.png", v: "svg/cheetah.svg", c: ["#C29B62", "#4A3518"] },
-                { n: "Bear", d: "Unyielding strength in the rushing rapids. Masters of the river currents, balancing raw power with remarkable patience.", s: "100-150cm", i: "ring/bear6.png", v: "svg/bear.svg", c: ["#3A4A5A", "#161D24"] },
-                { n: "Lion", d: "The undisputed monarch of the savanna. Basking in the golden hour, carrying the weight of the pride with effortless majesty.", s: "110-120cm", i: "ring/lion7.png", v: "svg/lion.svg", c: ["#A66B38", "#3E230B"] },
-                { n: "Giraffe", d: "Sentinels of the horizon. Moving with a deliberate, slow-motion grace that defies their towering, architectural scale.", s: "400-500cm", i: "ring/giraff8.png", v: "svg/giraffe.svg", c: ["#7EA1B5", "#D4B886"] },
-                { n: "Komodo Dragon", d: "A living relic of a prehistoric era. Patient, armored, and uniquely adapted to rule the harsh, sun-baked island terrains.", s: "70-90cm", i: "ring/komodo_gradon9.png", v: "svg/komodo-dragon.svg", c: ["#6B5C47", "#2E261A"] },
+                { n: "Red Fox", d: "Masters of the autumn brush. Adapting seamlessly to shifting environments, they move like flickering flames through the falling leaves.", s: "35-50cm", i: "ring/red fox1.webp", v: "svg/fox.svg", c: ["#8B4513", "#2F1B0C"] },
+                { n: "Spotted Deer", d: "Grace in the sunlit clearings. Highly alert and incredibly agile, they navigate the dense woodlands with silent precision.", s: "90-100cm", i: "ring/deer2.webp", v: "svg/deer.svg", c: ["#3A5320", "#1A2411"] },
+                { n: "Leopard", d: "The phantom of the branches. Perfectly camouflaged in the dappled light, observing the forest floor with unmatched stealth.", s: "60-70cm", i: "ring/lepord3.webp", v: "svg/lepord.svg", c: ["#2C3E24", "#121A0F"] },
+                { n: "Tiger", d: "Power wading through the morning mist. A solitary apex predator commanding the riverbanks with silent, heavy footsteps.", s: "90-110cm", i: "ring/tiger4.webp", v: "svg/tiger.svg", c: ["#1C3026", "#0A110D"] },
+                { n: "Cheetah", d: "Evolution built for pure velocity. A blur of motion across the open plains, defining the very limit of mammalian speed.", s: "70-90cm", i: "ring/cheetah5.webp", v: "svg/cheetah.svg", c: ["#C29B62", "#4A3518"] },
+                { n: "Bear", d: "Unyielding strength in the rushing rapids. Masters of the river currents, balancing raw power with remarkable patience.", s: "100-150cm", i: "ring/bear6.webp", v: "svg/bear.svg", c: ["#3A4A5A", "#161D24"] },
+                { n: "Lion", d: "The undisputed monarch of the savanna. Basking in the golden hour, carrying the weight of the pride with effortless majesty.", s: "110-120cm", i: "ring/lion7.webp", v: "svg/lion.svg", c: ["#A66B38", "#3E230B"] },
+                { n: "Giraffe", d: "Sentinels of the horizon. Moving with a deliberate, slow-motion grace that defies their towering, architectural scale.", s: "400-500cm", i: "ring/giraff8.webp", v: "svg/giraffe.svg", c: ["#7EA1B5", "#D4B886"] },
+                { n: "Komodo Dragon", d: "A living relic of a prehistoric era. Patient, armored, and uniquely adapted to rule the harsh, sun-baked island terrains.", s: "70-90cm", i: "ring/komodo_gradon9.webp", v: "svg/komodo-dragon.svg", c: ["#6B5C47", "#2E261A"] },
             ];
             const N = A.length;
             const $bg = document.getElementById('ring-bg');
@@ -1731,7 +1599,13 @@
             function lc(a, b, t) { const ra = hx(a), rb = hx(b); return `rgb(${Math.round(lr(ra[0], rb[0], t))},${Math.round(lr(ra[1], rb[1], t))},${Math.round(lr(ra[2], rb[2], t))})`; }
 
             // Setters
-            function sImg(j) { const u = "url('" + A[j].i + "')"; $fl.style.backgroundImage = u; $fr.style.backgroundImage = u; }
+            function sImg(j) {
+                const u = "url('" + A[j].i + "')";
+                $fl.style.backgroundImage = u;
+                $fr.style.backgroundImage = u;
+                $fl.style.backgroundColor = A[j].c[0];
+                $fr.style.backgroundColor = A[j].c[0];
+            }
             function sGl(j, f) { const u = "url('" + A[j].i + "')"; $gp.forEach(p => { p.querySelector('.glass-' + f + ' .glass-img').style.backgroundImage = u; }); }
             function sInf(j) { $in.textContent = A[j].n; $id.textContent = A[j].d; $is.innerHTML = '<span class="info-stat-label">HEIGHT</span>' + A[j].s; }
             function sUI(j) {
@@ -1742,7 +1616,18 @@
                 document.querySelectorAll('.ring-slot img').forEach(im => { im.style.transform = 'rotate(' + (-r) + 'deg)'; });
             }
 
+            // Native Browser Image Preloader (Leverages 5.7MB WebP native HTTP caching)
+            function preloadNextImages(currentIdx) {
+                for (let offset = 0; offset <= 3; offset++) {
+                    const targetIdx = (currentIdx + offset) % N;
+                    const imgUrl = A[targetIdx].i;
+                    const img = new Image();
+                    img.src = imgUrl;
+                }
+            }
+
             // Init
+            preloadNextImages(0);
             sImg(0); sGl(0, 'front'); sGl(0, 'back'); sInf(0); sUI(0);
             $bg.style.background = 'linear-gradient(160deg,' + A[0].c[0] + ' 0%,' + A[0].c[1] + ' 100%)';
 
@@ -1753,6 +1638,7 @@
                 const lp = seg - idx;
                 const nxt = Math.min(idx + 1, N - 1);
 
+                preloadNextImages(idx);
                 sImg(idx); sGl(idx, 'front');
                 if (idx !== nxt) sGl(nxt, 'back');
 
@@ -1812,29 +1698,103 @@
                 }
             }
 
-            ScrollTrigger.create({
-                trigger: '#ring-section',
-                start: 'top top',
-                end: '+=9000',
-                pin: true,
-                pinSpacing: true,
-                scrub: 0.3,
-                onUpdate: function (self) { render(self.progress); }
-            });
+            const CORRIDOR_HEIGHT = 980; // vh (+70% extended scroll space for 3D room tunnel)
+            const GALLERY_DISTANCE = 25000; // vh
 
-            /* ── JIT BOOT FOR CINEMATIC RING ── */
-            if (window.WildlifeJIT) {
-                window.WildlifeJIT.register('ring-cinematic', (sec) => {
-                    const vids = sec.querySelectorAll('video[data-src]');
-                    vids.forEach(v => {
-                        if (!v.src && v.dataset.src) {
-                            v.src = v.dataset.src;
-                            v.load();
-                            v.play().catch(() => {});
+            ScrollTrigger.create({
+                trigger: '#land-corridor-section',
+                start: 'top top',
+                end: `+=${CORRIDOR_HEIGHT + GALLERY_DISTANCE}vh`,
+                pin: true,
+                scrub: 1.2,
+                onToggle: (self) => {
+                    if (self.isActive) bootCorridor();
+                    else if (window.oceanRoomInstance) window.oceanRoomInstance.pause();
+                },
+                onUpdate: (self) => {
+                    const winH = window.innerHeight;
+                    const totalPixelDist = (CORRIDOR_HEIGHT + GALLERY_DISTANCE) * (winH / 100);
+                    const currentPx = self.progress * totalPixelDist;
+                    const corridorPx = CORRIDOR_HEIGHT * (winH / 100);
+
+                    if (currentPx <= corridorPx) {
+                        // PHASE 1: Extended 3D Room Corridor (0 to 680vh)
+                        const pCorridor = Math.min(1, Math.max(0, currentPx / corridorPx));
+
+                        const canvas = document.getElementById('room-canvas');
+                        if (canvas) {
+                            canvas.style.display = 'block';
+                            canvas.style.opacity = '1';
                         }
-                    });
-                });
-            }
+
+                        if (window.oceanRoomInstance) {
+                            window.oceanRoomInstance.resume();
+                            if (typeof window.oceanRoomInstance.setScrollProgress === 'function') {
+                                window.oceanRoomInstance.setScrollProgress(pCorridor);
+                            }
+                        }
+
+                        const content = document.getElementById('corridor-hero-content');
+                        if (content) {
+                            const opacity = Math.max(0, 1 - pCorridor / 0.40);
+                            content.style.opacity = opacity;
+                            content.style.transform = `translate(-50%, ${-15 - (1 - opacity) * 30}px)`;
+                        }
+
+                        const lifePin = document.getElementById('ring-life-pin');
+                        if (lifePin) {
+                            render(0); // Keep Red Fox ready inside pin
+
+                            if (pCorridor < 0.50) {
+                                lifePin.style.opacity = '0';
+                                lifePin.style.pointerEvents = 'none';
+                            } else {
+                                const pFade = Math.min(1, (pCorridor - 0.50) / 0.25);
+                                lifePin.style.opacity = pFade;
+
+                                const pZoom = Math.min(1, Math.max(0, (pCorridor - 0.75) / 0.25));
+                                const easeZoom = pZoom * pZoom * (3 - 2 * pZoom);
+                                const scaleVal = 0.22 + (1.0 - 0.22) * easeZoom;
+
+                                lifePin.style.transform = `translate(-50%, -50%) scale(${scaleVal})`;
+                                lifePin.style.borderRadius = (pZoom > 0.85) ? `${(1 - (pZoom - 0.85) / 0.15) * 16}px` : '16px';
+                                lifePin.style.boxShadow = (pZoom > 0.85) ? 'none' : '0 0 80px rgba(0,0,0,0.9)';
+                                lifePin.style.pointerEvents = (pZoom >= 0.98) ? 'auto' : 'none';
+                            }
+                        }
+                    } else {
+                        // PHASE 2: Full Screen 9-Animal Ring Gallery Animations
+                        const galleryPx = currentPx - corridorPx;
+                        const pGallery = Math.min(1, Math.max(0, galleryPx / (GALLERY_DISTANCE * (winH / 100))));
+
+                        const content = document.getElementById('corridor-hero-content');
+                        if (content) content.style.opacity = '0';
+
+                        const lifePin = document.getElementById('ring-life-pin');
+                        if (lifePin) {
+                            lifePin.style.opacity = '1';
+                            lifePin.style.transform = 'translate(-50%, -50%) scale(1.0)';
+                            lifePin.style.borderRadius = '0px';
+                            lifePin.style.boxShadow = 'none';
+                            lifePin.style.pointerEvents = 'auto';
+                        }
+                        const canvas = document.getElementById('room-canvas');
+                        if (canvas) canvas.style.display = 'none';
+                        if (window.oceanRoomInstance) window.oceanRoomInstance.pause();
+
+                        render(pGallery);
+                    }
+                }
+            });
+        })();
+
+        (() => {
+            /* ── ENSURE CINEMATIC VIDEOS PLAY NATIVELY ── */
+            const vids = document.querySelectorAll('#ring-cinematic video');
+            vids.forEach(v => {
+                v.muted = true;
+                v.play().catch(() => { });
+            });
 
             /* ── CINEMATIC RING LOGIC ── */
             const cinematicRing = document.getElementById('cinematic-ring-disc');
@@ -1876,15 +1836,18 @@
 
                 // Calculate displacement to keep the clicked half's center fixed in the middle of the viewport
                 let rad = 0;
-                if (mat !== 'none') {
-                    const vals = mat.split('(')[1].split(')')[0].split(',');
-                    const a = parseFloat(vals[0]);
-                    const b = parseFloat(vals[1]);
-                    rad = Math.atan2(b, a);
+                if (mat && mat !== 'none' && mat.includes('(')) {
+                    const match = mat.match(/matrix(?:3d)?\(([^)]+)\)/);
+                    if (match && match[1]) {
+                        const vals = match[1].split(',').map(v => parseFloat(v.trim()));
+                        if (vals.length >= 2 && !isNaN(vals[0]) && !isNaN(vals[1])) {
+                            rad = Math.atan2(vals[1], vals[0]);
+                        }
+                    }
                 }
 
                 // Radius of the offset (25% of the circle height)
-                const rect = ringWrap.getBoundingClientRect();
+                const rect = ringWrap ? ringWrap.getBoundingClientRect() : { height: 600 };
                 const R = rect.height / 4;
                 // Local angle: air is -90deg, water is +90deg from center
                 const localAng = halfEl === airHalf ? -Math.PI / 2 : Math.PI / 2;
@@ -1894,37 +1857,45 @@
                 const dy = R * Math.sin(totalAng);
 
                 setTimeout(() => {
-                    bgImgCinematic.style.opacity = '0';
+                    if (bgImgCinematic) bgImgCinematic.style.opacity = '0';
 
-                    ringWrap.style.transition = 'transform 1.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.6s ease';
-                    // Scale heavily and counter-translate so the selected half covers the screen
-                    ringWrap.style.transform = `translate(calc(-50% - ${dx}px), calc(-50% - ${dy}px)) scale(6)`;
+                    if (ringWrap) {
+                        ringWrap.style.transition = 'transform 1.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.6s ease';
+                        // Scale heavily and counter-translate so the selected half covers the screen
+                        ringWrap.style.transform = `translate(calc(-50% - ${dx}px), calc(-50% - ${dy}px)) scale(6)`;
+                    }
 
-                    const vid = halfEl.querySelector('video');
-                    vid.style.transition = 'opacity 1.5s ease 0.4s';
-                    vid.style.opacity = '0';
+                    const vid = halfEl ? halfEl.querySelector('video') : null;
+                    if (vid) {
+                        vid.style.transition = 'opacity 1.5s ease 0.4s';
+                        vid.style.opacity = '0';
+                    }
 
                     setTimeout(() => {
-                        ringWrap.style.display = 'none';
+                        if (ringWrap) ringWrap.style.display = 'none';
                         // Navigate to Air Section
                         if (halfEl === airHalf) {
                             sessionStorage.setItem('airAccess', 'true');
                             window.location.href = 'air.html';
+                        } else {
+                            sessionStorage.setItem('waterAccess', 'true');
+                            window.location.href = 'water.html';
                         }
                     }, 1800);
                 }, 400);
             }
 
-            airHalf.addEventListener('click', () => expandCinematic(airHalf));
-            waterHalf.addEventListener('click', () => expandCinematic(waterHalf));
+            if (airHalf) airHalf.addEventListener('click', () => expandCinematic(airHalf));
+            if (waterHalf) waterHalf.addEventListener('click', () => expandCinematic(waterHalf));
 
-            /* â”€â”€ MAGNETIC CIRCULAR TEXT & GLOW â”€â”€ */
+            /* ── MAGNETIC CIRCULAR TEXT & GLOW ── */
             const circularText = document.getElementById('circular-text');
             const airText = "AIR WORLD";
             const waterText = "WATER WORLD";
             const magneticChars = [];
 
             function createTextRing(text, isBottom) {
+                if (!circularText) return;
                 const totalAngle = 105; // Spread arc over 105 degrees for massive look
                 const step = totalAngle / Math.max(1, text.length - 1);
 
@@ -1960,23 +1931,26 @@
             let mouseY = window.innerHeight / 2;
             let isHoveringCinematic = false;
 
-            document.getElementById('ring-cinematic').addEventListener('mouseenter', () => {
-                isHoveringCinematic = true;
-                glow.style.opacity = '1';
-            });
-            document.getElementById('ring-cinematic').addEventListener('mouseleave', () => {
-                isHoveringCinematic = false;
-                glow.style.opacity = '0';
-            });
-            document.getElementById('ring-cinematic').addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            });
+            const ringCinematicSection = document.getElementById('ring-cinematic');
+            if (ringCinematicSection) {
+                ringCinematicSection.addEventListener('mouseenter', () => {
+                    isHoveringCinematic = true;
+                    if (glow) glow.style.opacity = '1';
+                });
+                ringCinematicSection.addEventListener('mouseleave', () => {
+                    isHoveringCinematic = false;
+                    if (glow) glow.style.opacity = '0';
+                });
+                ringCinematicSection.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
+            }
 
             /* ── WEB WORKER OFFLOADING FOR MAGNETIC TEXT MATH ── */
             let physicsWorker = null;
             if (window.Worker) {
-                try { physicsWorker = new Worker('physics.worker.js'); } catch (e) {}
+                try { physicsWorker = new Worker('physics.worker.js'); } catch (e) { }
             }
 
             if (physicsWorker) {
@@ -2003,20 +1977,22 @@
                                 c.inner.style.textShadow = 'none';
                             }
                         });
-                        glow.style.opacity = (0.3 + 0.6 * maxProx).toString();
+                        if (glow) glow.style.opacity = (0.3 + 0.6 * maxProx).toString();
                     }
                 };
             }
 
             function updateMagneticText() {
                 if (!isHoveringCinematic || cinematicRotationPaused) {
-                    if (cinematicRotationPaused) glow.style.opacity = '0';
+                    if (cinematicRotationPaused && glow) glow.style.opacity = '0';
                     requestAnimationFrame(updateMagneticText);
                     return;
                 }
 
-                glow.style.left = mouseX + 'px';
-                glow.style.top = mouseY + 'px';
+                if (glow) {
+                    glow.style.left = mouseX + 'px';
+                    glow.style.top = mouseY + 'px';
+                }
 
                 if (physicsWorker) {
                     const charData = magneticChars.map(c => {
@@ -2049,7 +2025,7 @@
                             c.inner.style.textShadow = 'none';
                         }
                     });
-                    glow.style.opacity = (0.3 + 0.6 * maxProx).toString();
+                    if (glow) glow.style.opacity = (0.3 + 0.6 * maxProx).toString();
                 }
 
                 requestAnimationFrame(updateMagneticText);
