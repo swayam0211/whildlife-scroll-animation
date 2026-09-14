@@ -106,36 +106,27 @@
             background: #020a18;
         }
 
-        /* ── SINGLE VIDEO ── */
-        #hero-video {
+        #hero-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 0;
-            will-change: auto;
+            z-index: 2;
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
-        /* ── CLIP HALVES ── */
         #clip-top,
         #clip-bot {
+            display: none !important;
             position: absolute;
             inset: 0;
             z-index: 1;
             will-change: clip-path;
             pointer-events: none;
-        }
-
-        #clip-top {
-            background: #020a18;
-            clip-path: inset(0 0 50% 0);
-        }
-
-        #clip-bot {
-            background: #020a18;
-            clip-path: inset(50% 0 0 0);
         }
 
         /* ── GAP FILL ── */
@@ -1092,10 +1083,8 @@
 
             <div id="gap-fill"></div>
 
-            <!-- SINGLE video -->
-            <video id="hero-video" preload="auto" muted playsinline webkit-playsinline>
-                <source src="air_section/herosection/cheetahfinal.mp4" type="video/mp4" />
-            </video>
+            <!-- Canvas Frame Engine (24fps WebP Scrubbing) -->
+            <canvas id="hero-canvas"></canvas>
 
             <!-- Transparent clip overlays -->
             <div id="clip-top"></div>
@@ -1124,7 +1113,7 @@
                 </div>
                 <h2 class="card-title-bg" id="card-title-bg">CORMORANT</h2>
                 <div class="card-animal" id="card-animal">
-                    <img src="air_section/herosection/Double-crested_Cormorant.png" alt="Double-crested Cormorant" />
+                    <img src="air_section/herosection/Double-crested_Cormorant.webp" alt="Double-crested Cormorant" />
                 </div>
                 <p class="card-label" id="card-label">Sky Archive</p>
                 <p class="card-desc" id="card-desc">
@@ -1317,41 +1306,63 @@
             const titleBg = document.getElementById('card-title-bg');
             const labelEl = document.getElementById('card-label');
             const descEl = document.getElementById('card-desc');
+        /* ── SECTION 1: 24FPS WEBP CANVAS FRAME ENGINE & CORMORANT CARD SPLIT ── */
+        (() => {
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas ? canvas.getContext('2d', { alpha: false, desynchronized: true }) : null;
+            const clipTop = document.getElementById('clip-top');
+            const clipBot = document.getElementById('clip-bot');
+            const heroText = document.getElementById('hero-text');
+            const scrollCue = document.getElementById('scroll-cue');
+            const card = document.getElementById('animal-card');
+            const panels = document.getElementById('card-panels');
+            const animalImg = document.getElementById('card-animal');
+            const titleBg = document.getElementById('card-title-bg');
+            const labelEl = document.getElementById('card-label');
+            const descEl = document.getElementById('card-desc');
             const statsEl = document.getElementById('card-stats');
             const seamEl = document.getElementById('seam');
             const progBar = document.getElementById('progress-bar');
             const loader = document.getElementById('loader');
 
-            /* ── STATE ──────────────────────────────────── */
-            let duration = 0, isReady = false;
-            let dispTime = 0, targTime = 0, vidRaf = null;
-            let floating = false, dirty = false, renderRaf = null;
+            const TOTAL_FRAMES = 241;
+            const frames = new Array(TOTAL_FRAMES);
+            const CRITICAL_BATCH = 30;
+            let loadedFramesCount = 0;
+            let isReady = false;
+            let currentDrawFrame = -1;
+            let dirty = false;
+            let renderRaf = null;
+            let floating = false;
 
-            /* ── CACHED LAYOUT ── */
-            let stageH = 1, winH = 1, maxGap = 1;
+            let stageH = 1, winH = 1;
             function cacheLayout() {
                 const stage = document.getElementById('scroll-stage');
                 winH = window.innerHeight;
-                stageH = stage.offsetHeight - winH;
-                maxGap = winH * 0.22;
+                stageH = stage ? stage.offsetHeight - winH : 1;
             }
 
-            /* ── TUNING ── */
-            const LERP = 0.10, MAX_STEP = 0.20;
+            function resizeCanvas() {
+                if (!canvas) return;
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = Math.floor(window.innerWidth * dpr);
+                canvas.height = Math.floor(window.innerHeight * dpr);
+                canvas.style.width = window.innerWidth + 'px';
+                canvas.style.height = window.innerHeight + 'px';
+            }
 
-            /* ── TIMELINE (card appears at 8s / 10s = 0.8 progress) ── */
+            // Eased Timeline mapping for Cormorant card split
+            const pTarget = 0.76;
             const T = {
-                TEXT_HOLD: 0.60, TEXT_GONE: 0.74,
-                SPLIT_OPEN: 0.76, SPLIT_FULL: 0.84,
+                TEXT_HOLD: 0.60, TEXT_GONE: 0.72,
+                SPLIT_OPEN: pTarget, SPLIT_FULL: 0.84,
                 SPLIT_CLOSE: 0.92, SPLIT_DONE: 0.98,
             };
 
-            /* ── MATH ── */
             function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
             function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
             function ss(t) { return t * t * (3 - 2 * t); }
             function beat(sp, s, e) { return ss(clamp01((sp - s) / (e - s))); }
-
             function getP() { return stageH > 0 ? clamp01(window.scrollY / stageH) : 0; }
 
             function splitProg(p) {
@@ -1362,187 +1373,229 @@
                 return 0;
             }
 
-            /* ── OPTIMIZED VIDEO SEEK ── */
-            let lastSeekMs = 0;
-            const SEEK_INTERVAL = 50; // approx 20fps decode — gives browser breathing room to avoid skipping frames
-            const HAS_FAST_SEEK = typeof HTMLVideoElement.prototype.fastSeek === 'function';
+            function drawHeroFrame(img, gapPct) {
+                if (!ctx || !img || !img.complete || img.naturalWidth === 0) return;
+                const cw = canvas.width;
+                const ch = canvas.height;
+                const iw = img.naturalWidth;
+                const ih = img.naturalHeight;
 
-            function doSeek(t) {
-                if (video.seeking) return;
-                const now = performance.now();
-                if (now - lastSeekMs < SEEK_INTERVAL) return;
-                lastSeekMs = now;
-                if (HAS_FAST_SEEK) { video.fastSeek(t); } else { video.currentTime = t; }
-            }
+                const scale = Math.max(cw / iw, ch / ih);
+                const nw = iw * scale;
+                const nh = ih * scale;
+                const cx = (cw - nw) / 2;
+                const cy = (ch - nh) / 2;
 
-            function videoLerp() {
-                const d = targTime - dispTime;
-                if (d > -0.008 && d < 0.008) {
-                    dispTime = targTime;
-                    doSeek(dispTime);
-                    vidRaf = null;
-                    return;
+                ctx.save();
+                if (gapPct > 0.1) {
+                    const topEnd = (50 - gapPct / 2) * (ch / 100);
+                    const botStart = (50 + gapPct / 2) * (ch / 100);
+
+                    // Top split half
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(0, 0, cw, topEnd);
+                    ctx.clip();
+                    ctx.drawImage(img, cx, cy, nw, nh);
+                    ctx.restore();
+
+                    // Bottom split half
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(0, botStart, cw, ch - botStart);
+                    ctx.clip();
+                    ctx.drawImage(img, cx, cy, nw, nh);
+                    ctx.restore();
+                } else {
+                    ctx.drawImage(img, cx, cy, nw, nh);
                 }
-                let step = d * LERP;
-                if (step > MAX_STEP) step = MAX_STEP;
-                else if (step < -MAX_STEP) step = -MAX_STEP;
-                dispTime = clamp(dispTime + step, 0, duration - 0.001);
-                doSeek(dispTime);
+                ctx.restore();
             }
 
-            // Sync with GSAP for butter-smooth timing
-            gsap.ticker.add(videoLerp);
-
-            /* ═══════════════════════════════════════════
-               RENDER — called once per RAF frame max
-            ═══════════════════════════════════════════ */
             function render() {
-                renderRaf = null;
                 dirty = false;
-                if (!isReady) return;
-
                 const p = getP();
                 const sp = splitProg(p);
                 const gapPct = sp * 22;
 
-                // ── Video seek
-                targTime = clamp(p * duration, 0, duration - 0.001);
+                if (progBar) progBar.style.transform = `scaleX(${p})`;
 
-                // ── Progress bar
-                progBar.style.transform = `scaleX(${dispTime / duration})`;
+                // Frame Scrubbing
+                const targetFrameIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.floor(p * TOTAL_FRAMES)));
+                const img = frames[targetFrameIdx];
 
-                // ── SPLIT: clip-path
-                const topEnd = 50 - gapPct / 2;
-                const botStart = 50 + gapPct / 2;
-                if (gapPct < 0.1) {
-                    video.style.clipPath = 'none';
+                if (img && img.complete && img.naturalWidth > 0) {
+                    currentDrawFrame = targetFrameIdx;
+                    drawHeroFrame(img, gapPct);
                 } else {
-                    video.style.clipPath =
-                        `polygon(0% 0%, 100% 0%, 100% ${topEnd}%, 0% ${topEnd}%, 0% ${botStart}%, 100% ${botStart}%, 100% 100%, 0% 100%)`;
+                    // Fallback to nearest available loaded frame
+                    for (let d = 1; d < TOTAL_FRAMES; d++) {
+                        const fwd = targetFrameIdx + d;
+                        const bwd = targetFrameIdx - d;
+                        if (fwd < TOTAL_FRAMES && frames[fwd] && frames[fwd].complete && frames[fwd].naturalWidth > 0) {
+                            drawHeroFrame(frames[fwd], gapPct);
+                            break;
+                        }
+                        if (bwd >= 0 && frames[bwd] && frames[bwd].complete && frames[bwd].naturalWidth > 0) {
+                            drawHeroFrame(frames[bwd], gapPct);
+                            break;
+                        }
+                    }
                 }
-                clipTop.style.display = 'none';
-                clipBot.style.display = 'none';
 
-                // ── Seam glow
-                seamEl.style.opacity = sp;
+                if (clipTop) clipTop.style.display = 'none';
+                if (clipBot) clipBot.style.display = 'none';
+                if (seamEl) seamEl.style.opacity = sp;
 
-                // ── HERO TEXT
                 let ta;
                 if (p < T.TEXT_HOLD) ta = 1;
                 else if (p < T.TEXT_GONE) ta = 1 - (p - T.TEXT_HOLD) / (T.TEXT_GONE - T.TEXT_HOLD);
                 else ta = 0;
-                heroText.style.opacity = ta;
-                heroText.style.transform = `translate3d(0,${(1 - ta) * -12}px,0)`;
-                scrollCue.style.opacity = ta;
 
-                // ── CARD (overall)
-                const cardScale = 0.82 + 0.18 * sp;
-                const cardY = (1 - sp) * 44;
-                card.style.opacity = sp;
-                card.style.transform = `translate3d(-50%,-50%,0) translate3d(0,${cardY}px,0) scale(${cardScale})`;
-
-                // ① Panels
-                const bP = beat(sp, 0.00, 0.28);
-                panels.style.opacity = bP;
-                panels.style.transform = `translate3d(0,${(1 - bP) * 30}px,0)`;
-
-                // ② Animal
-                const bE = beat(sp, 0.18, 0.46);
-                animalImg.style.opacity = bE;
-                animalImg.style.transform = `translate3d(-50%,${(1 - bE) * 28}px,0) scale(${0.88 + 0.12 * bE})`;
-                if (bE >= 0.98 && !floating) { animalImg.classList.add('floating'); floating = true; }
-                if (bE < 0.98 && floating) { animalImg.classList.remove('floating'); floating = false; }
-
-                // ③ Title
-                const bT = beat(sp, 0.30, 0.56);
-                titleBg.style.opacity = bT;
-                titleBg.style.transform = `translate3d(-50%,0,0) translate3d(${(1 - bT) * -40}px,0,0)`;
-
-                // ④ Label
-                const bL = beat(sp, 0.38, 0.60);
-                labelEl.style.opacity = bL;
-                labelEl.style.transform = `translate3d(-50%,${(1 - bL) * -18}px,0)`;
-
-                // ⑤ Description
-                const bD = beat(sp, 0.50, 0.72);
-                descEl.style.opacity = bD;
-                descEl.style.transform = `translate3d(${(1 - bD) * -30}px,0,0)`;
-
-                // ⑥ Stats
-                const bS = beat(sp, 0.62, 0.84);
-                statsEl.style.opacity = bS;
-                statsEl.style.transform = `translate3d(0,${(1 - bS) * 20}px,0)`;
-            }
-
-            /* ── SCROLL → dirty flag + single RAF ──── */
-            function onScroll() {
-                render(); // Just render directly inside the ticker-aware function
-            }
-
-            function resetToTop() {
-                window.scrollTo(0, 0);
-                if (window.lenis) {
-                    try { window.lenis.scrollTo(0, { immediate: true }); } catch (e) { }
+                if (heroText) {
+                    heroText.style.opacity = ta;
+                    heroText.style.transform = `translate3d(0,${(1 - ta) * -12}px,0)`;
                 }
-                if (video) {
-                    try { video.currentTime = 0; } catch (e) { }
-                }
-                dispTime = 0;
-                targTime = 0;
-            }
+                if (scrollCue) scrollCue.style.opacity = ta;
 
-            /* ── VIDEO READY ──────────────────────────── */
-            function checkVideoReady() {
-                if (!video) {
-                    if (loader) loader.classList.add('hidden');
-                    isReady = true;
-                    cacheLayout();
-                    render();
-                    return;
+                if (card) {
+                    const cardScale = 0.82 + 0.18 * sp;
+                    const cardY = (1 - sp) * 44;
+                    card.style.opacity = sp;
+                    card.style.transform = `translate3d(-50%,-50%,0) translate3d(0,${cardY}px,0) scale(${cardScale})`;
                 }
-                if (video.duration && !isNaN(video.duration) && video.duration > 0) {
-                    duration = video.duration;
-                    isReady = true;
-                    if (loader) loader.classList.add('hidden');
-                    cacheLayout();
-                    render();
+
+                if (panels) {
+                    const bP = beat(sp, 0.00, 0.28);
+                    panels.style.opacity = bP;
+                    panels.style.transform = `translate3d(0,${(1 - bP) * 30}px,0)`;
+                }
+
+                if (animalImg) {
+                    const bE = beat(sp, 0.18, 0.46);
+                    animalImg.style.opacity = bE;
+                    animalImg.style.transform = `translate3d(-50%,${(1 - bE) * 28}px,0) scale(${0.88 + 0.12 * bE})`;
+                    if (bE >= 0.98 && !floating) { animalImg.classList.add('floating'); floating = true; }
+                    if (bE < 0.98 && floating) { animalImg.classList.remove('floating'); floating = false; }
+                }
+
+                if (titleBg) {
+                    const bT = beat(sp, 0.30, 0.56);
+                    titleBg.style.opacity = bT;
+                    titleBg.style.transform = `translate3d(-50%,0,0) translate3d(${(1 - bT) * -40}px,0,0)`;
+                }
+
+                if (labelEl) {
+                    const bL = beat(sp, 0.38, 0.60);
+                    labelEl.style.opacity = bL;
+                    labelEl.style.transform = `translate3d(-50%,${(1 - bL) * -18}px,0)`;
+                }
+
+                if (descEl) {
+                    const bD = beat(sp, 0.50, 0.72);
+                    descEl.style.opacity = bD;
+                    descEl.style.transform = `translate3d(${(1 - bD) * -30}px,0,0)`;
+                }
+
+                if (statsEl) {
+                    const bS = beat(sp, 0.62, 0.84);
+                    statsEl.style.opacity = bS;
+                    statsEl.style.transform = `translate3d(0,${(1 - bS) * 20}px,0)`;
                 }
             }
 
-            /* ── INIT ────────────────────────────────── */
-            function init() {
-                resetToTop();
-                if (video) {
-                    video.pause();
-                    video.addEventListener('play', () => video.pause());
-                    video.addEventListener('loadedmetadata', checkVideoReady);
-                    video.addEventListener('durationchange', checkVideoReady);
-                    video.addEventListener('canplaythrough', checkVideoReady);
-                    video.addEventListener('loadeddata', checkVideoReady);
+            function requestRender() {
+                if (!dirty) {
+                    dirty = true;
+                    renderRaf = requestAnimationFrame(render);
+                }
+            }
 
-                    checkVideoReady();
-                    const pollTimer = setInterval(() => {
-                        checkVideoReady();
-                        if (isReady && duration > 0) clearInterval(pollTimer);
-                    }, 100);
-                    setTimeout(() => {
-                        clearInterval(pollTimer);
-                        if (loader) loader.classList.add('hidden');
+            // Tiered Preloader Engine
+            function getFrameUrl(idx) {
+                return 'air_section/herosection/frames/frame_' + String(idx + 1).padStart(4, '0') + '.webp';
+            }
+
+            function preloadCriticalBatch() {
+                let criticalLoaded = 0;
+                for (let i = 0; i < CRITICAL_BATCH; i++) {
+                    const img = new Image();
+                    img.src = getFrameUrl(i);
+                    img.onload = () => {
+                        criticalLoaded++;
+                        loadedFramesCount++;
+                        if (i === 0 || criticalLoaded === 1) {
+                            if (loader) loader.classList.add('hidden');
+                            isReady = true;
+                            resizeCanvas();
+                            cacheLayout();
+                            render();
+                        }
+                    };
+                    img.onerror = () => {
+                        criticalLoaded++;
+                        if (criticalLoaded === 1 && loader) loader.classList.add('hidden');
+                    };
+                    frames[i] = img;
+                }
+
+                // Fallback timeout so page never gets stuck
+                setTimeout(() => {
+                    if (loader && !loader.classList.contains('hidden')) {
+                        loader.classList.add('hidden');
                         isReady = true;
+                        resizeCanvas();
                         cacheLayout();
                         render();
-                    }, 1500);
-                } else {
-                    if (loader) loader.classList.add('hidden');
-                    isReady = true;
-                    cacheLayout();
-                    render();
+                    }
+                }, 300);
+            }
+
+            function streamRemainingFrames(startIndex = CRITICAL_BATCH) {
+                const BATCH_SIZE = 30;
+                let current = startIndex;
+
+                function loadBatch() {
+                    const end = Math.min(TOTAL_FRAMES, current + BATCH_SIZE);
+                    for (let i = current; i < end; i++) {
+                        if (!frames[i]) {
+                            const img = new Image();
+                            img.src = getFrameUrl(i);
+                            img.onload = () => {
+                                loadedFramesCount++;
+                                if (Math.abs(Math.floor(getP() * TOTAL_FRAMES) - i) < 2) {
+                                    requestRender();
+                                }
+                            };
+                            frames[i] = img;
+                        }
+                    }
+                    current = end;
+                    if (current < TOTAL_FRAMES) {
+                        if ('requestIdleCallback' in window) {
+                            requestIdleCallback(loadBatch, { timeout: 100 });
+                        } else {
+                            setTimeout(loadBatch, 40);
+                        }
+                    }
                 }
 
-                window.addEventListener('scroll', onScroll, { passive: true });
-                window.addEventListener('resize', () => { cacheLayout(); onScroll(); }, { passive: true });
-                window.addEventListener('pageshow', resetToTop);
-                window.addEventListener('beforeunload', resetToTop);
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(loadBatch, { timeout: 200 });
+                } else {
+                    setTimeout(loadBatch, 80);
+                }
+            }
+
+            function init() {
+                cacheLayout();
+                resizeCanvas();
+                preloadCriticalBatch();
+                streamRemainingFrames();
+                render();
+
+                window.addEventListener('scroll', requestRender, { passive: true });
+                window.addEventListener('resize', () => { cacheLayout(); resizeCanvas(); requestRender(); }, { passive: true });
             }
 
             if (document.readyState === 'loading') {
@@ -1550,6 +1603,7 @@
             } else {
                 init();
             }
+        })();
 
             /* ══════════════════════════════════════════════════════════════
                AIR LIFE ANIMATION SYSTEM
@@ -1560,55 +1614,55 @@
                     title: "EAGLE", tagline: "Highland Guardian",
                     data: "3.2m Wingspan • Thermal Focus • Alpha",
                     desc: "Master of the highest peaks, ruling with an unwavering gaze.",
-                    img: "air_section/photosb/eagle.png", cA: "#FFD700", cB: "#FF8C00"
+                    img: "air_section/photosb/eagle.webp", cA: "#FFD700", cB: "#FF8C00"
                 },
                 {
                     title: "FALCON", tagline: "Shadow in the Sun",
                     data: "320 km/h • Pursuit • Calculation",
                     desc: "The fastest animal on earth, turning gravity into a weapon.",
-                    img: "air_section/photosb/falcon.png", cA: "#3E2723", cB: "#D7CCC8"
+                    img: "air_section/photosb/falcon.webp", cA: "#3E2723", cB: "#D7CCC8"
                 },
                 {
                     title: "OWL", tagline: "Ghost of the Pines",
                     data: "Night Vision • Stealth • Wisdom",
                     desc: "A silent predator whose presence is only known after the strike.",
-                    img: "air_section/photosb/owl.png", cA: "#0B1D3A", cB: "#EAEFF7"
+                    img: "air_section/photosb/owl.webp", cA: "#0B1D3A", cB: "#EAEFF7"
                 },
                 {
                     title: "PARROT", tagline: "Vibrant Adaption",
                     data: "Complexity • Social • Memory",
                     desc: "Intelligence beyond instinct, mastering the language of the jungle.",
-                    img: "air_section/photosb/parrot.png", cA: "#2ECC71", cB: "#F4D03F"
+                    img: "air_section/photosb/parrot.webp", cA: "#2ECC71", cB: "#F4D03F"
                 },
                 {
                     title: "PEACOCK", tagline: "Nature's Royal",
                     data: "Display • Elegance • Statuesque",
                     desc: "A breathtaking display of vanity, where every feather tells a story.",
-                    img: "air_section/photosb/peacock.png", cA: "#1ABC9C", cB: "#2E86C1"
+                    img: "air_section/photosb/peacock.webp", cA: "#1ABC9C", cB: "#2E86C1"
                 },
                 {
                     title: "ALBATROSS", tagline: "Ocean Wanderer",
                     data: "Storm Rider • Infinite • Strength",
                     desc: "Crossing entire oceans without a single wing-beat of effort.",
-                    img: "air_section/photosb/albatross.png", cA: "#3A7BD5", cB: "#BDC3C7"
+                    img: "air_section/photosb/albatross.webp", cA: "#3A7BD5", cB: "#BDC3C7"
                 },
                 {
                     title: "HUMMINGBIRD", tagline: "Hovering Gem",
                     data: "High Frequency • Stillness • Focus",
                     desc: "Defying physics with micro-precision and pure energy.",
-                    img: "air_section/photosb/hummingbird.png", cA: "#FF4DA6", cB: "#00FFB3"
+                    img: "air_section/photosb/hummingbird.webp", cA: "#FF4DA6", cB: "#00FFB3"
                 },
                 {
                     title: "FLAMINGO", tagline: "Rosy Solitude",
                     data: "Balance • Filter • Colony",
                     desc: "Thriving in extremes, turning harsh alkaline waters into a sanctuary of rose.",
-                    img: "air_section/photosb/flamingo.png", cA: "#FF69B4", cB: "#FFB6C1"
+                    img: "air_section/photosb/flamingo.webp", cA: "#FF69B4", cB: "#FFB6C1"
                 },
                 {
                     title: "CRANE", tagline: "Wetland Grace",
                     data: "Poise • Zen • Flow",
                     desc: "Moving with the harmony of the water and the stillness of the air.",
-                    img: "air_section/photosb/crane.png", cA: "#E8DCC3", cB: "#A7C7E7"
+                    img: "air_section/photosb/crane.webp", cA: "#E8DCC3", cB: "#A7C7E7"
                 }
             ];
 
@@ -1857,15 +1911,15 @@
             /* ── SECTION 2 & 3 UNIFIED ENGINE: 3D CORRIDOR & SKY LIFE GALLERY ── */
             (() => {
                 const birdImages = [
-                    'air_section/photosb/albatross.png',
-                    'air_section/photosb/black_raven.png',
-                    'air_section/photosb/crane.png',
-                    'air_section/photosb/eagle.png',
-                    'air_section/photosb/falcon.png',
-                    'air_section/photosb/hummingbird.png',
-                    'air_section/photosb/owl.png',
-                    'air_section/photosb/parrot.png',
-                    'air_section/photosb/peacock.png'
+                    'air_section/photosb/albatross.webp',
+                    'air_section/photosb/black_raven.webp',
+                    'air_section/photosb/crane.webp',
+                    'air_section/photosb/eagle.webp',
+                    'air_section/photosb/falcon.webp',
+                    'air_section/photosb/hummingbird.webp',
+                    'air_section/photosb/owl.webp',
+                    'air_section/photosb/parrot.webp',
+                    'air_section/photosb/peacock.webp'
                 ];
 
                 const section = document.getElementById('air-corridor-section');
@@ -1883,7 +1937,7 @@
                     }
                 }
 
-                const CORRIDOR_HEIGHT = 720; // vh (+50% slower scroll distance for 3D corridor)
+                const CORRIDOR_HEIGHT = 980; // vh (+70% extended scroll space for 3D room tunnel)
                 const GALLERY_DISTANCE = AIR_BIRDS.length * 1800; // vh (+50% slower scroll distance for 9-bird gallery: 1800vh per bird)
 
                 ScrollTrigger.create({
@@ -1903,7 +1957,7 @@
                         const corridorPx = CORRIDOR_HEIGHT * (winH / 100);
 
                         if (currentPx <= corridorPx) {
-                            // PHASE 1: Corridor 3D Tunnel & Center Pin Zoom (0 to 400vh)
+                            // PHASE 1: Corridor 3D Tunnel & Center Pin Zoom (0 to 980vh)
                             const pCorridor = Math.min(1, Math.max(0, currentPx / corridorPx));
 
                             // 1. Unhide 3D Room canvas for Corridor Zoom and resume rendering engine
@@ -1931,14 +1985,14 @@
                             if (lifePin) {
                                 renderAirLife(0); // Keep Eagle fully joined & background colors ready
 
-                                if (pCorridor < 0.15) {
+                                if (pCorridor < 0.50) {
                                     lifePin.style.opacity = '0';
                                     lifePin.style.pointerEvents = 'none';
                                 } else {
-                                    const pFade = Math.min(1, (pCorridor - 0.15) / 0.20);
+                                    const pFade = Math.min(1, (pCorridor - 0.50) / 0.25);
                                     lifePin.style.opacity = pFade;
 
-                                    const pZoom = Math.min(1, Math.max(0, (pCorridor - 0.35) / 0.65));
+                                    const pZoom = Math.min(1, Math.max(0, (pCorridor - 0.75) / 0.25));
                                     const easeZoom = pZoom * pZoom * (3 - 2 * pZoom);
                                     const scaleVal = 0.22 + (1.0 - 0.22) * easeZoom;
 

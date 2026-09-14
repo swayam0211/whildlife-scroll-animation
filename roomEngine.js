@@ -157,10 +157,12 @@
             this.onKeyDown = this.onKeyDown.bind(this);
             this.onResize = this.onResize.bind(this);
 
-            this.init();
+            this.initialized = false;
         }
 
         init() {
+            if (this.initialized) return;
+            this.initialized = true;
             this.setupRenderer();
             this.setupScene();
             this.setupCamera();
@@ -406,12 +408,17 @@
 
         resume() {
             if (this.isDestroyed) return;
+            if (!this.initialized) {
+                this.init();
+                return;
+            }
             this.isSleeping = false;
             if (this.clock) this.clock.getDelta();
             this.startLoop();
         }
 
         setScrollProgress(progress) {
+            if (!this.initialized) this.init();
             this.externalScrollDrive = true;
             const maxZ = this.totalTunnelLength * 1.6;
             this.targetScrollZ = progress * maxZ;
@@ -488,6 +495,16 @@
 
             if (this.renderer && this.scene && this.camera) {
                 this.renderer.render(this.scene, this.camera);
+            }
+
+            if (isStatic) {
+                this.idleFrames = (this.idleFrames || 0) + 1;
+                if (this.idleFrames > 45) {
+                    this.pause();
+                    return;
+                }
+            } else {
+                this.idleFrames = 0;
             }
 
             this.animFrameId = requestAnimationFrame(() => this.render());
