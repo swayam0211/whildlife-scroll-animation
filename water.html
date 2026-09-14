@@ -159,14 +159,14 @@
             background: #010a14;
         }
 
-        #hero-video {
+        #hero-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 0;
+            z-index: 2;
             will-change: transform;
             transform: translateZ(0);
             backface-visibility: hidden;
@@ -174,21 +174,12 @@
 
         #clip-top,
         #clip-bot {
+            display: none !important;
             position: absolute;
             inset: 0;
             z-index: 1;
             will-change: clip-path;
             pointer-events: none;
-        }
-
-        #clip-top {
-            background: #010a14;
-            clip-path: inset(0 0 50% 0);
-        }
-
-        #clip-bot {
-            background: #010a14;
-            clip-path: inset(50% 0 0 0);
         }
 
         #gap-fill {
@@ -548,7 +539,7 @@
             box-shadow: 0 0 45px rgba(0, 229, 255, 0.5), inset 0 0 25px rgba(0, 229, 255, 0.3);
             overflow: hidden;
             z-index: 20;
-            background: url('last%20section/image.png') center/cover no-repeat #010810;
+            background: url('last%20section/image.webp') center/cover no-repeat #010810;
             will-change: width, height, border-radius, box-shadow, opacity;
             pointer-events: auto;
         }
@@ -1249,10 +1240,8 @@
         <div id="hero-sticky">
             <div id="gap-fill"></div>
 
-            <!-- Scroll Scrub Video -->
-            <video id="hero-video" preload="auto" muted playsinline webkit-playsinline>
-                <source src="last section/Realistic_Horse_and_Dolphin_Video.mp4" type="video/mp4" />
-            </video>
+            <!-- Canvas Frame Engine (24fps WebP Scrubbing) -->
+            <canvas id="hero-canvas"></canvas>
 
             <!-- Clip Overlays -->
             <div id="clip-top"></div>
@@ -1282,7 +1271,7 @@
                 </div>
                 <h2 class="card-title-bg" id="card-title-bg">DOLPHINS</h2>
                 <div class="card-animal" id="card-animal">
-                    <img src="last section/dolphin.png" alt="Bottlenose Dolphins Underwater" />
+                    <img src="last section/dolphin.webp" alt="Bottlenose Dolphins Underwater" />
                 </div>
                 <p class="card-label" id="card-label">Ocean Archive — Bottlenose</p>
                 <p class="card-desc" id="card-desc">
@@ -1324,55 +1313,55 @@
                     <div class="semicircle-carousel-track" id="semicircle-carousel-track">
                         <div class="arc-card" data-index="0">
                             <div class="arc-card-inner">
-                                <img src="last section/images of sec2,3/Blue Sea Dragon.png" alt="Blue Sea Dragon" />
+                                <img src="last section/images of sec2,3/Blue Sea Dragon.webp" alt="Blue Sea Dragon" />
                                 <span class="arc-card-label">Blue Sea Dragon</span>
                             </div>
                         </div>
                         <div class="arc-card" data-index="1">
                             <div class="arc-card-inner">
-                                <img src="last section/images of sec2,3/Blue Whale.png" alt="Blue Whale" />
+                                <img src="last section/images of sec2,3/Blue Whale.webp" alt="Blue Whale" />
                                 <span class="arc-card-label">Blue Whale</span>
                             </div>
                         </div>
                         <div class="arc-card" data-index="2">
                             <div class="arc-card-inner">
-                                <img src="last section/images of sec2,3/Mantis Shrimp.png" alt="Mantis Shrimp" />
+                                <img src="last section/images of sec2,3/Mantis Shrimp.webp" alt="Mantis Shrimp" />
                                 <span class="arc-card-label">Mantis Shrimp</span>
                             </div>
                         </div>
                         <div class="arc-card" data-index="3">
                             <div class="arc-card-inner">
-                                <img src="last section/images of sec2,3/Octopus.png" alt="Kraken Octopus" />
+                                <img src="last section/images of sec2,3/Octopus.webp" alt="Kraken Octopus" />
                                 <span class="arc-card-label">Kraken Octopus</span>
                             </div>
                         </div>
                         <div class="arc-card" data-index="4">
                             <div class="arc-card-inner">
-                                <img src="last section/images of sec2,3/gerat white shark.png" alt="Great White Shark" />
+                                <img src="last section/images of sec2,3/gerat white shark.webp" alt="Great White Shark" />
                                 <span class="arc-card-label">Great White Shark</span>
                             </div>
                         </div>
                         <div class="arc-card" data-index="5">
                             <div class="arc-card-inner">
-                                <img src="last section/images of sec2,3/jellyfish.png" alt="Immortal Jellyfish" />
+                                <img src="last section/images of sec2,3/jellyfish.webp" alt="Immortal Jellyfish" />
                                 <span class="arc-card-label">Immortal Jellyfish</span>
                             </div>
                         </div>
                         <div class="arc-card" data-index="6">
                             <div class="arc-card-inner">
-                                <img src="last section/images of sec2,3/seahorse.png" alt="Crowned Seahorse" />
+                                <img src="last section/images of sec2,3/seahorse.webp" alt="Crowned Seahorse" />
                                 <span class="arc-card-label">Crowned Seahorse</span>
                             </div>
                         </div>
                         <div class="arc-card" data-index="7">
                             <div class="arc-card-inner">
-                                <img src="last section/images of sec2,3/wagel ray.png" alt="Spotted Eagle Ray" />
+                                <img src="last section/images of sec2,3/wagel ray.webp" alt="Spotted Eagle Ray" />
                                 <span class="arc-card-label">Spotted Eagle Ray</span>
                             </div>
                         </div>
                         <div class="arc-card" data-index="8">
                             <div class="arc-card-inner">
-                                <img src="last section/images of sec2,3/white beluga whale.png" alt="Beluga Whale" />
+                                <img src="last section/images of sec2,3/white beluga whale.webp" alt="Beluga Whale" />
                                 <span class="arc-card-label">Beluga Whale</span>
                             </div>
                         </div>
@@ -1463,9 +1452,10 @@
         }
         requestAnimationFrame(lenisRaf);
 
-        /* ── SECTION 1: HERO VIDEO SCRUB & 5.5s DOLPHIN CARD SPLIT ── */
+        /* ── SECTION 1: 24FPS WEBP CANVAS FRAME ENGINE & 5.5s DOLPHIN CARD SPLIT ── */
         (() => {
-            const video = document.getElementById('hero-video');
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas ? canvas.getContext('2d', { alpha: false, desynchronized: true }) : null;
             const clipTop = document.getElementById('clip-top');
             const clipBot = document.getElementById('clip-bot');
             const heroText = document.getElementById('hero-text');
@@ -1481,8 +1471,14 @@
             const progBar = document.getElementById('progress-bar');
             const loader = document.getElementById('loader');
 
-            let duration = 0, isReady = false;
-            let dispTime = 0, targTime = 0;
+            const TOTAL_FRAMES = 192;
+            const frames = new Array(TOTAL_FRAMES);
+            const CRITICAL_BATCH = 30;
+            let loadedFramesCount = 0;
+            let isReady = false;
+            let currentDrawFrame = -1;
+            let dirty = false;
+            let renderRaf = null;
             let floating = false;
 
             let stageH = 1, winH = 1;
@@ -1492,25 +1488,25 @@
                 stageH = stage ? stage.offsetHeight - winH : 1;
             }
 
-            const LERP = 0.10, MAX_STEP = 0.20;
-
-            let TARGET_CARD_TIME = 5.5; 
-            let T = {
-                TEXT_HOLD: 0.35, TEXT_GONE: 0.45,
-                SPLIT_OPEN: 0.48, SPLIT_FULL: 0.58,
-                SPLIT_CLOSE: 0.72, SPLIT_DONE: 0.82
-            };
-
-            function updateTimelineMapping() {
-                if (duration <= 0) return;
-                const pTarget = Math.min(0.85, Math.max(0.2, TARGET_CARD_TIME / duration));
-                T.TEXT_HOLD = Math.max(0.1, pTarget - 0.14);
-                T.TEXT_GONE = Math.max(0.15, pTarget - 0.04);
-                T.SPLIT_OPEN = pTarget;
-                T.SPLIT_FULL = Math.min(0.9, pTarget + 0.10);
-                T.SPLIT_CLOSE = Math.min(0.95, pTarget + 0.24);
-                T.SPLIT_DONE = Math.min(0.98, pTarget + 0.30);
+            function resizeCanvas() {
+                if (!canvas) return;
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = Math.floor(window.innerWidth * dpr);
+                canvas.height = Math.floor(window.innerHeight * dpr);
+                canvas.style.width = window.innerWidth + 'px';
+                canvas.style.height = window.innerHeight + 'px';
             }
+
+            // Eased Timeline mapping for 5.5s Dolphin card split
+            const pTarget = 5.5 / 8.0; // ~0.6875
+            const T = {
+                TEXT_HOLD: Math.max(0.1, pTarget - 0.20),
+                TEXT_GONE: Math.max(0.15, pTarget - 0.08),
+                SPLIT_OPEN: pTarget,
+                SPLIT_FULL: Math.min(0.9, pTarget + 0.08),
+                SPLIT_CLOSE: Math.min(0.95, pTarget + 0.18),
+                SPLIT_DONE: Math.min(0.98, pTarget + 0.24)
+            };
 
             function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
             function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
@@ -1526,146 +1522,250 @@
                 return 0;
             }
 
-            let lastSeekMs = 0;
-            const SEEK_INTERVAL = 50;
-            const HAS_FAST_SEEK = typeof HTMLVideoElement.prototype.fastSeek === 'function';
+            function drawHeroFrame(img, gapPct) {
+                if (!ctx || !img || !img.complete || img.naturalWidth === 0) return;
+                const cw = canvas.width;
+                const ch = canvas.height;
+                const iw = img.naturalWidth;
+                const ih = img.naturalHeight;
 
-            function doSeek(t) {
-                if (video.seeking) return;
-                const now = performance.now();
-                if (now - lastSeekMs < SEEK_INTERVAL) return;
-                lastSeekMs = now;
-                if (HAS_FAST_SEEK) { video.fastSeek(t); } else { video.currentTime = t; }
-            }
+                const scale = Math.max(cw / iw, ch / ih);
+                const nw = iw * scale;
+                const nh = ih * scale;
+                const cx = (cw - nw) / 2;
+                const cy = (ch - nh) / 2;
 
-            function videoLerp() {
-                if (!isReady || duration <= 0) return;
-                const d = targTime - dispTime;
-                if (d > -0.008 && d < 0.008) {
-                    dispTime = targTime;
-                    doSeek(dispTime);
-                    return;
+                ctx.save();
+                if (gapPct > 0.1) {
+                    const topEnd = (50 - gapPct / 2) * (ch / 100);
+                    const botStart = (50 + gapPct / 2) * (ch / 100);
+
+                    // Top split half
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(0, 0, cw, topEnd);
+                    ctx.clip();
+                    ctx.drawImage(img, cx, cy, nw, nh);
+                    ctx.restore();
+
+                    // Bottom split half
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(0, botStart, cw, ch - botStart);
+                    ctx.clip();
+                    ctx.drawImage(img, cx, cy, nw, nh);
+                    ctx.restore();
+                } else {
+                    ctx.drawImage(img, cx, cy, nw, nh);
                 }
-                let step = d * LERP;
-                if (step > MAX_STEP) step = MAX_STEP;
-                else if (step < -MAX_STEP) step = -MAX_STEP;
-                dispTime = clamp(dispTime + step, 0, duration - 0.001);
-                doSeek(dispTime);
+                ctx.restore();
             }
-
-            gsap.ticker.add(videoLerp);
 
             function render() {
-                if (!isReady || duration <= 0) return;
+                dirty = false;
                 const p = getP();
                 const sp = splitProg(p);
                 const gapPct = sp * 22;
 
-                targTime = clamp(p * duration, 0, duration - 0.001);
-                progBar.style.transform = `scaleX(${dispTime / duration})`;
+                if (progBar) progBar.style.transform = `scaleX(${p})`;
 
-                const topEnd = 50 - gapPct / 2;
-                const botStart = 50 + gapPct / 2;
-                if (gapPct < 0.1) {
-                    video.style.clipPath = 'none';
+                // Frame Scrubbing
+                const targetFrameIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.floor(p * TOTAL_FRAMES)));
+                const img = frames[targetFrameIdx];
+
+                if (img && img.complete && img.naturalWidth > 0) {
+                    currentDrawFrame = targetFrameIdx;
+                    drawHeroFrame(img, gapPct);
                 } else {
-                    video.style.clipPath = `polygon(0% 0%, 100% 0%, 100% ${topEnd}%, 0% ${topEnd}%, 0% ${botStart}%, 100% ${botStart}%, 100% 100%, 0% 100%)`;
+                    // Fallback to nearest available loaded frame
+                    for (let d = 1; d < TOTAL_FRAMES; d++) {
+                        const fwd = targetFrameIdx + d;
+                        const bwd = targetFrameIdx - d;
+                        if (fwd < TOTAL_FRAMES && frames[fwd] && frames[fwd].complete && frames[fwd].naturalWidth > 0) {
+                            drawHeroFrame(frames[fwd], gapPct);
+                            break;
+                        }
+                        if (bwd >= 0 && frames[bwd] && frames[bwd].complete && frames[bwd].naturalWidth > 0) {
+                            drawHeroFrame(frames[bwd], gapPct);
+                            break;
+                        }
+                    }
                 }
-                clipTop.style.display = 'none';
-                clipBot.style.display = 'none';
 
-                seamEl.style.opacity = sp;
+                if (clipTop) clipTop.style.display = 'none';
+                if (clipBot) clipBot.style.display = 'none';
+                if (seamEl) seamEl.style.opacity = sp;
 
                 let ta;
                 if (p < T.TEXT_HOLD) ta = 1;
                 else if (p < T.TEXT_GONE) ta = 1 - (p - T.TEXT_HOLD) / (T.TEXT_GONE - T.TEXT_HOLD);
                 else ta = 0;
 
-                heroText.style.opacity = ta;
-                heroText.style.transform = `translate3d(0,${(1 - ta) * -12}px,0)`;
-                scrollCue.style.opacity = ta;
+                if (heroText) {
+                    heroText.style.opacity = ta;
+                    heroText.style.transform = `translate3d(0,${(1 - ta) * -12}px,0)`;
+                }
+                if (scrollCue) scrollCue.style.opacity = ta;
 
-                const cardScale = 0.82 + 0.18 * sp;
-                const cardY = (1 - sp) * 44;
-                card.style.opacity = sp;
-                card.style.transform = `translate3d(-50%,-50%,0) translate3d(0,${cardY}px,0) scale(${cardScale})`;
+                if (card) {
+                    const cardScale = 0.82 + 0.18 * sp;
+                    const cardY = (1 - sp) * 44;
+                    card.style.opacity = sp;
+                    card.style.transform = `translate3d(-50%,-50%,0) translate3d(0,${cardY}px,0) scale(${cardScale})`;
+                }
 
-                const bP = beat(sp, 0.00, 0.28);
-                panels.style.opacity = bP;
-                panels.style.transform = `translate3d(0,${(1 - bP) * 30}px,0)`;
+                if (panels) {
+                    const bP = beat(sp, 0.00, 0.28);
+                    panels.style.opacity = bP;
+                    panels.style.transform = `translate3d(0,${(1 - bP) * 30}px,0)`;
+                }
 
-                const bE = beat(sp, 0.18, 0.46);
-                animalImg.style.opacity = bE;
-                animalImg.style.transform = `translate3d(-50%,${(1 - bE) * 28}px,0) scale(${0.88 + 0.12 * bE})`;
-                if (bE >= 0.98 && !floating) { animalImg.classList.add('floating'); floating = true; }
-                if (bE < 0.98 && floating) { animalImg.classList.remove('floating'); floating = false; }
+                if (animalImg) {
+                    const bE = beat(sp, 0.18, 0.46);
+                    animalImg.style.opacity = bE;
+                    animalImg.style.transform = `translate3d(-50%,${(1 - bE) * 28}px,0) scale(${0.88 + 0.12 * bE})`;
+                    if (bE >= 0.98 && !floating) { animalImg.classList.add('floating'); floating = true; }
+                    if (bE < 0.98 && floating) { animalImg.classList.remove('floating'); floating = false; }
+                }
 
-                const bT = beat(sp, 0.30, 0.56);
-                titleBg.style.opacity = bT;
-                titleBg.style.transform = `translate3d(-50%,0,0) translate3d(${(1 - bT) * -40}px,0,0)`;
+                if (titleBg) {
+                    const bT = beat(sp, 0.30, 0.56);
+                    titleBg.style.opacity = bT;
+                    titleBg.style.transform = `translate3d(-50%,0,0) translate3d(${(1 - bT) * -40}px,0,0)`;
+                }
 
-                const bL = beat(sp, 0.38, 0.60);
-                labelEl.style.opacity = bL;
-                labelEl.style.transform = `translate3d(-50%,${(1 - bL) * -18}px,0)`;
+                if (labelEl) {
+                    const bL = beat(sp, 0.38, 0.60);
+                    labelEl.style.opacity = bL;
+                    labelEl.style.transform = `translate3d(-50%,${(1 - bL) * -18}px,0)`;
+                }
 
-                const bD = beat(sp, 0.50, 0.72);
-                descEl.style.opacity = bD;
-                descEl.style.transform = `translate3d(${(1 - bD) * -30}px,0,0)`;
+                if (descEl) {
+                    const bD = beat(sp, 0.50, 0.72);
+                    descEl.style.opacity = bD;
+                    descEl.style.transform = `translate3d(${(1 - bD) * -30}px,0,0)`;
+                }
 
-                const bS = beat(sp, 0.62, 0.84);
-                statsEl.style.opacity = bS;
-                statsEl.style.transform = `translate3d(0,${(1 - bS) * 20}px,0)`;
-            }
-
-            window.addEventListener('scroll', render, { passive: true });
-            window.addEventListener('resize', () => { cacheLayout(); render(); });
-
-            function checkVideoReady() {
-                if (video && video.duration && !isNaN(video.duration) && video.duration > 0) {
-                    duration = video.duration;
-                    isReady = true;
-                    updateTimelineMapping();
-                    cacheLayout();
-                    if (loader) loader.classList.add('hidden');
-                    render();
+                if (statsEl) {
+                    const bS = beat(sp, 0.62, 0.84);
+                    statsEl.style.opacity = bS;
+                    statsEl.style.transform = `translate3d(0,${(1 - bS) * 20}px,0)`;
                 }
             }
 
-            if (video) {
-                video.pause();
-                video.addEventListener('play', () => video.pause());
-                video.addEventListener('loadedmetadata', checkVideoReady);
-                video.addEventListener('durationchange', checkVideoReady);
-                video.addEventListener('canplaythrough', checkVideoReady);
-                video.addEventListener('loadeddata', checkVideoReady);
+            function requestRender() {
+                if (!dirty) {
+                    dirty = true;
+                    renderRaf = requestAnimationFrame(render);
+                }
+            }
 
-                checkVideoReady();
-                const pollTimer = setInterval(() => {
-                    checkVideoReady();
-                    if (isReady && duration > 0) clearInterval(pollTimer);
-                }, 100);
+            // Tiered Preloader Engine
+            function getFrameUrl(idx) {
+                return 'last%20section/frames/frame_' + String(idx + 1).padStart(4, '0') + '.webp';
+            }
+
+            function preloadCriticalBatch() {
+                let criticalLoaded = 0;
+                for (let i = 0; i < CRITICAL_BATCH; i++) {
+                    const img = new Image();
+                    img.src = getFrameUrl(i);
+                    img.onload = () => {
+                        criticalLoaded++;
+                        loadedFramesCount++;
+                        if (i === 0 || criticalLoaded === 1) {
+                            if (loader) loader.classList.add('hidden');
+                            isReady = true;
+                            resizeCanvas();
+                            cacheLayout();
+                            render();
+                        }
+                    };
+                    img.onerror = () => {
+                        criticalLoaded++;
+                        if (criticalLoaded === 1 && loader) loader.classList.add('hidden');
+                    };
+                    frames[i] = img;
+                }
+
+                // Fallback timeout so page never gets stuck
                 setTimeout(() => {
-                    clearInterval(pollTimer);
-                    if (loader) loader.classList.add('hidden');
-                    isReady = true;
-                    cacheLayout();
-                    render();
-                }, 1500);
+                    if (loader && !loader.classList.contains('hidden')) {
+                        loader.classList.add('hidden');
+                        isReady = true;
+                        resizeCanvas();
+                        cacheLayout();
+                        render();
+                    }
+                }, 300);
+            }
+
+            function streamRemainingFrames(startIndex = CRITICAL_BATCH) {
+                const BATCH_SIZE = 30;
+                let current = startIndex;
+
+                function loadBatch() {
+                    const end = Math.min(TOTAL_FRAMES, current + BATCH_SIZE);
+                    for (let i = current; i < end; i++) {
+                        if (!frames[i]) {
+                            const img = new Image();
+                            img.src = getFrameUrl(i);
+                            img.onload = () => {
+                                loadedFramesCount++;
+                                if (Math.abs(Math.floor(getP() * TOTAL_FRAMES) - i) < 2) {
+                                    requestRender();
+                                }
+                            };
+                            frames[i] = img;
+                        }
+                    }
+                    current = end;
+                    if (current < TOTAL_FRAMES) {
+                        if ('requestIdleCallback' in window) {
+                            requestIdleCallback(loadBatch, { timeout: 100 });
+                        } else {
+                            setTimeout(loadBatch, 40);
+                        }
+                    }
+                }
+
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(loadBatch, { timeout: 200 });
+                } else {
+                    setTimeout(loadBatch, 80);
+                }
+            }
+
+            function init() {
+                cacheLayout();
+                resizeCanvas();
+                preloadCriticalBatch();
+                streamRemainingFrames();
+                render();
+
+                window.addEventListener('scroll', requestRender, { passive: true });
+                window.addEventListener('resize', () => { cacheLayout(); resizeCanvas(); requestRender(); }, { passive: true });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
             }
         })();
 
         /* ── SECTION 2: 3D CONTINUOUS OCEAN ROOM CORRIDOR (PERMANENT LIFECYCLE) ── */
         (() => {
             const marineImages = [
-                'last section/images of sec2,3/Blue Sea Dragon.png',
-                'last section/images of sec2,3/Blue Whale.png',
-                'last section/images of sec2,3/Mantis Shrimp.png',
-                'last section/images of sec2,3/Octopus.png',
-                'last section/images of sec2,3/gerat white shark.png',
-                'last section/images of sec2,3/jellyfish.png',
-                'last section/images of sec2,3/seahorse.png',
-                'last section/images of sec2,3/wagel ray.png',
-                'last section/images of sec2,3/white beluga whale.png'
+                'last section/images of sec2,3/Blue Sea Dragon.webp',
+                'last section/images of sec2,3/Blue Whale.webp',
+                'last section/images of sec2,3/Mantis Shrimp.webp',
+                'last section/images of sec2,3/Octopus.webp',
+                'last section/images of sec2,3/gerat white shark.webp',
+                'last section/images of sec2,3/jellyfish.webp',
+                'last section/images of sec2,3/seahorse.webp',
+                'last section/images of sec2,3/wagel ray.webp',
+                'last section/images of sec2,3/white beluga whale.webp'
             ];
 
             window.bootOceanCorridor = () => {
@@ -1768,7 +1868,7 @@
                     scene.add(mesh);
 
                     const textureLoader = new THREE.TextureLoader();
-                    textureLoader.load('last section/image.png', (loadedTexture) => {
+                    textureLoader.load('last section/image.webp', (loadedTexture) => {
                         loadedTexture.minFilter = THREE.LinearFilter;
                         loadedTexture.magFilter = THREE.LinearFilter;
                         if (waterMaterial && waterMaterial.uniforms) {
@@ -1910,15 +2010,15 @@
                 ];
 
                 const marineImagesList = [
-                    'last section/images of sec2,3/Blue Sea Dragon.png',
-                    'last section/images of sec2,3/Blue Whale.png',
-                    'last section/images of sec2,3/Mantis Shrimp.png',
-                    'last section/images of sec2,3/Octopus.png',
-                    'last section/images of sec2,3/gerat white shark.png',
-                    'last section/images of sec2,3/jellyfish.png',
-                    'last section/images of sec2,3/seahorse.png',
-                    'last section/images of sec2,3/wagel ray.png',
-                    'last section/images of sec2,3/white beluga whale.png'
+                    'last section/images of sec2,3/Blue Sea Dragon.webp',
+                    'last section/images of sec2,3/Blue Whale.webp',
+                    'last section/images of sec2,3/Mantis Shrimp.webp',
+                    'last section/images of sec2,3/Octopus.webp',
+                    'last section/images of sec2,3/gerat white shark.webp',
+                    'last section/images of sec2,3/jellyfish.webp',
+                    'last section/images of sec2,3/seahorse.webp',
+                    'last section/images of sec2,3/wagel ray.webp',
+                    'last section/images of sec2,3/white beluga whale.webp'
                 ];
                 const marineImageCache = new Map();
                 function preloadMarineImages(currentIdx) {
@@ -2277,13 +2377,15 @@
 
                 const p = getStageProgress();
 
-                // 1. Sync 3D Corridor Tunnel depth with scroll progress
+                // 1. Sync 3D Corridor Tunnel depth with extended scroll progress (Extended +70% scroll distance for Section 2 room corridor)
+                const pCorridor = Math.min(1.0, p / 0.28);
                 if (window.oceanRoomInstance && typeof window.oceanRoomInstance.setScrollProgress === 'function') {
-                    window.oceanRoomInstance.setScrollProgress(p);
+                    window.oceanRoomInstance.setScrollProgress(pCorridor);
                 }
 
-                // 2. Exponential scaling p^2.0 maps slow initial growth in center to explosive full-screen bloom
-                const pEased = Math.min(1.0, Math.pow(p / 0.08, 2.0));
+                // 2. Exponential scaling maps smooth portal expansion as Section 2 corridor depth completes
+                const pExpansion = Math.max(0, Math.min(1.0, (p - 0.18) / 0.12));
+                const pEased = Math.pow(pExpansion, 2.0);
 
                 const minW = 280;
                 const minH = 180;
@@ -2309,19 +2411,19 @@
                     }
                 }
 
-                // 3. Fade out Section 2 text title as user travels down corridor (p from 0.0 to 0.04)
-                const sec2Opacity = Math.max(0, 1 - p / 0.04);
+                // 3. Fade out Section 2 text title as user travels down corridor (p from 0.0 to 0.15)
+                const sec2Opacity = Math.max(0, 1 - p / 0.15);
                 if (corridorContent) {
                     corridorContent.style.opacity = sec2Opacity;
                     corridorContent.style.transform = `translate(-50%, ${-15 - (1 - sec2Opacity) * 30}px)`;
                 }
 
-                // 4. Fade in Section 3 text title as portal reaches full screen (p from 0.06 to 0.10)
+                // 4. Fade in Section 3 text title as portal reaches full screen (p from 0.22 to 0.30)
                 let sec3Opacity = 0;
-                if (p > 0.06 && p < 0.12) {
-                    sec3Opacity = Math.min(1, (p - 0.06) / 0.04);
-                } else if (p >= 0.12) {
-                    sec3Opacity = Math.max(0, 1 - (p - 0.12) / 0.04);
+                if (p > 0.22 && p < 0.32) {
+                    sec3Opacity = Math.min(1, (p - 0.22) / 0.06);
+                } else if (p >= 0.32) {
+                    sec3Opacity = Math.max(0, 1 - (p - 0.32) / 0.06);
                 }
                 if (waterContent) {
                     waterContent.style.opacity = sec3Opacity;
