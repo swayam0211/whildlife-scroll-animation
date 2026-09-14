@@ -102,19 +102,6 @@ In the current landscape of modern web design (seen on Awwwards, Apple, Stripe, 
 - **Cinematic Feel**: The golden-hour lighting, dark sapphire palettes, subtle vignette gradients, floating dust particles, and smooth math-lerped motions give it a high-budget documentary feel (BBC Planet Earth / National Geographic).
 - **Micro-Interactions**: The 3D eye tracking on the login page and magnetic circular text on the portal ring add elements of delight that encourage interactive exploration.
 
-### 👥 User Experience (UX) & Emotional Impact Across Age Groups
-
-- 👦 **Children & Young Kids (Ages 5–12)**:
-  - **Feel**: Pure wonder, magic, and playfulness.
-  - **Highlights**: The animal eyes following their cursor on the login page creates instant delight. The interactive stardust particles and 3D animal flips make learning about animals feel like an interactive game.
-
-- 🧑 **Teens & Young Adults (Ages 13–25)**:
-  - **Feel**: High-tech immersion, gaming aesthetic, "WOW" factor.
-  - **Highlights**: Appreciates the 3D WebGL models, smooth glassmorphism, responsive tilt effects, and dark futuristic lighting style.
-
-- 🧑‍💼 **Middle-Aged Adults (Ages 26–50)**:
-  - **Feel**: Sophisticated, documentary-style, elegant, premium quality.
-  - **Highlights**: The controlled scroll speed allows them to read stats and descriptions naturally without feeling rushed or overwhelmed by auto-playing carousels.
 
 - 👴 **Seniors & Older Adults (Ages 50+)**:
   - **Feel**: Calm, comfortable, high-contrast clarity.
