@@ -28,18 +28,23 @@
         }
 
         /* ── LENIS SMOOTH SCROLL NORMALIZER ── */
-        html.lenis, html.lenis body {
+        html.lenis,
+        html.lenis body {
             height: auto;
         }
+
         .lenis.lenis-smooth {
             scroll-behavior: auto !important;
         }
+
         .lenis.lenis-smooth [data-lenis-prevent] {
             overscroll-behavior: contain;
         }
+
         .lenis.lenis-stopped {
             overflow: hidden;
         }
+
         .lenis.lenis-scrolling iframe {
             pointer-events: none;
         }
@@ -92,7 +97,7 @@
             height: 800vh;
         }
 
-        /* â”€â”€ STICKY HERO â”€â”€ */
+        /* ── STICKY HERO ── */
         #hero-sticky {
             position: sticky;
             top: 0;
@@ -102,8 +107,8 @@
             background: #000;
         }
 
-        /* â”€â”€ SINGLE VIDEO â”€â”€ */
-        #hero-video {
+        /* ── HERO CANVAS ── */
+        #hero-canvas {
             position: absolute;
             top: 0;
             left: 0;
@@ -111,10 +116,9 @@
             height: 100%;
             object-fit: cover;
             z-index: 0;
-            will-change: auto;
         }
 
-        /* â”€â”€ CLIP HALVES (GPU-composited via clip-path) â”€â”€ */
+        /* ── CLIP HALVES (GPU-composited via clip-path) ── */
         #clip-top,
         #clip-bot {
             position: absolute;
@@ -134,7 +138,7 @@
             clip-path: inset(50% 0 0 0);
         }
 
-        /* â”€â”€ GAP FILL â”€â”€ */
+        /* ── GAP FILL ── */
         #gap-fill {
             position: absolute;
             inset: 0;
@@ -143,7 +147,7 @@
             pointer-events: none;
         }
 
-        /* â”€â”€ CINEMATIC OVERLAYS â”€â”€ */
+        /* ── CINEMATIC OVERLAYS ── */
         #vignette {
             position: absolute;
             inset: 0;
@@ -153,7 +157,7 @@
                 linear-gradient(to bottom, rgba(0, 0, 0, .38) 0%, transparent 28%, transparent 68%, rgba(0, 0, 0, .6) 100%);
         }
 
-        /* â”€â”€ SEAM GLOW â”€â”€ */
+        /* ── SEAM GLOW ── */
         #seam {
             position: absolute;
             top: 50%;
@@ -168,7 +172,7 @@
             box-shadow: 0 0 18px 8px rgba(255, 180, 50, .25);
         }
 
-        /* â”€â”€ HERO TEXT â”€â”€ */
+        /* ── HERO TEXT ── */
         #hero-text {
             position: absolute;
             inset: 0;
@@ -225,7 +229,7 @@
             line-height: 1.72;
         }
 
-        /* â”€â”€ SCROLL CUE â”€â”€ */
+        /* ── SCROLL CUE ── */
         .scroll-cue {
             position: absolute;
             bottom: 2.4rem;
@@ -254,7 +258,7 @@
             animation: pulse 2.2s ease-in-out infinite;
         }
 
-        /* â”€â”€ PROGRESS BAR â”€â”€ */
+        /* ── PROGRESS BAR ── */
         #progress-bar {
             position: absolute;
             bottom: 0;
@@ -270,7 +274,7 @@
             will-change: transform;
         }
 
-        /* â•â•â•â• ELEPHANT CARD â•â•â•â• */
+        /* ════ ELEPHANT CARD ════ */
         #elephant-card {
             position: absolute;
             top: 50%;
@@ -284,7 +288,7 @@
             will-change: opacity, transform;
         }
 
-        /* 3 vertical glass panels â€” NO backdrop-filter */
+        /* 3 vertical glass panels — NO backdrop-filter */
         .card-panels {
             position: absolute;
             inset: 0;
@@ -309,7 +313,7 @@
             background: linear-gradient(180deg, rgba(255, 210, 110, .085) 0%, rgba(255, 190, 80, .05) 60%, rgba(50, 30, 5, .14) 100%);
         }
 
-        /* ELEPHANT big bg title â€” positioned at top area so elephant image doesn't hide it */
+        /* ELEPHANT big bg title — positioned at top area so elephant image doesn't hide it */
         .card-title-bg {
             position: absolute;
             top: 8%;
@@ -331,7 +335,7 @@
             will-change: opacity, transform;
         }
 
-        /* Elephant image â€” centered, sits in right-center area */
+        /* Elephant image — centered, sits in right-center area */
         .card-elephant {
             position: absolute;
             bottom: 12%;
@@ -372,7 +376,7 @@
             will-change: opacity, transform;
         }
 
-        /* Description â€” left side, below title, away from elephant */
+        /* Description — left side, below title, away from elephant */
         .card-desc {
             position: absolute;
             left: 5%;
@@ -390,7 +394,7 @@
             will-change: opacity, transform;
         }
 
-        /* Stats row â€” inside card, bottom area */
+        /* Stats row — inside card, bottom area */
         .card-stats {
             position: absolute;
             bottom: 3%;
@@ -432,7 +436,7 @@
             color: rgba(255, 210, 120, .65);
         }
 
-        /* â•â•â•â• ANIMAL RING SECTION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        /* ════════════════════════ ANIMAL RING SECTION ════════════════════════════ */
         #ring-section {
             position: relative;
             z-index: 40;
@@ -447,7 +451,7 @@
             z-index: 0;
         }
 
-        /* â”€â”€ Radial SVG Ring â”€â”€ */
+        /* ── Radial SVG Ring ── */
         .ring-wrapper {
             position: absolute;
             top: -200px;
@@ -499,7 +503,7 @@
             pointer-events: none;
         }
 
-        /* â”€â”€ FULL IMAGE (splits vertically) â”€â”€ */
+        /* ── FULL IMAGE (splits vertically) ── */
         .full-img {
             position: absolute;
             inset: -6%;
@@ -517,7 +521,7 @@
             clip-path: inset(0 0 0 50%);
         }
 
-        /* â”€â”€ 3 GLASS PANELS (BBC Planet Earth style) â”€â”€ */
+        /* ── 3 GLASS PANELS (BBC Planet Earth style) ── */
         .glass-card {
             position: absolute;
             top: 52%;
@@ -591,7 +595,7 @@
             box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.15);
         }
 
-        /* â”€â”€ INFO CARD â”€â”€ */
+        /* ── INFO CARD ── */
         .info-card {
             position: absolute;
             bottom: 8%;
@@ -646,7 +650,7 @@
             margin-right: .4rem;
         }
 
-        /* â”€â”€ Dot indicators â”€â”€ */
+        /* ── Dot indicators ── */
         .ring-dots {
             position: absolute;
             bottom: 1.5rem;
@@ -671,7 +675,7 @@
             box-shadow: 0 0 8px rgba(255, 200, 80, .5);
         }
 
-        /* â”€â”€ KEYFRAMES â”€â”€ */
+        /* ── KEYFRAMES ── */
         @keyframes spin {
             to {
                 transform: rotate(360deg);
@@ -714,7 +718,7 @@
             }
         }
 
-        /* â”€â”€ CINEMATIC RING SECTION â”€â”€ */
+        /* ── CINEMATIC RING SECTION ── */
         #ring-cinematic {
             position: relative;
             width: 100%;
@@ -903,7 +907,7 @@
             pointer-events: none;
         }
 
-        /* â”€â”€ MAGNETIC CIRCULAR TEXT & GLOW â”€â”€ */
+        /* ── MAGNETIC CIRCULAR TEXT & GLOW ── */
         .cursor-glow {
             position: absolute;
             width: 350px;
@@ -1056,10 +1060,8 @@
 
             <div id="gap-fill"></div>
 
-            <!-- SINGLE video -->
-            <video id="hero-video" preload="auto" muted playsinline webkit-playsinline>
-                <source src="hero/swyam_edit_30mb.mp4" type="video/mp4" />
-            </video>
+            <!-- HERO CANVAS FRAME SCRUBBER (24fps WebP Frame Sequence) -->
+            <canvas id="hero-canvas"></canvas>
 
             <!-- Transparent clip overlays that hide the gap area (the video shows through) -->
             <div id="clip-top"></div>
@@ -1121,7 +1123,9 @@
             <!-- Corridor hero text -->
             <div class="corridor-hero-content" id="corridor-hero-content">
                 <p class="eyebrow">The Land Kingdom</p>
-                <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,6vw,5.5rem);font-weight:300;color:#fff;text-shadow:0 2px 40px rgba(0,0,0,.7);">Enter the <em style="font-style:italic;color:rgba(255,220,150,.92);">Wild</em></h2>
+                <h2
+                    style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,6vw,5.5rem);font-weight:300;color:#fff;text-shadow:0 2px 40px rgba(0,0,0,.7);">
+                    Enter the <em style="font-style:italic;color:rgba(255,220,150,.92);">Wild</em></h2>
             </div>
 
             <!-- Section 3: Ring Gallery (grows and settles on screen) -->
@@ -1144,16 +1148,34 @@
                     <!-- 3-panel glass card -->
                     <div class="glass-card" id="glass-card">
                         <div class="glass-panel" id="gpanel-0">
-                            <div class="glass-front"><div class="glass-img"></div><div class="glass-frost"></div></div>
-                            <div class="glass-back"><div class="glass-img"></div><div class="glass-frost"></div></div>
+                            <div class="glass-front">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
+                            <div class="glass-back">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
                         </div>
                         <div class="glass-panel" id="gpanel-1">
-                            <div class="glass-front"><div class="glass-img"></div><div class="glass-frost"></div></div>
-                            <div class="glass-back"><div class="glass-img"></div><div class="glass-frost"></div></div>
+                            <div class="glass-front">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
+                            <div class="glass-back">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
                         </div>
                         <div class="glass-panel" id="gpanel-2">
-                            <div class="glass-front"><div class="glass-img"></div><div class="glass-frost"></div></div>
-                            <div class="glass-back"><div class="glass-img"></div><div class="glass-frost"></div></div>
+                            <div class="glass-front">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
+                            <div class="glass-back">
+                                <div class="glass-img"></div>
+                                <div class="glass-frost"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -1173,7 +1195,7 @@
         </div><!-- /#land-corridor-sticky -->
     </section><!-- /#land-corridor-section -->
 
-    <!-- â”€â”€ CINEMATIC RING SECTION â”€â”€ -->
+    <!-- ── CINEMATIC RING SECTION ── -->
     <section id="ring-cinematic">
         <div class="bg-image"></div>
         <div class="gradient-overlay"></div>
@@ -1185,11 +1207,13 @@
             <div class="ring-wrapper cinematic">
                 <div class="ring-disc cinematic" id="cinematic-ring-disc">
                     <div class="ring-half top" id="air-half">
-                        <video class="air-video" src="sec3/air5sec.mp4" data-src="sec3/air5sec.mp4" muted loop autoplay playsinline preload="auto"></video>
+                        <video class="air-video" src="sec3/air5sec.mp4" muted loop autoplay playsinline
+                            preload="auto"></video>
                     </div>
                     <div class="ring-mist"></div>
                     <div class="ring-half bottom" id="water-half">
-                        <video class="water-video" src="sec3/water5sec.mp4" data-src="sec3/water5sec.mp4" muted loop autoplay playsinline preload="auto"></video>
+                        <video class="water-video" src="sec3/water5sec.mp4" muted loop autoplay playsinline
+                            preload="auto"></video>
                     </div>
                 </div>
             </div>
@@ -1253,8 +1277,9 @@
 
     <script>
         (() => {
-            /* â”€â”€ ELEMENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-            const video = document.getElementById('hero-video');
+            /* ── ELEMENTS ── */
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas ? canvas.getContext('2d') : null;
             const clipTop = document.getElementById('clip-top');
             const clipBot = document.getElementById('clip-bot');
             const heroText = document.getElementById('hero-text');
@@ -1270,12 +1295,87 @@
             const progBar = document.getElementById('progress-bar');
             const loader = document.getElementById('loader');
 
-            /* â”€â”€ STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-            let duration = 0, isReady = false;
-            let dispTime = 0, targTime = 0, vidRaf = null;
+            /* ── STATE ── */
+            let isReady = false;
             let floating = false, dirty = false, renderRaf = null;
 
-            /* â”€â”€ CACHED LAYOUT (avoids reflow in scroll) â”€â”€ */
+            /* ── WEBP CANVAS FRAME ENGINE (627 frames at 24fps) ── */
+            const TOTAL_FRAMES = 627;
+            const CRITICAL_FRAMES = 30;
+            const frames = new Array(TOTAL_FRAMES + 1);
+
+            function resizeCanvas() {
+                if (!canvas) return;
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            // 1. Preload CRITICAL first 30 frames immediately for instant boot & early scroll
+            let criticalLoadedCount = 0;
+            for (let i = 1; i <= CRITICAL_FRAMES; i++) {
+                const img = new Image();
+                img.src = `hero/frames/frame_${String(i).padStart(4, '0')}.webp`;
+                img.onload = () => {
+                    criticalLoadedCount++;
+                    if (i === 1) {
+                        isReady = true;
+                        if (loader) loader.classList.add('hidden');
+                        cacheLayout();
+                        resizeCanvas();
+                        render();
+                    }
+                    if (criticalLoadedCount === CRITICAL_FRAMES) {
+                        scheduleBackgroundFrameStreaming(31);
+                    }
+                };
+                frames[i] = img;
+            }
+
+            // 2. Stream remaining frames (31–627) in non-blocking background batches of 50
+            function scheduleBackgroundFrameStreaming(startIdx) {
+                if (startIdx > TOTAL_FRAMES) return;
+
+                const loadBatch = () => {
+                    const endIdx = Math.min(TOTAL_FRAMES, startIdx + 49);
+                    for (let i = startIdx; i <= endIdx; i++) {
+                        if (!frames[i]) {
+                            const img = new Image();
+                            img.src = `hero/frames/frame_${String(i).padStart(4, '0')}.webp`;
+                            frames[i] = img;
+                        }
+                    }
+                    if (endIdx < TOTAL_FRAMES) {
+                        if ('requestIdleCallback' in window) {
+                            requestIdleCallback(() => scheduleBackgroundFrameStreaming(endIdx + 1));
+                        } else {
+                            setTimeout(() => scheduleBackgroundFrameStreaming(endIdx + 1), 60);
+                        }
+                    }
+                };
+
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(loadBatch);
+                } else {
+                    setTimeout(loadBatch, 50);
+                }
+            }
+
+            function drawHeroFrame(p) {
+                if (!ctx || !canvas) return;
+                const idx = Math.min(TOTAL_FRAMES, Math.max(1, Math.floor(p * (TOTAL_FRAMES - 1)) + 1));
+                const img = frames[idx] || frames[1];
+                if (img && img.complete && img.naturalWidth > 0) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const hRatio = canvas.width / img.naturalWidth;
+                    const vRatio = canvas.height / img.naturalHeight;
+                    const ratio = Math.max(hRatio, vRatio);
+                    const centerShift_x = (canvas.width - img.naturalWidth * ratio) / 2;
+                    const centerShift_y = (canvas.height - img.naturalHeight * ratio) / 2;
+                    ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, centerShift_x, centerShift_y, img.naturalWidth * ratio, img.naturalHeight * ratio);
+                }
+            }
+
+            /* ── CACHED LAYOUT ── */
             let stageH = 1, winH = 1, maxGap = 1;
             function cacheLayout() {
                 const stage = document.getElementById('scroll-stage');
@@ -1284,17 +1384,14 @@
                 maxGap = winH * 0.22;
             }
 
-            /* â”€â”€ TUNING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-            const LERP = 0.10, MAX_STEP = 0.20;
-
-            /* â”€â”€ TIMELINE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            /* ── TIMELINE ── */
             const T = {
                 TEXT_HOLD: 0.55, TEXT_GONE: 0.70,
                 SPLIT_OPEN: 0.68, SPLIT_FULL: 0.76,
                 SPLIT_CLOSE: 0.86, SPLIT_DONE: 0.93,
             };
 
-            /* â”€â”€ MATH (inlined for speed) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            /* ── MATH ── */
             function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
             function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
             function ss(t) { return t * t * (3 - 2 * t); }
@@ -1310,41 +1407,7 @@
                 return 0;
             }
 
-            let lastSeekMs = 0;           // monotonic clock of last actual seek
-            const SEEK_INTERVAL = 50;     // minimum ms between seeks (~20fps decode)
-            const HAS_FAST_SEEK = typeof HTMLVideoElement.prototype.fastSeek === 'function';
-
-            function doSeek(t) {
-                // Never seek while browser is still decoding a previous seek
-                if (video && video.seeking) return;
-                const now = performance.now();
-                if (now - lastSeekMs < SEEK_INTERVAL) return;
-                lastSeekMs = now;
-                if (video) {
-                    if (HAS_FAST_SEEK) { video.fastSeek(t); } else { video.currentTime = t; }
-                }
-            }
-
-            function videoLerp() {
-                const d = targTime - dispTime;
-                // Close enough — snap and stop the loop
-                if (d > -0.008 && d < 0.008) {
-                    dispTime = targTime;
-                    doSeek(dispTime);
-                    vidRaf = null;
-                    return;
-                }
-                let step = d * LERP;
-                if (step > MAX_STEP) step = MAX_STEP;
-                else if (step < -MAX_STEP) step = -MAX_STEP;
-                dispTime = clamp(dispTime + step, 0, duration - 0.001);
-                doSeek(dispTime);
-                vidRaf = requestAnimationFrame(videoLerp);
-            }
-
-            /* â• â• â• â• â• â••â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â•â• â• â•â• â•â•â•â•â•â•â•â•â•
-               RENDER â€” called once per RAF frame max
-            â• â• â• â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+            /* ── RENDER ── */
             function render() {
                 renderRaf = null;
                 dirty = false;
@@ -1354,27 +1417,22 @@
                 const sp = splitProg(p);
                 const gapPct = sp * 22;
 
-                // ── Video seek
-                if ((!duration || isNaN(duration)) && video && !isNaN(video.duration) && video.duration > 0) {
-                    duration = video.duration;
-                }
-                const validDuration = (duration && !isNaN(duration)) ? duration : 0;
-                targTime = validDuration > 0 ? clamp(p * validDuration, 0, validDuration - 0.001) : 0;
-                if (!vidRaf && validDuration > 0) vidRaf = requestAnimationFrame(videoLerp);
+                // Draw 24fps WebP Canvas Frame
+                drawHeroFrame(p);
 
-                // ── Progress bar (scaleX = GPU-composited)
-                if (progBar && validDuration > 0) {
-                    progBar.style.transform = `scaleX(${dispTime / validDuration})`;
+                // Progress bar
+                if (progBar) {
+                    progBar.style.transform = `scaleX(${p})`;
                 }
 
-                // ── SPLIT: clip-path cuts center gap from video, gap-fill shows behind
+                // SPLIT clip-path
                 const topEnd = 50 - gapPct / 2;
                 const botStart = 50 + gapPct / 2;
-                if (video) {
+                if (canvas) {
                     if (gapPct < 0.1) {
-                        video.style.clipPath = 'none';
+                        canvas.style.clipPath = 'none';
                     } else {
-                        video.style.clipPath =
+                        canvas.style.clipPath =
                             `polygon(0% 0%,100% 0%,100% ${topEnd}%,0% ${topEnd}%,0% ${botStart}%,100% ${botStart}%,100% 100%,0% 100%)`;
                     }
                 }
@@ -1450,70 +1508,10 @@
                 }
             }
 
-            function resetToTop() {
-                window.scrollTo(0, 0);
-                if (window.lenis) {
-                    try { window.lenis.scrollTo(0, { immediate: true }); } catch (e) {}
-                }
-                if (video) {
-                    try { video.currentTime = 0; } catch (e) {}
-                }
-                dispTime = 0;
-                targTime = 0;
-                isReady = false;
-                floating = false;
-            }
-
-            function checkVideoReady() {
-                if (!video) {
-                    if (loader) loader.classList.add('hidden');
-                    isReady = true;
-                    cacheLayout();
-                    render();
-                    return;
-                }
-                if (video.duration && !isNaN(video.duration) && video.duration > 0) {
-                    duration = video.duration;
-                    isReady = true;
-                    if (loader) loader.classList.add('hidden');
-                    cacheLayout();
-                    render();
-                }
-            }
-
             function init() {
-                resetToTop();
-                if (video) {
-                    video.pause();
-                    video.addEventListener('play', () => video.pause());
-                    video.addEventListener('loadedmetadata', checkVideoReady);
-                    video.addEventListener('durationchange', checkVideoReady);
-                    video.addEventListener('canplaythrough', checkVideoReady);
-                    video.addEventListener('loadeddata', checkVideoReady);
-
-                    checkVideoReady();
-                    const pollTimer = setInterval(() => {
-                        checkVideoReady();
-                        if (isReady && duration > 0) clearInterval(pollTimer);
-                    }, 100);
-                    setTimeout(() => {
-                        clearInterval(pollTimer);
-                        if (loader) loader.classList.add('hidden');
-                        isReady = true;
-                        cacheLayout();
-                        render();
-                    }, 1500);
-                } else {
-                    if (loader) loader.classList.add('hidden');
-                    isReady = true;
-                    cacheLayout();
-                    render();
-                }
-
+                cacheLayout();
                 window.addEventListener('scroll', onScroll, { passive: true });
-                window.addEventListener('resize', () => { cacheLayout(); render(); }, { passive: true });
-                window.addEventListener('pageshow', resetToTop);
-                window.addEventListener('beforeunload', resetToTop);
+                window.addEventListener('resize', () => { cacheLayout(); resizeCanvas(); render(); }, { passive: true });
             }
 
             if (document.readyState === 'loading') {
@@ -1532,15 +1530,15 @@
             gsap.registerPlugin(ScrollTrigger);
 
             const landImages = [
-                'ring/red fox1.png',
-                'ring/deer2.png',
-                'ring/lepord3.png',
-                'ring/tiger4.png',
-                'ring/cheetah5.png',
-                'ring/bear6.png',
-                'ring/lion7.png',
-                'ring/giraff8.png',
-                'ring/komodo_gradon9.png'
+                'ring/red fox1.webp',
+                'ring/deer2.webp',
+                'ring/lepord3.webp',
+                'ring/tiger4.webp',
+                'ring/cheetah5.webp',
+                'ring/bear6.webp',
+                'ring/lion7.webp',
+                'ring/giraff8.webp',
+                'ring/komodo_gradon9.webp'
             ];
 
             function bootCorridor() {
@@ -1555,15 +1553,15 @@
             }
 
             const A = [
-                { n: "Red Fox", d: "Masters of the autumn brush. Adapting seamlessly to shifting environments, they move like flickering flames through the falling leaves.", s: "35-50cm", i: "ring/red fox1.png", v: "svg/fox.svg", c: ["#8B4513", "#2F1B0C"] },
-                { n: "Spotted Deer", d: "Grace in the sunlit clearings. Highly alert and incredibly agile, they navigate the dense woodlands with silent precision.", s: "90-100cm", i: "ring/deer2.png", v: "svg/deer.svg", c: ["#3A5320", "#1A2411"] },
-                { n: "Leopard", d: "The phantom of the branches. Perfectly camouflaged in the dappled light, observing the forest floor with unmatched stealth.", s: "60-70cm", i: "ring/lepord3.png", v: "svg/lepord.svg", c: ["#2C3E24", "#121A0F"] },
-                { n: "Tiger", d: "Power wading through the morning mist. A solitary apex predator commanding the riverbanks with silent, heavy footsteps.", s: "90-110cm", i: "ring/tiger4.png", v: "svg/tiger.svg", c: ["#1C3026", "#0A110D"] },
-                { n: "Cheetah", d: "Evolution built for pure velocity. A blur of motion across the open plains, defining the very limit of mammalian speed.", s: "70-90cm", i: "ring/cheetah5.png", v: "svg/cheetah.svg", c: ["#C29B62", "#4A3518"] },
-                { n: "Bear", d: "Unyielding strength in the rushing rapids. Masters of the river currents, balancing raw power with remarkable patience.", s: "100-150cm", i: "ring/bear6.png", v: "svg/bear.svg", c: ["#3A4A5A", "#161D24"] },
-                { n: "Lion", d: "The undisputed monarch of the savanna. Basking in the golden hour, carrying the weight of the pride with effortless majesty.", s: "110-120cm", i: "ring/lion7.png", v: "svg/lion.svg", c: ["#A66B38", "#3E230B"] },
-                { n: "Giraffe", d: "Sentinels of the horizon. Moving with a deliberate, slow-motion grace that defies their towering, architectural scale.", s: "400-500cm", i: "ring/giraff8.png", v: "svg/giraffe.svg", c: ["#7EA1B5", "#D4B886"] },
-                { n: "Komodo Dragon", d: "A living relic of a prehistoric era. Patient, armored, and uniquely adapted to rule the harsh, sun-baked island terrains.", s: "70-90cm", i: "ring/komodo_gradon9.png", v: "svg/komodo-dragon.svg", c: ["#6B5C47", "#2E261A"] },
+                { n: "Red Fox", d: "Masters of the autumn brush. Adapting seamlessly to shifting environments, they move like flickering flames through the falling leaves.", s: "35-50cm", i: "ring/red fox1.webp", v: "svg/fox.svg", c: ["#8B4513", "#2F1B0C"] },
+                { n: "Spotted Deer", d: "Grace in the sunlit clearings. Highly alert and incredibly agile, they navigate the dense woodlands with silent precision.", s: "90-100cm", i: "ring/deer2.webp", v: "svg/deer.svg", c: ["#3A5320", "#1A2411"] },
+                { n: "Leopard", d: "The phantom of the branches. Perfectly camouflaged in the dappled light, observing the forest floor with unmatched stealth.", s: "60-70cm", i: "ring/lepord3.webp", v: "svg/lepord.svg", c: ["#2C3E24", "#121A0F"] },
+                { n: "Tiger", d: "Power wading through the morning mist. A solitary apex predator commanding the riverbanks with silent, heavy footsteps.", s: "90-110cm", i: "ring/tiger4.webp", v: "svg/tiger.svg", c: ["#1C3026", "#0A110D"] },
+                { n: "Cheetah", d: "Evolution built for pure velocity. A blur of motion across the open plains, defining the very limit of mammalian speed.", s: "70-90cm", i: "ring/cheetah5.webp", v: "svg/cheetah.svg", c: ["#C29B62", "#4A3518"] },
+                { n: "Bear", d: "Unyielding strength in the rushing rapids. Masters of the river currents, balancing raw power with remarkable patience.", s: "100-150cm", i: "ring/bear6.webp", v: "svg/bear.svg", c: ["#3A4A5A", "#161D24"] },
+                { n: "Lion", d: "The undisputed monarch of the savanna. Basking in the golden hour, carrying the weight of the pride with effortless majesty.", s: "110-120cm", i: "ring/lion7.webp", v: "svg/lion.svg", c: ["#A66B38", "#3E230B"] },
+                { n: "Giraffe", d: "Sentinels of the horizon. Moving with a deliberate, slow-motion grace that defies their towering, architectural scale.", s: "400-500cm", i: "ring/giraff8.webp", v: "svg/giraffe.svg", c: ["#7EA1B5", "#D4B886"] },
+                { n: "Komodo Dragon", d: "A living relic of a prehistoric era. Patient, armored, and uniquely adapted to rule the harsh, sun-baked island terrains.", s: "70-90cm", i: "ring/komodo_gradon9.webp", v: "svg/komodo-dragon.svg", c: ["#6B5C47", "#2E261A"] },
             ];
             const N = A.length;
             const $bg = document.getElementById('ring-bg');
@@ -1601,7 +1599,13 @@
             function lc(a, b, t) { const ra = hx(a), rb = hx(b); return `rgb(${Math.round(lr(ra[0], rb[0], t))},${Math.round(lr(ra[1], rb[1], t))},${Math.round(lr(ra[2], rb[2], t))})`; }
 
             // Setters
-            function sImg(j) { const u = "url('" + A[j].i + "')"; $fl.style.backgroundImage = u; $fr.style.backgroundImage = u; }
+            function sImg(j) {
+                const u = "url('" + A[j].i + "')";
+                $fl.style.backgroundImage = u;
+                $fr.style.backgroundImage = u;
+                $fl.style.backgroundColor = A[j].c[0];
+                $fr.style.backgroundColor = A[j].c[0];
+            }
             function sGl(j, f) { const u = "url('" + A[j].i + "')"; $gp.forEach(p => { p.querySelector('.glass-' + f + ' .glass-img').style.backgroundImage = u; }); }
             function sInf(j) { $in.textContent = A[j].n; $id.textContent = A[j].d; $is.innerHTML = '<span class="info-stat-label">HEIGHT</span>' + A[j].s; }
             function sUI(j) {
@@ -1612,17 +1616,13 @@
                 document.querySelectorAll('.ring-slot img').forEach(im => { im.style.transform = 'rotate(' + (-r) + 'deg)'; });
             }
 
-            // Predictive image preloader array (Pre-decodes 2-3 images ahead into RAM/VRAM)
-            const imageCache = new Map();
+            // Native Browser Image Preloader (Leverages 5.7MB WebP native HTTP caching)
             function preloadNextImages(currentIdx) {
                 for (let offset = 0; offset <= 3; offset++) {
                     const targetIdx = (currentIdx + offset) % N;
                     const imgUrl = A[targetIdx].i;
-                    if (!imageCache.has(imgUrl)) {
-                        const img = new Image();
-                        img.src = imgUrl;
-                        imageCache.set(imgUrl, img);
-                    }
+                    const img = new Image();
+                    img.src = imgUrl;
                 }
             }
 
@@ -1698,8 +1698,8 @@
                 }
             }
 
-            const CORRIDOR_HEIGHT = 400; // vh
-            const GALLERY_DISTANCE = 9000; // vh
+            const CORRIDOR_HEIGHT = 980; // vh (+70% extended scroll space for 3D room tunnel)
+            const GALLERY_DISTANCE = 25000; // vh
 
             ScrollTrigger.create({
                 trigger: '#land-corridor-section',
@@ -1718,7 +1718,7 @@
                     const corridorPx = CORRIDOR_HEIGHT * (winH / 100);
 
                     if (currentPx <= corridorPx) {
-                        // PHASE 1: Corridor 3D Tunnel & Center Pin Zoom (0 to 400vh)
+                        // PHASE 1: Extended 3D Room Corridor (0 to 680vh)
                         const pCorridor = Math.min(1, Math.max(0, currentPx / corridorPx));
 
                         const canvas = document.getElementById('room-canvas');
@@ -1736,7 +1736,7 @@
 
                         const content = document.getElementById('corridor-hero-content');
                         if (content) {
-                            const opacity = Math.max(0, 1 - pCorridor / 0.30);
+                            const opacity = Math.max(0, 1 - pCorridor / 0.40);
                             content.style.opacity = opacity;
                             content.style.transform = `translate(-50%, ${-15 - (1 - opacity) * 30}px)`;
                         }
@@ -1745,14 +1745,14 @@
                         if (lifePin) {
                             render(0); // Keep Red Fox ready inside pin
 
-                            if (pCorridor < 0.15) {
+                            if (pCorridor < 0.50) {
                                 lifePin.style.opacity = '0';
                                 lifePin.style.pointerEvents = 'none';
                             } else {
-                                const pFade = Math.min(1, (pCorridor - 0.15) / 0.20);
+                                const pFade = Math.min(1, (pCorridor - 0.50) / 0.25);
                                 lifePin.style.opacity = pFade;
 
-                                const pZoom = Math.min(1, Math.max(0, (pCorridor - 0.35) / 0.65));
+                                const pZoom = Math.min(1, Math.max(0, (pCorridor - 0.75) / 0.25));
                                 const easeZoom = pZoom * pZoom * (3 - 2 * pZoom);
                                 const scaleVal = 0.22 + (1.0 - 0.22) * easeZoom;
 
@@ -1789,19 +1789,12 @@
         })();
 
         (() => {
-            /* ── JIT BOOT FOR CINEMATIC RING ── */
-            if (window.WildlifeJIT) {
-                window.WildlifeJIT.register('ring-cinematic', (sec) => {
-                    const vids = sec.querySelectorAll('video[data-src]');
-                    vids.forEach(v => {
-                        if (!v.src && v.dataset.src) {
-                            v.src = v.dataset.src;
-                            v.load();
-                            v.play().catch(() => {});
-                        }
-                    });
-                });
-            }
+            /* ── ENSURE CINEMATIC VIDEOS PLAY NATIVELY ── */
+            const vids = document.querySelectorAll('#ring-cinematic video');
+            vids.forEach(v => {
+                v.muted = true;
+                v.play().catch(() => { });
+            });
 
             /* ── CINEMATIC RING LOGIC ── */
             const cinematicRing = document.getElementById('cinematic-ring-disc');
@@ -1957,7 +1950,7 @@
             /* ── WEB WORKER OFFLOADING FOR MAGNETIC TEXT MATH ── */
             let physicsWorker = null;
             if (window.Worker) {
-                try { physicsWorker = new Worker('physics.worker.js'); } catch (e) {}
+                try { physicsWorker = new Worker('physics.worker.js'); } catch (e) { }
             }
 
             if (physicsWorker) {
